@@ -1,0 +1,380 @@
+/* ─── Reset ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+ul,
+ol {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* ─── Body ─── */
+body {
+  font-family: "Cairo", sans-serif;
+  color: #fff;
+  min-height: 100vh;
+  padding: 40px 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ══════════════════════════════════════
+       MIDNIGHT SKY BACKGROUND
+    ══════════════════════════════════════ */
+.sky-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: #050505;
+  overflow: hidden;
+}
+
+/* Stars */
+.stars {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+  pointer-events: none;
+}
+.stars-1 {
+  background-image:
+    radial-gradient(1px 1px at 10% 10%, #fff, transparent),
+    radial-gradient(1px 1px at 30% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 50% 50%, #fff, transparent),
+    radial-gradient(1px 1px at 70% 30%, #fff, transparent),
+    radial-gradient(1px 1px at 90% 10%, #fff, transparent),
+    radial-gradient(1px 1px at 15% 60%, #fff, transparent),
+    radial-gradient(1px 1px at 45% 80%, #fff, transparent),
+    radial-gradient(1px 1px at 80% 75%, #fff, transparent),
+    radial-gradient(1px 1px at 60% 45%, #fff, transparent),
+    radial-gradient(1px 1px at 25% 90%, #fff, transparent);
+  background-size: 200px 200px;
+  animation: twinkle 3s ease-in-out infinite;
+}
+.stars-2 {
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 40%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 60% 85%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 85% 65%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 40% 15%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 75% 30%, #fff, transparent);
+  background-size: 300px 300px;
+  animation: twinkle 5s ease-in-out infinite 1s;
+}
+.stars-3 {
+  background-image:
+    radial-gradient(2px 2px at 40% 70%, #fff, transparent),
+    radial-gradient(2px 2px at 10% 80%, #fff, transparent),
+    radial-gradient(2px 2px at 80% 40%, #fff, transparent),
+    radial-gradient(2px 2px at 55% 20%, #fff, transparent);
+  background-size: 400px 400px;
+  animation: twinkle 7s ease-in-out infinite 2s;
+}
+
+/* Moon */
+.moon {
+  position: absolute;
+  top: 12%;
+  right: 10%;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 14px 14px 0 0 #fdfbd3;
+  filter: drop-shadow(0 0 18px rgba(253, 251, 211, 0.45));
+}
+
+/* Meteors */
+.meteor {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  pointer-events: none;
+}
+.meteor::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, #fff, transparent);
+}
+.m1 {
+  top: 8%;
+  left: 110%;
+  animation: shoot 8s linear infinite;
+}
+.m2 {
+  top: 28%;
+  left: 110%;
+  animation: shoot 12s linear infinite 4s;
+}
+.m3 {
+  top: 55%;
+  left: 110%;
+  animation: shoot 10s linear infinite 2s;
+}
+
+/* ─── Animations ─── */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+@keyframes shoot {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-35deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  15% {
+    transform: translateX(-1500px) translateY(1000px) rotate(-35deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-1500px) translateY(1000px) rotate(-35deg);
+    opacity: 0;
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ══════════════════════════════════════
+       LAYOUT
+    ══════════════════════════════════════ */
+.container {
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ══════════════════════════════════════
+       GLASS CARD — shared
+    ══════════════════════════════════════ */
+.glass-card {
+  background: rgba(0, 150, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 1.5rem;
+  padding: 2rem 1.75rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(0, 240, 255, 0.1);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.glass-card:hover {
+  border-color: rgba(0, 240, 255, 0.5);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.65),
+    0 0 30px rgba(0, 240, 255, 0.25);
+}
+
+/* ══════════════════════════════════════
+       PROFILE CARD
+    ══════════════════════════════════════ */
+.profile-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  animation: float 4s ease-in-out infinite;
+}
+
+.profile-image {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0, 240, 255, 0.5);
+  box-shadow:
+    0 0 0 6px rgba(0, 240, 255, 0.08),
+    0 8px 25px rgba(0, 240, 255, 0.2);
+}
+
+.profile-card h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.profile-card .role {
+  font-size: 0.85rem;
+  color: #00f0ff;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+.profile-card .location {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.profile-card .stack {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Links inside profile ── */
+.links-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1.25rem;
+  width: 100%;
+}
+
+.link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  background: rgba(5, 5, 5, 0.6);
+  transition: all 0.3s ease;
+  width: 100%;
+}
+.link-btn:hover {
+  background: #00f0ff;
+  color: #050505;
+  border-color: #00f0ff;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+/* ══════════════════════════════════════
+       OCCASION SECTION
+    ══════════════════════════════════════ */
+.occasion-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.occasion-title {
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: center;
+  color: #fbbf24;
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
+  margin-bottom: 4px;
+}
+
+
+.occasion-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(5, 5, 5, 0.6);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  transition: all 0.3s ease;
+  width: 100%;
+}
+.occasion-link:hover {
+  background: #00f0ff;
+  color: #050505;
+  border-color: #00f0ff;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+/* ══════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════ */
+footer {
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 20px;
+  border-top: 1px solid rgba(0, 240, 255, 0.12);
+}
+footer p {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Mobile fine-tune ── */
+@media (max-width: 480px) {
+  body {
+    padding: 24px 14px;
+  }
+  .glass-card {
+    padding: 1.5rem 1.25rem;
+  }
+  .profile-card h1 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-card {
+    animation: none;
+  }
+  .stars-1,
+  .stars-2,
+  .stars-3 {
+    animation: none;
+  }
+  .meteor {
+    display: none;
+  }
+}
+
+
+

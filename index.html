@@ -1,464 +1,186 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
+    <link rel="stylesheet" href="style.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>خُطَي | منصة سيرة النبي ﷺ وأصحابه</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="icon" href="./khatti_logo.png" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>محمد أحمد حلمي | مبرمج فرونت اند | أبونجاح</title>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "محمد أحمد حلمي",
+      "url": "https://mohamedahmedhelmyaboura-485a0.web.app/"
+    }
+    </script>
+
+    <meta
+      name="description"
+      content="محمد أحمد حلمي السيد أحمد عابورة — مبرمج فرونت اند محترف من أبونجاح. متخصص في HTML وCSS وJavaScript وReact وبناء تجارب ويب سريعة وجذابة."
+    />
+    <meta
+      name="keywords"
+      content="محمد أحمد حلمي, مبرمج فرونت اند, أبونجاح, front end developer, HTML CSS JavaScript, React developer, مطور ويب, برمجة مواقع"
+    />
+    <meta name="author" content="محمد أحمد حلمي" />
+    <meta name="robots" content="index, follow" />
+
+    <link
+      rel="canonical"
+      href="https://mohamedahmedhelmyaboura-485a0.web.app/"
+    />
+    <link rel="icon" type="image/jpeg" href="2.jpg" />
+    <link rel="apple-touch-icon" href="2.jpg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ar_EG" />
+    <meta property="og:site_name" content="محمد أحمد حلمي" />
+    <meta property="og:title" content="محمد أحمد حلمي | مبرمج فرونت اند" />
+    <meta
+      property="og:description"
+      content="مبرمج فرونت اند محترف من أبونجاح."
+    />
+    <meta
+      property="og:url"
+      content="https://mohamedahmedhelmyaboura-485a0.web.app/"
+    />
+    <meta property="og:image" content="2.jpg" />
+    <link rel="preload" as="image" href="2.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <meta name="theme-color" content="#050505" />
   </head>
+
   <body>
+    <div class="sky-bg">
+      <div class="stars stars-1"></div>
+      <div class="stars stars-2"></div>
+      <div class="stars stars-3"></div>
+      <div class="meteor m1"></div>
+      <div class="meteor m2"></div>
+      <div class="meteor m3"></div>
+      <div class="moon"></div>
+    </div>
+
     <div class="container">
-      <nav>
-        <img src="./الصور/khatti_logo.png" alt="logo" />
+      <div class="glass-card profile-card">
+        <img src="2.jpg" alt="صورة محمد أحمد حلمي" class="profile-image" />
+        <h1>Mohamed Ahmed Helmy</h1>
+        <span class="role">Front-End Web Developer</span>
+        <span class="stack">Python · HTML · CSS · JavaScript</span>
+        <span class="location"
+          ><i
+            class="fas fa-map-marker-alt"
+            style="color: #00f0ff; margin-left: 4px"
+          ></i
+          >مصر — الشرقية — الزقازيق — أبونجاح</span
+        >
 
-        <input type="checkbox" id="menu-check" class="menu-check" />
-
-        <label for="menu-check" class="menu-toggle" aria-label="تفتيح القائمة">
-          <span></span>
-          <span></span>
-          <span></span>
-        </label>
-
-        <ul class="nav-links">
-          <li><a href="#chapters">الفصول</a></li>
-          <li><a href="#companions">الصحابة</a></li>
-          <li><a href="#about">عن المنصة</a></li>
-          <li><a href="#developer">عن المطور</a></li>
-        </ul>
-      </nav>
-
-      <header>
-        <div class="hero-frame">
-          <span class="eyebrow">سيرة المصطفى ﷺ وأصحابه الكرام</span>
-          <h1 class="hero-title">
-            خُطَي
-            <span>سطورٌ من نورٍ، تروي سيرة خير البشر</span>
-          </h1>
-          <p class="hero-sub">
-            منصة لقراءة سيرة النبي محمد ﷺ وصحابته الكرام رضي الله عنهم، عبر فصول
-            مفصّلة تأخذك من المولد الشريف إلى رحلة الدعوة والهجرة وبناء الأمة.
-          </p>
-          <div class="hero-cta">
-            <a href="#chapters" class="btn">ابدأ القراءة</a>
-            <a href="#developer" class="btn outline">عن المطور</a>
-          </div>
-        </div>
-      </header>
-
-      <section id="chapters">
-        <div class="section-head">
-          <span class="tag">فهرس السيرة</span>
-          <h2>فصول السيرة النبوية</h2>
-          <p>
-            تسلسل زمني لأهم محطات سيرة النبي ﷺ، من المولد إلى الهجرة، اختر فصلاً
-            لقراءته كاملاً.
-          </p>
-        </div>
-
-        <div class="chapters-grid">
-          <a href="#ch1" class="chapter-card">
-            <span class="num">الباب الأول</span>
-            <h3>المولد والنشأة</h3>
-            <p>
-              مولد النبي ﷺ في مكة المكرمة، ونشأته في بيئة بدأت بفقدان الأب
-              والأم، وكفالة جده ثم عمه أبي طالب.
-            </p>
-            <span class="read">قراءة الفصل ←</span>
+        <div class="links-section">
+          <a
+            href="https://khuta-psi.vercel.app/"
+            class="link-btn khuta"
+            target="_blank"
+          >
+            <i class="fas fa-pen-nib"></i> منصة خطي
           </a>
-
-          <a href="#ch2" class="chapter-card">
-            <span class="num">الباب الثاني</span>
-            <h3>الصادق الأمين</h3>
-            <p>
-              شبابه ﷺ بين قريش، اشتهاره بالصدق والأمانة، وزواجه من السيدة خديجة
-              رضي الله عنها.
-            </p>
-            <span class="read">قراءة الفصل ←</span>
+          <a
+            href="https://basma-eta.vercel.app"
+            class="link-btn basma"
+            target="_blank"
+          >
+            <i class="fas fa-building"></i> شركة بصمة
           </a>
-
-          <a href="#ch3" class="chapter-card">
-            <span class="num">الباب الثالث</span>
-            <h3>البعثة ونزول الوحي</h3>
-            <p>
-              تحنّثه ﷺ في غار حراء، ولحظة نزول الوحي الأول، وبداية الرسالة
-              الخاتمة.
-            </p>
-            <span class="read">قراءة الفصل ←</span>
+          <a
+            href="https://gamepatchhub88.github.io/M-TECH1/"
+            class="link-btn projects"
+            target="_blank"
+          >
+            <i class="fas fa-folder-open"></i> مشاريع الشخصية
           </a>
-
-          <a href="#ch4" class="chapter-card">
-            <span class="num">الباب الرابع</span>
-            <h3>الدعوة في مكة</h3>
-            <p>
-              مرحلة الدعوة السرية ثم العلنية، وموقف قريش، وثبات الصحابة الأوائل
-              على الإيمان.
-            </p>
-            <span class="read">قراءة الفصل ←</span>
+          <a
+            href="https://m-tech-chats.web.app/"
+            class="link-btn mtech"
+            target="_blank"
+          >
+            <i class="fas fa-comments"></i> M-TECH Chats
           </a>
-
-          <a href="#ch5" class="chapter-card">
-            <span class="num">الباب الخامس</span>
-            <h3>الهجرة إلى المدينة</h3>
-            <p>
-              رحلة الهجرة النبوية، ودخول المدينة المنورة، وتأسيس أول مجتمع
-              إسلامي.
-            </p>
-            <span class="read">قراءة الفصل ←</span>
-          </a>
-
-          <a href="#ch6" class="chapter-card">
-            <span class="num">الباب السادس</span>
-            <h3>الصحابة الكرام</h3>
-            <p>
-              نظرة على نخبة من صحابة النبي ﷺ، أدوارهم في الدعوة، وما تركوه من
-              قدوة وأثر.
-            </p>
-            <span class="read">قراءة الفصل ←</span>
-          </a>
-        </div>
-      </section>
-
-      <section id="articles">
-        <article class="chapter-article" id="ch1">
-          <span class="badge">الباب الأول</span>
-          <h3>المولد والنشأة</h3>
-          <div class="meta-line">مكة المكرمة — عام الفيل</div>
-          <div class="content">
-            <p>
-              وُلد النبي محمد ﷺ في مكة المكرمة، في عام عُرف بـ"عام الفيل"، لأبيه
-              عبد الله بن عبد المطلب الذي توفي قبل ولادته، فنشأ يتيم الأب. كانت
-              ولادته في بيت بني هاشم، أحد بطون قريش الكبرى، وهو البيت المعروف
-              بالشرف والمكانة بين العرب.
-            </p>
-            <p>
-              أرضعته السيدة حليمة السعدية في البادية كما كانت عادة قريش في إرسال
-              أبنائهم للرضاعة عند البدو، فنشأ في بيئة تتميز بصفاء اللغة وقوة
-              البنية. وبعد عودته إلى مكة، توفيت والدته آمنة بنت وهب وهو في
-              السادسة من عمره، فكُفل بعدها من جده عبد المطلب.
-            </p>
-            <blockquote>
-              "ووجدك يتيماً فآوى" — إشارة إلى رعاية الله له منذ نشأته الأولى.
-            </blockquote>
-            <p>
-              بعد وفاة جده، انتقلت كفالته إلى عمه أبي طالب، الذي أحاطه برعايته
-              وحمايته، وظل سنداً له طوال حياته حتى بعد بدء الدعوة، رغم بقائه على
-              دين قومه.
-            </p>
-          </div>
-          <div class="islamic-audio-container">
-            <p class="audio-title">الاستماع إلى المقطع</p>
-            <audio src="./الأصوات/1.mp3" controls class="custom-audio"></audio>
-          </div>
-          <a href="#chapters" class="back-link">العودة إلى الفهرس ↑</a>
-        </article>
-
-        <article class="chapter-article" id="ch2">
-          <span class="badge">الباب الثاني</span>
-          <h3>الصادق الأمين</h3>
-          <div class="meta-line">مكة المكرمة — قبل البعثة</div>
-          <div class="content">
-            <p>
-              نشأ محمد ﷺ بين أهل مكة معروفاً بصدقه وأمانته، حتى لُقّب بـ"الصادق
-              الأمين" قبل أن يُبعث بالرسالة. عمل في رعي الأغنام، ثم في التجارة،
-              وكان يرافق عمه أبا طالب في رحلات التجارة إلى الشام، فاكتسب خبرة
-              واسعة في التعامل مع الناس.
-            </p>
-            <p>
-              ذاع صيت أمانته بين تجار مكة، حتى عرضت عليه السيدة خديجة بنت خويلد،
-              وهي من كبار تجار مكة، أن يخرج بتجارتها إلى الشام نظير أجر مضاعف،
-              فحقق في تلك الرحلة ربحاً كبيراً وأمانة لافتة أثارت إعجابها.
-            </p>
-            <blockquote>
-              ثقة الناس بصدقه وأمانته كانت تمهيداً لثقتهم برسالته فيما بعد.
-            </blockquote>
-            <p>
-              تزوج النبي ﷺ من السيدة خديجة رضي الله عنها، وكانت أول من آمن به
-              وصدّقه عند بدء الوحي، وظلت سنداً له في أصعب سنوات الدعوة الأولى
-              حتى وفاتها.
-            </p>
-          </div>
-          <div class="islamic-audio-container">
-            <p class="audio-title">الاستماع إلى المقطع</p>
-            <audio src="./الأصوات/2.mp3" controls class="custom-audio"></audio>
-          </div>
-          <a href="#chapters" class="back-link">العودة إلى الفهرس ↑</a>
-        </article>
-
-        <article class="chapter-article" id="ch3">
-          <span class="badge">الباب الثالث</span>
-          <h3>البعثة ونزول الوحي</h3>
-          <div class="meta-line">غار حراء — بداية الرسالة</div>
-          <div class="content">
-            <p>
-              قبل البعثة، كان النبي ﷺ يتعبد ويتأمل في غار حراء، يبتعد عن صخب مكة
-              وما كان عليه قومه من عبادة الأوثان. وفي إحدى هذه الخلوات، نزل عليه
-              الملك جبريل بأول آيات من القرآن الكريم، في حادثة عُرفت ببدء الوحي.
-            </p>
-            <blockquote>
-              "اقرأ باسم ربك الذي خلق" — أول ما نزل من القرآن الكريم.
-            </blockquote>
-            <p>
-              عاد النبي ﷺ إلى بيته مرتجفاً مما رآه، فطمأنته السيدة خديجة، وأخذته
-              إلى ابن عمها ورقة بن نوفل، الذي بشّره بأنه نبي هذه الأمة، وأن ما
-              رآه هو الوحي الذي نزل على من قبله من الأنبياء.
-            </p>
-            <p>
-              كانت هذه اللحظة بداية رسالة استمرت ثلاثاً وعشرين عاماً، غيّرت وجه
-              التاريخ، وأسست لدين خاتم يجمع الناس على توحيد الله ومكارم الأخلاق.
-            </p>
-          </div>
-          <div class="islamic-audio-container">
-            <p class="audio-title">الاستماع إلى المقطع</p>
-            <audio src="./الأصوات/3.mp3" controls class="custom-audio"></audio>
-          </div>
-          <a href="#chapters" class="back-link">العودة إلى الفهرس ↑</a>
-        </article>
-
-        <article class="chapter-article" id="ch4">
-          <span class="badge">الباب الرابع</span>
-          <h3>الدعوة في مكة</h3>
-          <div class="meta-line">مكة المكرمة — سنوات الدعوة الأولى</div>
-          <div class="content">
-            <p>
-              بدأت الدعوة سرّية، حيث دعا النبي ﷺ أقرب المقربين إليه، فكان أبو
-              بكر الصديق وعلي بن أبي طالب وزيد بن حارثة وخديجة من أوائل من آمن
-              به. استمرت هذه المرحلة سنوات قليلة، يجتمع فيها المؤمنون في أماكن
-              بعيدة عن أعين قريش.
-            </p>
-            <p>
-              بعد ذلك، أُمر النبي ﷺ بإعلان الدعوة، فواجه رفضاً شديداً من زعماء
-              قريش الذين رأوا في الدعوة تهديداً لمكانتهم ومصالحهم. تعرّض
-              المسلمون الأوائل لأشكال متعددة من الأذى والمقاطعة، وصبروا على ذلك
-              صبراً عظيماً.
-            </p>
-            <blockquote>
-              "وما أرسلناك إلا رحمة للعالمين" — جوهر الرسالة وسط كل هذا
-              الابتلاء.
-            </blockquote>
-            <p>
-              ومع تصاعد الضغط، هاجر بعض المسلمين إلى الحبشة طلباً للأمان، في أول
-              هجرة في تاريخ الإسلام، بينما ظل النبي ﷺ في مكة يواصل الدعوة بصبر
-              وحكمة.
-            </p>
-          </div>
-          <div class="islamic-audio-container">
-            <p class="audio-title">الاستماع إلى المقطع</p>
-            <audio src="./الأصوات/4.mp3" controls class="custom-audio"></audio>
-          </div>
-          <a href="#chapters" class="back-link">العودة إلى الفهرس ↑</a>
-        </article>
-
-        <article class="chapter-article" id="ch5">
-          <span class="badge">الباب الخامس</span>
-          <h3>الهجرة إلى المدينة</h3>
-          <div class="meta-line">من مكة إلى يثرب</div>
-          <div class="content">
-            <p>
-              بعد سنوات من الأذى والمقاطعة في مكة، ومع تزايد إيمان أهل يثرب
-              (المدينة) بالدعوة، أُمر النبي ﷺ بالهجرة إليها. خرج برفقة أبي بكر
-              الصديق رضي الله عنه في رحلة محفوفة بالمخاطر، تخفّيا عن أعين من
-              كانوا يتعقبونهما.
-            </p>
-            <p>
-              استقبل أهل المدينة النبي ﷺ استقبالاً عظيماً، وآووه ونصروه، فعُرفوا
-              بعدها بـ"الأنصار"، في حين عُرف من هاجر معه من مكة بـ"المهاجرين".
-              أسس النبي ﷺ في المدينة أول مجتمع مسلم منظم، ووضع وثيقة تنظم
-              العلاقة بين مختلف فئات المدينة.
-            </p>
-            <blockquote>
-              بداية الهجرة كانت بداية تأسيس أمة، لا مجرد انتقال من مكان إلى آخر.
-            </blockquote>
-            <p>
-              من هذه النقطة، أصبحت المدينة المنورة مركزاً لانطلاق الدعوة
-              الإسلامية، ومنها استمرت رسالة النبي ﷺ في الانتشار حتى اكتمل الدين،
-              وعاد المسلمون فيما بعد إلى مكة فاتحين بلا قتال.
-            </p>
-          </div>
-          <div class="islamic-audio-container">
-            <p class="audio-title">الاستماع إلى المقطع</p>
-            <audio src="./الأصوات/5.mp3" controls class="custom-audio"></audio>
-          </div>
-          <a href="#chapters" class="back-link">العودة إلى الفهرس ↑</a>
-        </article>
-
-        <article class="chapter-article" id="ch6">
-          <span class="badge">الباب السادس</span>
-          <h3>الصحابة الكرام</h3>
-          <div class="meta-line">نخبة من رجال السيرة</div>
-          <div class="content">
-            <p>
-              حمل صحابة النبي ﷺ رسالته من بعده، فكانوا قدوة في الإيمان والشجاعة
-              والعدل، وفيما يلي نظرة مختصرة على أربعة من أبرزهم، وهم الخلفاء
-              الراشدون رضي الله عنهم.
-            </p>
-          </div>
-          <div class="islamic-audio-container">
-            <p class="audio-title">الاستماع إلى المقطع</p>
-            <audio src="./الأصوات/6.mp3" controls class="custom-audio"></audio>
-          </div>
-          <a href="#chapters" class="back-link">العودة إلى الفهرس ↑</a>
-        </article>
-      </section>
-
-      <section id="companions">
-        <div class="section-head">
-          <span class="tag">رجال السيرة</span>
-          <h2>الصحابة الكرام</h2>
-          <p>
-            الخلفاء الراشدون الأربعة، من أقرب الناس إلى النبي ﷺ وأكثرهم أثراً في
-            حمل الرسالة من بعده.
-          </p>
-        </div>
-
-        <div class="companions">
-          <div class="companion-tile">
-            <div class="name">أبو بكر الصديق</div>
-            <div class="title">رضي الله عنه</div>
-            <p class="desc">
-              أول من صدّق النبي ﷺ من الرجال، ولازمه في الهجرة، وأول الخلفاء
-              الراشدين.
-            </p>
-          </div>
-          <div class="companion-tile">
-            <div class="name">عمر بن الخطاب</div>
-            <div class="title">رضي الله عنه</div>
-            <p class="desc">
-              عُرف بالفاروق لشدة عدله، وفي عهده اتسعت رقعة الدولة الإسلامية
-              اتساعاً كبيراً.
-            </p>
-          </div>
-          <div class="companion-tile">
-            <div class="name">عثمان بن عفان</div>
-            <div class="title">رضي الله عنه</div>
-            <p class="desc">
-              عُرف بـ"ذو النورين"، وله فضل جمع القرآن الكريم في مصحف واحد.
-            </p>
-          </div>
-          <div class="companion-tile">
-            <div class="name">علي بن أبي طالب</div>
-            <div class="title">رضي الله عنه</div>
-            <p class="desc">
-              ابن عم النبي ﷺ وصهره، عُرف بعلمه وشجاعته وحكمته في القضاء.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section id="about">
-        <div class="section-head">
-          <span class="tag">عن المنصة</span>
-          <h2>لماذا خُطي؟</h2>
-          <p>
-            "خُطي" مساحة لقراءة سيرة النبي محمد ﷺ وأصحابه الكرام بأسلوب مبسّط
-            ومرتب، يربط القارئ بسطور من تاريخ مليء بالعِبر والقدوة، فصلاً بعد
-            فصل.
-          </p>
-        </div>
-      </section>
-
-      <section id="developer">
-        <div class="section-head">
-          <span class="tag">من نحن</span>
-          <h2>المطوّر</h2>
-          <p>الشخص الذي بنى هذه المنصة وصممها</p>
-        </div>
-        <div class="dev-card">
-          <div class="dev-img-wrap">
-            <img src="./الصور/1.jpg" alt="محمد أحمد حلمي" />
-            <div class="dev-img-ring"></div>
-          </div>
-          <div class="dev-info">
-            <div class="dev-name">محمد أحمد حلمي</div>
-            <div class="dev-role">
-              Front-End Developer &amp; Python / CustomTkinter
-            </div>
-            <p class="dev-bio">
-              مطوّر مهتم ببناء تجارب رقمية أنيقة وواضحة، جمع في هذه المنصة بين
-              شغفه بالبرمجة وحبّه لسيرة النبي ﷺ وصحبه الكرام.
-            </p>
-            <div class="dev-stack">
-              <span class="stack-badge">HTML &amp; CSS</span>
-              <span class="stack-badge">JavaScript</span>
-              <span class="stack-badge">Python</span>
-              <span class="stack-badge">CustomTkinter</span>
-            </div>
-            <div class="dev-meta">
-              <span class="dev-date">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                تاريخ الإصدار: 12 يونيو 2026
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <footer>
-        <div class="brand">خُطي</div>
-        <p class="footer-tagline">منصة لسيرة النبي ﷺ وأصحابه الكرام</p>
-
-        <div class="footer-socials">
           <a
             href="https://www.youtube.com/@M-Tech11_dev"
+            class="link-btn youtube"
             target="_blank"
-            class="social-link yt"
-            aria-label="YouTube"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"
-              />
-            </svg>
-          </a>
-          <a
-            href="https://www.facebook.com/mohamed.dev27"
-            target="_blank"
-            class="social-link fb"
-            aria-label="Facebook"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.27h3.32l-.53 3.5h-2.79V24C19.61 23.1 24 18.1 24 12.07z"
-              />
-            </svg>
+            <i class="fab fa-youtube"></i> YouTube
           </a>
           <a
             href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/"
+            class="link-btn linkedin"
             target="_blank"
-            class="social-link li"
-            aria-label="LinkedIn"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.59 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM3.56 20.45h3.55V9H3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"
-              />
-            </svg>
+            <i class="fab fa-linkedin-in"></i> LinkedIn
           </a>
           <a
-            href="https://wa.me/201110742678"
+            href="https://www.facebook.com/mohamed.dev27"
+            class="link-btn facebook"
             target="_blank"
-            class="social-link wa"
-            aria-label="WhatsApp"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.65.07a8.17 8.17 0 0 1-2.4-1.48 9 9 0 0 1-1.66-2.07c-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.03 1-1.03 2.45s1.06 2.84 1.2 3.04c.15.2 2.08 3.18 5.04 4.46.7.3 1.25.49 1.68.62.7.22 1.34.19 1.85.12.56-.08 1.73-.71 1.97-1.39.25-.68.25-1.26.17-1.39-.07-.12-.27-.2-.57-.34zM12.05 21.8h-.02a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26C2.15 6.57 6.66 2.1 12.07 2.1a9.82 9.82 0 0 1 6.98 2.9 9.79 9.79 0 0 1 2.88 6.96c0 5.44-4.5 9.84-9.88 9.84zM20.52 3.49A11.82 11.82 0 0 0 12.06 0C5.47 0 .1 5.37.1 11.97c0 2.1.55 4.16 1.6 5.97L0 24l6.22-1.63a11.93 11.93 0 0 0 5.83 1.48h.01c6.6 0 11.96-5.37 11.96-11.97 0-3.2-1.24-6.2-3.5-8.39z"
-              />
-            </svg>
+            <i class="fab fa-facebook-f"></i> Facebook
+          </a>
+          <a
+            href="https://github.com/GamePatchhub88"
+            class="link-btn github"
+            target="_blank"
+          >
+            <i class="fab fa-github"></i> GitHub
           </a>
         </div>
+      </div>
+
+      <div class="glass-card occasion-card">
+        <h2 class="occasion-title">زاوية شهر رمضان المبارك 🌙</h2>
+        <a
+          href="https://gamepatchhub88.github.io/Ramadan-Mubarak/"
+          class="occasion-link"
+          target="_blank"
+        >
+          <i class="fas fa-hands-praying"></i>
+          <span>أدعية في شهر رمضان المبارك</span>
+        </a>
+      </div>
+
+      <div class="glass-card occasion-card">
+        <h2 class="occasion-title">زاوية عيد الفطر المبارك 🌙</h2>
+        <a
+          href="https://gamepatchhub88.github.io/-----/"
+          class="occasion-link"
+          target="_blank"
+        >
+          <i class="fas fa-praying-hands"></i>
+          <span>أدعية في عيد الفطر المبارك</span>
+        </a>
+        <a
+          href="https://gamepatchhub88.github.io/m/"
+          class="occasion-link"
+          target="_blank"
+        >
+          <i class="fas fa-star-and-crescent"></i>
+          <span>تهنئة عيد الفطر باسمي</span>
+        </a>
+      </div>
+
+      <footer>
+        <p>© 2026 Mohamed Ahmed Helmy · جميع الحقوق محفوظة</p>
       </footer>
     </div>
   </body>

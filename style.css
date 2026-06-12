@@ -376,19 +376,5 @@ footer p {
   }
 }
 
-.container{
-  opacity: 1;
-  animation: anim 1s;
-}
-@keyframes anim {
-  0%{
-    opacity: 0;
-    transform: translateX(20rem);
-  }
-  50%{
-    opacity: 0.5;
-  }
-  100%{
-    opacity: 1;
-  }
-}
+
+

@@ -9,12 +9,12 @@
     <title>محمد أحمد حلمي | مبرمج فرونت اند | أبونجاح</title>
 
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "محمد أحمد حلمي",
-      "url": "https://mohamedahmedhelmi.vercel.app/"
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "محمد أحمد حلمي",
+        "url": "https://mohamedahmedhelmi.vercel.app/"
+      }
     </script>
 
     <meta
@@ -28,10 +28,7 @@
     <meta name="author" content="محمد أحمد حلمي" />
     <meta name="robots" content="index, follow" />
 
-    <link
-      rel="canonical"
-      href="https://mohamedahmedhelmi.vercel.app/"
-    />
+    <link rel="canonical" href="https://mohamedahmedhelmi.vercel.app/" />
     <link rel="icon" type="image/jpeg" href="2.jpg" />
     <link rel="apple-touch-icon" href="2.jpg" />
 
@@ -43,10 +40,7 @@
       property="og:description"
       content="مبرمج فرونت اند محترف من أبونجاح."
     />
-    <meta
-      property="og:url"
-      content="https://mohamedahmedhelmi.vercel.app/"
-    />
+    <meta property="og:url" content="https://mohamedahmedhelmi.vercel.app/" />
     <meta property="og:image" content="2.jpg" />
     <link rel="preload" as="image" href="2.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -60,128 +54,768 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
     <meta name="theme-color" content="#050505" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              ink: "#070a10",
+              panel: "#0d121c",
+              panel2: "#121826",
+              line: "#1c2433",
+              cyan: "#00e5c7",
+              cyanDim: "#0a8f7f",
+              amber: "#ffb454",
+              muted: "#7c8aa3",
+              fog: "#cfd8e6",
+            },
+            fontFamily: {
+              tajawal: ["Tajawal", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="styles.css" />
   </head>
-
-  <body>
-    <div class="sky-bg">
-      <div class="stars stars-1"></div>
-      <div class="stars stars-2"></div>
-      <div class="stars stars-3"></div>
-      <div class="meteor m1"></div>
-      <div class="meteor m2"></div>
-      <div class="meteor m3"></div>
-      <div class="moon"></div>
-    </div>
-
-    <div class="container">
-      <div class="glass-card profile-card">
-        <img src="2.jpg" alt="صورة محمد أحمد حلمي" class="profile-image" />
-        <h1>Mohamed Ahmed Helmy</h1>
-        <span class="role">Front-End Web Developer</span>
-        <span class="stack">Python · HTML · CSS · JavaScript</span>
-        <span class="location"
-          ><i
-            class="fas fa-map-marker-alt"
-            style="color: #00f0ff; margin-left: 4px"
-          ></i
-          >مصر — الشرقية — الزقازيق — أبونجاح</span
+  <body class="bg-ink text-fog antialiased">
+    <nav
+      class="sticky top-0 w-full bg-ink/90 backdrop-blur-md z-50 border-b border-line"
+    >
+      <div
+        class="container mx-auto px-6 py-4 flex justify-between items-center"
+      >
+        <a href="#home" class="mono text-xl font-bold text-cyan"
+          >&gt;_ BA<span class="blink">_</span></a
         >
+        <div class="hidden md:flex items-center gap-8 text-sm text-fog/90">
+          <a href="#home" class="nav-link hover:text-cyan transition-colors"
+            >الرئيسية</a
+          >
+          <a href="#about" class="nav-link hover:text-cyan transition-colors"
+            >نبذة عني</a
+          >
+          <a href="#skills" class="nav-link hover:text-cyan transition-colors"
+            >المهارات</a
+          >
+          <a href="#design" class="nav-link hover:text-cyan transition-colors"
+            >التصميم</a
+          >
+          <a href="#projects" class="nav-link hover:text-cyan transition-colors"
+            >أعمالي</a
+          >
+          <a href="#why" class="nav-link hover:text-cyan transition-colors"
+            >ليه أنا</a
+          >
+          <a href="#contact" class="nav-link hover:text-cyan transition-colors"
+            >تواصل</a
+          >
+        </div>
+        <a
+          href="https://wa.me/201110742678"
+          target="_blank"
+          class="hidden md:flex items-center gap-2 px-4 py-2 rounded-md border border-cyan/40 text-cyan text-sm hover:bg-cyan hover:text-ink transition-colors mono"
+        >
+          <i class="fab fa-whatsapp"></i> تواصل الآن
+        </a>
+      </div>
+    </nav>
 
-        <div class="links-section">
-          <a
-            href="https://khuta-psi.vercel.app/"
-            class="link-btn khuta"
-            target="_blank"
+    <section
+      id="home"
+      class="relative min-h-[90vh] flex items-center grid-texture overflow-hidden border-b border-line"
+    >
+      <div class="absolute inset-0 pointer-events-none">
+        <div
+          class="absolute -top-32 -right-32 w-96 h-96 bg-cyan/10 rounded-full blur-3xl"
+        ></div>
+        <div
+          class="absolute bottom-0 left-0 w-72 h-72 bg-amber/5 rounded-full blur-3xl"
+        ></div>
+        <div class="scanline absolute left-0 right-0 top-1/3"></div>
+      </div>
+
+      <div
+        class="container mx-auto px-6 py-24 relative z-10 grid md:grid-cols-5 gap-12 items-center"
+      >
+        <div class="md:col-span-3">
+          <div
+            class="inline-flex items-center gap-2 mono badge text-cyan border border-cyan/30 rounded-full px-3 py-1 mb-6"
           >
-            <i class="fas fa-pen-nib"></i> منصة خطي
-          </a>
-          <a
-            href="https://basma-eta.vercel.app"
-            class="link-btn basma"
-            target="_blank"
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan"></span>
+            AVAILABLE_FOR_WORK
+          </div>
+
+          <div class="mono text-cyan/70 text-sm mb-3 type-line">Mohamed</div>
+
+          <h1
+            class="text-4xl md:text-6xl font-black mb-5 text-white leading-tight"
           >
-            <i class="fas fa-building"></i> شركة بصمة
-          </a>
-          <a
-            href="https://gamepatchhub88.github.io/M-TECH1/"
-            class="link-btn projects"
-            target="_blank"
+            محمد أحمد حلمي
+            <span
+              class="block mono text-xl md:text-2xl text-muted mt-2 tracking-wide"
+              >Mohamed Ahmed Helmy</span
+            >
+            <span
+              class="block text-2xl md:text-3xl font-medium text-cyan glow-text mt-3"
+              >مطوّر واجهات أمامية</span
+            >
+          </h1>
+
+          <p
+            class="text-base md:text-lg text-muted leading-relaxed max-w-xl mb-10"
           >
-            <i class="fas fa-folder-open"></i> مشاريع الشخصية
-          </a>
-          <a
-            href="https://mtechchats.vercel.app/"
-            class="link-btn mtech"
-            target="_blank"
+            أبني مواقع ويب عربية سريعة وواضحة، وأقترب من كل مشروع بعين أمنية
+            تحرص على حماية المستخدم لا فقط على شكل الواجهة. شغوف بالأمن
+            السيبراني، وأتعامل مع كل سطر كود وكأنه يحتاج لتدقيق.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4">
+            <a
+              href="https://wa.me/201110742678"
+              target="_blank"
+              class="relative px-6 py-3 rounded-md bg-cyan text-ink font-bold hover:brightness-110 transition-all flex items-center gap-2"
+            >
+              <i class="fab fa-whatsapp text-lg"></i> تواصل عبر واتساب
+            </a>
+            <a
+              href="#projects"
+              class="px-6 py-3 rounded-md border border-line text-fog font-bold hover:border-cyan hover:text-cyan transition-all flex items-center gap-2 mono text-sm"
+            >
+              عرض الأعمال <i class="fas fa-arrow-left"></i>
+            </a>
+          </div>
+
+          <div class="flex gap-6 mt-12 text-xl text-muted">
+            <a
+              href="https://wa.me/201110742678"
+              target="_blank"
+              class="hover:text-cyan transition-all"
+              ><i class="fab fa-whatsapp"></i
+            ></a>
+            <a
+              href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/"
+              target="_blank"
+              class="hover:text-cyan transition-all"
+              ><i class="fab fa-linkedin"></i
+            ></a>
+            <a
+              href="https://www.facebook.com/mohamed.dev27"
+              target="_blank"
+              class="hover:text-cyan transition-all"
+              ><i class="fab fa-facebook"></i
+            ></a>
+          </div>
+        </div>
+
+        <div class="md:col-span-2">
+          <div
+            class="corner-frame bg-panel border border-line rounded-xl overflow-hidden shadow-2xl"
           >
-            <i class="fas fa-comments"></i> M-TECH Chats
-          </a>
-          <a
-            href="https://www.youtube.com/@M-Tech11_dev"
-            class="link-btn youtube"
-            target="_blank"
-          >
-            <i class="fab fa-youtube"></i> YouTube
-          </a>
-          <a
-            href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/"
-            class="link-btn linkedin"
-            target="_blank"
-          >
-            <i class="fab fa-linkedin-in"></i> LinkedIn
-          </a>
-          <a
-            href="https://www.facebook.com/mohamed.dev27"
-            class="link-btn facebook"
-            target="_blank"
-          >
-            <i class="fab fa-facebook-f"></i> Facebook
-          </a>
-          <a
-            href="https://github.com/GamePatchhub88"
-            class="link-btn github"
-            target="_blank"
-          >
-            <i class="fab fa-github"></i> GitHub
-          </a>
+            <div
+              class="flex items-center gap-2 px-4 py-3 bg-panel2 border-b border-line"
+            >
+              <span class="w-3 h-3 rounded-full bg-red-500/70"></span>
+              <span class="w-3 h-3 rounded-full bg-amber/70"></span>
+              <span class="w-3 h-3 rounded-full bg-cyan/70"></span>
+              <span class="mono text-xs text-muted mr-2">profile.sh</span>
+            </div>
+            <div class="p-5 mono text-sm leading-7 text-fog/90">
+              <p><span class="text-cyan">$</span> cat profile.json</p>
+              <p class="text-muted">{</p>
+              <p class="pr-4">
+                <span class="text-amber">"name"</span>:
+                <span class="text-cyan">"Mohammad Ahmed Helmy"</span>,
+              </p>
+              <p class="pr-4">
+                <span class="text-amber">"role"</span>:
+                <span class="text-cyan">"Front-End Developer"</span>,
+              </p>
+              <p class="pr-4">
+                <span class="text-amber">"focus"</span>: [<span
+                  class="text-cyan"
+                  >"Web"</span
+                >, <span class="text-cyan">"Security"</span>],
+              </p>
+              <p class="pr-4">
+                <span class="text-amber">"location"</span>:
+                <span class="text-cyan">"Egypt"</span>,
+              </p>
+              <p class="pr-4">
+                <span class="text-amber">"status"</span>:
+                <span class="text-cyan">"open_to_work"</span>
+              </p>
+              <p class="text-muted">}</p>
+              <p class="mt-3">
+                <span class="text-cyan">$</span> <span class="blink">▌</span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="glass-card occasion-card">
-        <h2 class="occasion-title">زاوية شهر رمضان المبارك 🌙</h2>
-        <a
-          href="https://gamepatchhub88.github.io/Ramadan-Mubarak/"
-          class="occasion-link"
-          target="_blank"
-        >
-          <i class="fas fa-hands-praying"></i>
-          <span>أدعية في شهر رمضان المبارك</span>
-        </a>
+    <div class="border-b border-line bg-panel/60">
+      <div
+        class="container mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+      >
+        <div>
+          <div class="mono text-3xl md:text-4xl font-bold text-cyan">+15</div>
+          <div class="text-xs md:text-sm text-muted mt-1">مشروع تم تسليمه</div>
+        </div>
+        <div>
+          <div class="mono text-3xl md:text-4xl font-bold text-cyan">100%</div>
+          <div class="text-xs md:text-sm text-muted mt-1">التزام بالمواعيد</div>
+        </div>
+        <div>
+          <div class="mono text-3xl md:text-4xl font-bold text-cyan">
+            &lt;1h
+          </div>
+          <div class="text-xs md:text-sm text-muted mt-1">متوسط زمن الرد</div>
+        </div>
+        <div>
+          <div class="mono text-3xl md:text-4xl font-bold text-cyan">24/7</div>
+          <div class="text-xs md:text-sm text-muted mt-1">دعم بعد التسليم</div>
+        </div>
       </div>
-
-      <div class="glass-card occasion-card">
-        <h2 class="occasion-title">زاوية عيد الفطر المبارك 🌙</h2>
-        <a
-          href="https://gamepatchhub88.github.io/-----/"
-          class="occasion-link"
-          target="_blank"
-        >
-          <i class="fas fa-praying-hands"></i>
-          <span>أدعية في عيد الفطر المبارك</span>
-        </a>
-        <a
-          href="https://gamepatchhub88.github.io/m/"
-          class="occasion-link"
-          target="_blank"
-        >
-          <i class="fas fa-star-and-crescent"></i>
-          <span>تهنئة عيد الفطر باسمي</span>
-        </a>
-      </div>
-
-      <footer>
-        <p>© 2026 Mohamed Ahmed Helmy · جميع الحقوق محفوظة</p>
-      </footer>
     </div>
+
+    <section id="about" class="py-24 border-b border-line relative">
+      <div class="container mx-auto px-6 max-w-6xl">
+        <div class="mb-16">
+          <span class="mono badge text-cyan">// ABOUT</span>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
+            نبذة عني
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-5 gap-12 items-start">
+          <div class="md:col-span-2">
+            <p class="text-fog/90 leading-loose text-base">
+              أنا محمد أحمد حلمي، مطوّر واجهات أمامية من مصر، بدأت رحلتي في
+              البرمجة من شغفي ببناء أشياء يستخدمها الناس فعلاً. أعمل بشكل أساسي
+              على مواقع عربية كاملة الاتجاه (RTL) باستخدام HTML وCSS
+              وJavaScript، من المتاجر الإلكترونية إلى المواقع التعريفية
+              والتطبيقات التفاعلية.
+            </p>
+            <p class="text-fog/90 leading-loose text-base mt-4">
+              إلى جانب التطوير، أبني مساري في الأمن السيبراني خطوة بخطوة: من
+              أساسيات الشبكات ولينكس، إلى أدوات مثل Wireshark وNmap وBurp Suite،
+              استعدادًا لشهادة Security+ والعمل كمحلل أمني. هذه الخلفية تخلي
+              تركيزي مختلف شوية كمطوّر: مش بس "هل الموقع شغال؟" لكن كمان "هل
+              الموقع آمن؟".
+            </p>
+          </div>
+
+          <div class="md:col-span-3 grid sm:grid-cols-2 gap-5">
+            <div class="bg-panel border border-line rounded-2xl p-6 card-hover">
+              <div class="mono text-cyan text-2xl mb-3">01</div>
+              <h3 class="font-bold text-white mb-2">تطوير دقيق</h3>
+              <p class="text-sm text-muted leading-relaxed">
+                كود نظيف، واجهات متجاوبة، واهتمام بأدق التفاصيل في كل شاشة.
+              </p>
+            </div>
+            <div class="bg-panel border border-line rounded-2xl p-6 card-hover">
+              <div class="mono text-cyan text-2xl mb-3">02</div>
+              <h3 class="font-bold text-white mb-2">عقلية أمنية</h3>
+              <p class="text-sm text-muted leading-relaxed">
+                أبني مع وضع الثغرات الشائعة في الاعتبار، مش كفكرة لاحقة.
+              </p>
+            </div>
+            <div class="bg-panel border border-line rounded-2xl p-6 card-hover">
+              <div class="mono text-cyan text-2xl mb-3">03</div>
+              <h3 class="font-bold text-white mb-2">محتوى عربي</h3>
+              <p class="text-sm text-muted leading-relaxed">
+                خبرة فعلية في بناء واجهات RTL ومحتوى عربي معقّد بسلاسة.
+              </p>
+            </div>
+            <div class="bg-panel border border-line rounded-2xl p-6 card-hover">
+              <div class="mono text-cyan text-2xl mb-3">04</div>
+              <h3 class="font-bold text-white mb-2">جاهز للعمل</h3>
+              <p class="text-sm text-muted leading-relaxed">
+                متاح للمشاريع الحرة، وأتواصل بوضوح من أول بريف للتسليم.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="py-24 border-b border-line bg-panel/40">
+      <div class="container mx-auto px-6 max-w-6xl">
+        <div class="mb-16">
+          <span class="mono badge text-cyan">// SKILLS</span>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
+            المهارات التقنية
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-12">
+          <div>
+            <h3 class="mono text-sm text-cyan mb-6 flex items-center gap-2">
+              <i class="fas fa-code"></i> FRONT-END
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div
+                class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
+              >
+                <i class="fab fa-html5 text-2xl text-orange-400"></i
+                ><span class="font-medium text-sm">HTML5 / CSS3</span>
+              </div>
+              <div
+                class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
+              >
+                <i class="fab fa-js text-2xl text-yellow-400"></i
+                ><span class="font-medium text-sm">JavaScript</span>
+              </div>
+              <div
+                class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
+              >
+                <i class="fas fa-wind text-2xl text-cyan"></i
+                ><span class="font-medium text-sm">Tailwind CSS</span>
+              </div>
+              <div
+                class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
+              >
+                <i class="fas fa-mobile-screen text-2xl text-cyan"></i
+                ><span class="font-medium text-sm">تصميم متجاوب</span>
+              </div>
+              <div
+                class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
+              >
+                <i class="fas fa-language text-2xl text-cyan"></i
+                ><span class="font-medium text-sm">واجهات RTL</span>
+              </div>
+              <div
+                class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
+              >
+                <i class="fas fa-bolt text-2xl text-amber"></i
+                ><span class="font-medium text-sm">PWA Apps</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="mono text-sm text-amber mb-6 flex items-center gap-2">
+              <i class="fas fa-user-shield"></i> SECURITY & IT
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div
+                class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
+              >
+                <i class="fas fa-shield-halved text-2xl text-red-400"></i
+                ><span class="font-medium text-sm">Penetration Testing</span>
+              </div>
+              <div
+                class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
+              >
+                <i class="fas fa-certificate text-2xl text-amber"></i
+                ><span class="font-medium text-sm">Security+ (مسار)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="design" class="py-24 border-b border-line">
+      <div class="container mx-auto px-6 max-w-6xl">
+        <div class="mb-16">
+          <span class="mono badge text-cyan">// DESIGN</span>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
+            التصميم
+          </h2>
+          <p class="text-muted mt-3 max-w-xl">
+            مش بس بطوّر، كمان بصمم الهوية البصرية اللي حوالين المنتج: من اللوجو
+            لحد التفاصيل المتحركة.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-7">
+          <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
+            <div
+              class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
+            >
+              <i class="fas fa-pen-nib"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">تصميم لوجو</h3>
+            <p class="text-sm text-muted leading-relaxed">
+              بناء هوية بصرية مميزة لعلامتك التجارية، بشكل بسيط وقابل للتذكر
+              ويشتغل على كل المقاسات.
+            </p>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
+            <div
+              class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
+            >
+              <i class="fas fa-film"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">تصميم انترو</h3>
+            <p class="text-sm text-muted leading-relaxed">
+              مقدمات بصرية متحركة لموقعك أو تطبيقك، تدي أول انطباع احترافي من
+              اللحظة الأولى.
+            </p>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
+            <div
+              class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
+            >
+              <i class="fas fa-shapes"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">تصميم Canvas</h3>
+            <p class="text-sm text-muted leading-relaxed">
+              رسومات وتفاعلات مبنية بـ Canvas، من مشاركة صور مخصصة لحد عناصر
+              رسومية حية داخل الموقع.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="why" class="py-24 border-b border-line bg-panel/40">
+      <div class="container mx-auto px-6 max-w-6xl">
+        <div class="mb-16">
+          <span class="mono badge text-cyan">// WHY ME</span>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
+            ليه تشتغل معايا؟
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-7">
+          <div
+            class="bg-panel border border-line rounded-2xl p-7 card-hover flex gap-5"
+          >
+            <div
+              class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
+            >
+              <i class="fas fa-handshake"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white mb-1.5">أمانة في التعامل</h3>
+              <p class="text-sm text-muted leading-relaxed">
+                مواعيد واضحة، أسعار صريحة، ومفيش مفاجآت في الآخر. كلمتي عندي
+                مسؤولية.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="bg-panel border border-line rounded-2xl p-7 card-hover flex gap-5"
+          >
+            <div
+              class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
+            >
+              <i class="fas fa-shield-halved"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white mb-1.5">موقع آمن من الأساس</h3>
+              <p class="text-sm text-muted leading-relaxed">
+                خلفيتي في الأمن السيبراني بتخليني أبني وأنا واخد بالي من الثغرات
+                الشائعة من البداية.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="bg-panel border border-line rounded-2xl p-7 card-hover flex gap-5"
+          >
+            <div
+              class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
+            >
+              <i class="fas fa-bullseye"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white mb-1.5">تركيز على هدف المشروع</h3>
+              <p class="text-sm text-muted leading-relaxed">
+                مش بصمم عشان "يبان شكله حلو" بس، لكن عشان يخدم هدفك ويشد عملاءك
+                فعلاً.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="bg-panel border border-line rounded-2xl p-7 card-hover flex gap-5"
+          >
+            <div
+              class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
+            >
+              <i class="fas fa-comments"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-white mb-1.5">تواصل مستمر</h3>
+              <p class="text-sm text-muted leading-relaxed">
+                بتعرف ايه اللي بيحصل في مشروعك أول بأول، من البداية لحد التسليم.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-16 grid md:grid-cols-3 gap-6">
+          <div
+            class="corner-frame bg-panel2 border border-line rounded-2xl p-6"
+          >
+            <p class="text-fog leading-loose text-base mb-3">
+              ﴿إِنَّ اللَّهَ يَأْمُرُكُمْ أَن تُؤَدُّوا الْأَمَانَاتِ إِلَىٰ
+              أَهْلِهَا﴾
+            </p>
+            <span class="mono badge text-cyan">سورة النساء - ٥٨</span>
+          </div>
+          <div
+            class="corner-frame bg-panel2 border border-line rounded-2xl p-6"
+          >
+            <p class="text-fog leading-loose text-base mb-3">
+              ﴿وَفِي السَّمَاءِ رِزْقُكُمْ وَمَا تُوعَدُونَ﴾
+            </p>
+            <span class="mono badge text-cyan">سورة الذاريات - ٢٢</span>
+          </div>
+          <div
+            class="corner-frame bg-panel2 border border-line rounded-2xl p-6"
+          >
+            <p class="text-fog leading-loose text-base mb-3">
+              ﴿وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا ۝ وَيَرْزُقْهُ مِنْ
+              حَيْثُ لَا يَحْتَسِبُ﴾
+            </p>
+            <span class="mono badge text-cyan">سورة الطلاق - ٢-٣</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="py-24 border-b border-line">
+      <div class="container mx-auto px-6 max-w-6xl">
+        <div class="mb-16">
+          <span class="mono badge text-cyan">// PROJECTS</span>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
+            أحدث أعمالي
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-7">
+          <div
+            class="group rounded-2xl overflow-hidden bg-panel border border-line card-hover"
+          >
+            <div
+              class="h-44 bg-panel2 flex items-center justify-center relative overflow-hidden"
+            >
+              <div class="absolute inset-0 grid-texture opacity-40"></div>
+              <i class="fas fa-mosque text-5xl text-cyan/70 relative z-10"></i>
+            </div>
+            <div class="p-6">
+              <span class="mono badge text-amber">WEB APP · PWA</span>
+              <h3 class="text-xl font-bold mt-2 mb-2 text-white">منصة خُطي</h3>
+              <p class="text-sm text-muted leading-relaxed">
+                موقع إسلامي فيه سيرة النبي وأصحابه , مع امكانية الاستماع الي
+                الصوت
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="group rounded-2xl overflow-hidden bg-panel border border-line card-hover"
+          >
+            <div
+              class="h-44 bg-panel2 flex items-center justify-center relative overflow-hidden"
+            >
+              <div class="absolute inset-0 grid-texture opacity-40"></div>
+              <i
+                class="fas fa-user-circle text-5xl text-cyan/70 relative z-10"
+              ></i>
+            </div>
+            <div class="p-6">
+              <span class="mono badge text-amber">WEB APP · PWA</span>
+              <h3 class="text-xl font-bold mt-2 mb-2 text-white">Ah Stack</h3>
+              <p class="text-sm text-muted leading-relaxed">
+                مدونة شخصية لأحد العملاء , فيها مقالات وامكانية التواصل مع صاحب
+                المدونة
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="process" class="py-24 border-b border-line bg-panel/40">
+      <div class="container mx-auto px-6 max-w-6xl">
+        <div class="mb-16">
+          <span class="mono badge text-cyan">// PROCESS</span>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
+            إزاي بنشتغل سوا
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-4 gap-6">
+          <div
+            class="relative bg-panel border border-line rounded-2xl p-6 card-hover"
+          >
+            <div class="mono text-cyan text-3xl font-bold mb-4">01</div>
+            <h3 class="font-bold text-white mb-2">نتكلم عن فكرتك</h3>
+            <p class="text-sm text-muted leading-relaxed">
+              تبعتلي تفاصيل مشروعك على واتساب، ونحدد الهدف والمطلوب بالظبط.
+            </p>
+          </div>
+          <div
+            class="relative bg-panel border border-line rounded-2xl p-6 card-hover"
+          >
+            <div class="mono text-cyan text-3xl font-bold mb-4">02</div>
+            <h3 class="font-bold text-white mb-2">عرض سعر وخطة</h3>
+            <p class="text-sm text-muted leading-relaxed">
+              بستلم سعر واضح وميعاد تسليم محدد، من غير أي تكاليف مخفية.
+            </p>
+          </div>
+          <div
+            class="relative bg-panel border border-line rounded-2xl p-6 card-hover"
+          >
+            <div class="mono text-cyan text-3xl font-bold mb-4">03</div>
+            <h3 class="font-bold text-white mb-2">تصميم وتطوير</h3>
+            <p class="text-sm text-muted leading-relaxed">
+              بشتغل على مشروعك مع تحديثات أول بأول عشان تتابع الشغل لحظة بلحظة.
+            </p>
+          </div>
+          <div
+            class="relative bg-panel border border-line rounded-2xl p-6 card-hover"
+          >
+            <div class="mono text-cyan text-3xl font-bold mb-4">04</div>
+            <h3 class="font-bold text-white mb-2">تسليم ومتابعة</h3>
+            <p class="text-sm text-muted leading-relaxed">
+              بستلم موقعك جاهز، ومتاح للدعم والتعديلات حتى بعد التسليم.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="testimonials" class="py-24 border-b border-line">
+      <div class="container mx-auto px-6 max-w-6xl">
+        <div class="mb-16">
+          <span class="mono badge text-cyan">// TESTIMONIALS</span>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
+            آراء العملاء
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-7">
+          <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
+            <div class="flex gap-1 text-amber mb-4 text-sm">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i>
+            </div>
+            <p class="text-sm text-fog/90 leading-relaxed mb-5">
+              "تعامل محترف من أول يوم، وسلّم الموقع في الميعاد بالظبط زي ما
+              اتفقنا. تواصل واضح طول الوقت."
+            </p>
+            <div class="flex items-center gap-3">
+              <div
+                class="w-9 h-9 rounded-full bg-cyan/15 border border-cyan/30 flex items-center justify-center text-cyan text-xs font-bold"
+              >
+                صم
+              </div>
+              <div>
+                <div class="text-sm font-bold text-white">
+                  صاحب المدونة الشخصية
+                </div>
+                <div class="text-xs text-muted">عميل — المدونة الشخصية</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="py-24 relative overflow-hidden">
+      <div class="absolute inset-0 pointer-events-none">
+        <div
+          class="absolute top-0 right-1/3 w-96 h-96 bg-cyan/10 rounded-full blur-3xl"
+        ></div>
+      </div>
+      <div class="container mx-auto px-6 max-w-3xl text-center relative z-10">
+        <div
+          class="inline-flex items-center gap-2 mono badge text-cyan border border-cyan/30 rounded-full px-3 py-1 mb-6"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse"></span>
+          الأماكن محدودة هذا الشهر
+        </div>
+        <span class="mono badge text-cyan block">// CONTACT</span>
+        <h2 class="text-3xl md:text-4xl font-black text-white mt-2 mb-6">
+          لنبدأ مشروعك القادم
+        </h2>
+        <p class="text-muted mb-10 leading-relaxed">
+          محتاج موقع احترافي وآمن لمشروعك أو شركتك؟ تواصل معايا دلوقتي، واستشارة
+          أول مرة مجانًا قبل ما تقرر.
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-4 mb-8">
+          <a
+            href="https://wa.me/201110742678"
+            target="_blank"
+            class="px-7 py-3.5 rounded-md bg-cyan text-ink font-bold hover:brightness-110 transition-all flex items-center gap-2"
+          >
+            <i class="fab fa-whatsapp text-lg"></i> واتساب
+          </a>
+          <a
+            href="mailto:mh3976698@gmail.com"
+            class="px-7 py-3.5 rounded-md border border-line text-fog font-bold hover:border-cyan hover:text-cyan transition-all flex items-center gap-2 mono text-sm"
+          >
+            <i class="fas fa-envelope text-cyan"></i> mh3976698@gmail.com
+          </a>
+        </div>
+        <div
+          class="flex flex-wrap items-center justify-center gap-6 text-xs text-muted mono"
+        >
+          <span class="flex items-center gap-1.5"
+            ><i class="fas fa-check text-cyan"></i> استشارة مجانية</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><i class="fas fa-check text-cyan"></i> رد خلال ساعة</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><i class="fas fa-check text-cyan"></i> دعم بعد التسليم</span
+          >
+        </div>
+      </div>
+    </section>
+
+    <footer class="py-8 bg-panel border-t border-line text-center">
+      <div class="flex justify-center gap-6 text-muted mb-4 text-lg">
+        <a
+          href="https://wa.me/201110742678"
+          target="_blank"
+          class="hover:text-cyan transition-colors"
+          ><i class="fab fa-whatsapp"></i
+        ></a>
+        <a
+          href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/"
+          target="_blank"
+          class="hover:text-cyan transition-colors"
+          ><i class="fab fa-linkedin"></i
+        ></a>
+        <a
+          href="https://www.facebook.com/mohamed.dev27"
+          target="_blank"
+          class="hover:text-cyan transition-colors"
+          ><i class="fab fa-facebook"></i
+        ></a>
+      </div>
+      <p class="mono text-xs text-muted tracking-widest">
+        © 2026 Mohamed Ahmed Helmy — built with care.
+      </p>
+    </footer>
+
+    <script>
+      const reveals = document.querySelectorAll("section");
+      reveals.forEach((s) => s.classList.add("reveal"));
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) e.target.classList.add("in");
+          });
+        },
+        { threshold: 0.12 },
+      );
+      reveals.forEach((s) => io.observe(s));
+    </script>
   </body>
 </html>

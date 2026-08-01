@@ -88,6 +88,11 @@
           <a href="#projects" class="nav-link hover:text-cyan transition-colors"
             >أعمالي</a
           >
+          <a
+            href="#certificates"
+            class="nav-link hover:text-cyan transition-colors"
+            >الشهادات</a
+          >
           <a href="#why" class="nav-link hover:text-cyan transition-colors"
             >ليه أنا</a
           >
@@ -531,30 +536,12 @@
               شخصية العلامة
             </h3>
             <div class="flex flex-wrap gap-3">
-              <span
-                class="mono badge text-cyan border border-cyan/30 rounded-full px-4 py-2"
-                >احترافية</span
-              >
-              <span
-                class="mono badge text-cyan border border-cyan/30 rounded-full px-4 py-2"
-                >ودودة وسهلة التواصل</span
-              >
-              <span
-                class="mono badge text-cyan border border-cyan/30 rounded-full px-4 py-2"
-                >موثوقة</span
-              >
-              <span
-                class="mono badge text-cyan border border-cyan/30 rounded-full px-4 py-2"
-                >تهتم بالتفاصيل</span
-              >
-              <span
-                class="mono badge text-cyan border border-cyan/30 rounded-full px-4 py-2"
-                >مبتكرة</span
-              >
-              <span
-                class="mono badge text-cyan border border-cyan/30 rounded-full px-4 py-2"
-                >تركز على النتائج</span
-              >
+              <span class="pill">احترافية</span>
+              <span class="pill">ودودة وسهلة التواصل</span>
+              <span class="pill">موثوقة</span>
+              <span class="pill">تهتم بالتفاصيل</span>
+              <span class="pill">مبتكرة</span>
+              <span class="pill">تركز على النتائج</span>
             </div>
           </div>
         </div>
@@ -814,6 +801,43 @@
       </div>
     </section>
 
+    <section id="certificates" class="py-24 border-b border-line bg-panel/40">
+      <div class="container mx-auto px-6 max-w-6xl">
+        <div class="mb-16">
+          <span class="mono badge text-cyan">// CERTIFICATES</span>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
+            الشهادات
+          </h2>
+          <p class="text-muted mt-3 max-w-xl">
+            شهادات ودورات معتمدة، بتوثّق مسار التعلّم المستمر في التطوير
+            والأمن السيبراني.
+          </p>
+        </div>
+
+        <div
+          id="certificates-grid"
+          class="grid sm:grid-cols-2 md:grid-cols-3 gap-7"
+        >
+          <div class="pdf-frame">
+            <div class="cert-skeleton"></div>
+          </div>
+          <div class="pdf-frame">
+            <div class="cert-skeleton"></div>
+          </div>
+          <div class="pdf-frame">
+            <div class="cert-skeleton"></div>
+          </div>
+        </div>
+
+        <p
+          id="certificates-empty"
+          class="hidden text-center text-muted mono text-sm mt-4"
+        >
+          لا توجد شهادات مضافة حتى الآن.
+        </p>
+      </div>
+    </section>
+
     <section id="process" class="py-24 border-b border-line bg-panel/40">
       <div class="container mx-auto px-6 max-w-6xl">
         <div class="mb-16">
@@ -1018,6 +1042,56 @@
         { threshold: 0.12 },
       );
       reveals.forEach((s) => io.observe(s));
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <script>
+      async function loadCertificates() {
+        const grid = document.getElementById("certificates-grid");
+        const empty = document.getElementById("certificates-empty");
+        try {
+          const { data, error } = await supabaseClient
+            .from("certificates")
+            .select("id, name, pdf_url, created_at")
+            .order("created_at", { ascending: false });
+
+          if (error) throw error;
+
+          if (!data || data.length === 0) {
+            grid.innerHTML = "";
+            empty.classList.remove("hidden");
+            return;
+          }
+
+          grid.innerHTML = data
+            .map(
+              (cert) => `
+            <div class="rounded-2xl overflow-hidden bg-panel border border-line card-hover p-6">
+              <div class="pdf-frame mb-4">
+                <div class="pdf-inner">
+                  <iframe src="${cert.pdf_url}#toolbar=0" title="${cert.name}" loading="lazy"></iframe>
+                </div>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-3">${cert.name}</h3>
+              <a
+                href="${cert.pdf_url}"
+                target="_blank"
+                rel="noopener"
+                class="mono text-xs text-cyan hover:underline flex items-center gap-1.5"
+              >
+                فتح الشهادة كاملة <i class="fas fa-arrow-up-left"></i>
+              </a>
+            </div>`,
+            )
+            .join("");
+        } catch (err) {
+          console.error("تعذر تحميل الشهادات:", err);
+          grid.innerHTML = "";
+          empty.textContent = "تعذر تحميل الشهادات حاليًا، حاول لاحقًا.";
+          empty.classList.remove("hidden");
+        }
+      }
+      loadCertificates();
     </script>
   </body>
 </html>

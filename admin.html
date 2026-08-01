@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>لوحة التحكم | الشهادات</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <style>
+      .admin-input {
+        width: 100%;
+        background: #0d121c;
+        border: 1px solid #1c2433;
+        border-radius: 0.5rem;
+        padding: 0.7rem 0.9rem;
+        color: #cfd8e6;
+        font-family: "Tajawal", sans-serif;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s ease;
+      }
+      .admin-input:focus { border-color: #00e5c7; }
+      .admin-input::placeholder { color: #5a6579; }
+      .admin-label {
+        display: block;
+        font-size: 0.85rem;
+        color: #7c8aa3;
+        margin-bottom: 0.4rem;
+      }
+      .admin-btn {
+        background: #00e5c7;
+        color: #070a10;
+        font-weight: 700;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        transition: filter 0.2s ease;
+      }
+      .admin-btn:hover { filter: brightness(1.1); }
+      .admin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+      .admin-msg { font-size: 0.85rem; margin-top: 0.75rem; }
+      .admin-msg.ok { color: #00e5c7; }
+      .admin-msg.err { color: #f87171; }
+      .row-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.9rem 1rem;
+        border: 1px solid #1c2433;
+        border-radius: 0.6rem;
+        margin-bottom: 0.6rem;
+        background: #0d121c;
+      }
+    </style>
+  </head>
+  <body class="bg-ink text-fog antialiased">
+    <div class="container mx-auto px-6 py-16 max-w-2xl">
+      <div class="mono text-xl font-bold text-cyan mb-8">
+        &gt;_ لوحة التحكم — الشهادات
+      </div>
+
+      <!-- Login -->
+      <div id="login-box" class="bg-panel border border-line rounded-2xl p-7">
+        <h2 class="text-lg font-bold text-white mb-5">تسجيل الدخول</h2>
+        <div class="mb-4">
+          <label class="admin-label">البريد الإلكتروني</label>
+          <input
+            id="login-email"
+            type="email"
+            class="admin-input"
+            placeholder="admin@example.com"
+          />
+        </div>
+        <div class="mb-5">
+          <label class="admin-label">كلمة المرور</label>
+          <input
+            id="login-password"
+            type="password"
+            class="admin-input"
+            placeholder="••••••••"
+          />
+        </div>
+        <button id="login-btn" class="admin-btn">دخول</button>
+        <p id="login-msg" class="admin-msg"></p>
+      </div>
+
+      <!-- Panel (hidden until logged in) -->
+      <div id="panel" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <span id="user-email" class="mono text-xs text-muted"></span>
+          <button id="logout-btn" class="mono text-xs text-cyan hover:underline">
+            تسجيل الخروج
+          </button>
+        </div>
+
+        <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
+          <h2 class="text-lg font-bold text-white mb-5">إضافة شهادة جديدة</h2>
+          <div class="mb-4">
+            <label class="admin-label">اسم الشهادة</label>
+            <input
+              id="cert-name"
+              type="text"
+              class="admin-input"
+              placeholder="مثال: Security+ SY0-701"
+            />
+          </div>
+          <div class="mb-5">
+            <label class="admin-label">ملف الشهادة (PDF)</label>
+            <input
+              id="cert-file"
+              type="file"
+              accept="application/pdf"
+              class="admin-input"
+            />
+          </div>
+          <button id="add-btn" class="admin-btn">
+            <i class="fas fa-upload"></i> رفع وإضافة
+          </button>
+          <p id="add-msg" class="admin-msg"></p>
+        </div>
+
+        <div class="bg-panel border border-line rounded-2xl p-7">
+          <h2 class="text-lg font-bold text-white mb-5">الشهادات الحالية</h2>
+          <div id="cert-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <script>
+      const loginBox = document.getElementById("login-box");
+      const panel = document.getElementById("panel");
+      const loginMsg = document.getElementById("login-msg");
+      const addMsg = document.getElementById("add-msg");
+      const userEmail = document.getElementById("user-email");
+      const certList = document.getElementById("cert-list");
+
+      function showMsg(el, text, ok) {
+        el.textContent = text;
+        el.className = "admin-msg " + (ok ? "ok" : "err");
+      }
+
+      async function checkSession() {
+        const { data } = await supabaseClient.auth.getSession();
+        if (data.session) {
+          loginBox.classList.add("hidden");
+          panel.classList.remove("hidden");
+          userEmail.textContent = data.session.user.email;
+          loadCertList();
+        } else {
+          loginBox.classList.remove("hidden");
+          panel.classList.add("hidden");
+        }
+      }
+
+      document.getElementById("login-btn").addEventListener("click", async () => {
+        const email = document.getElementById("login-email").value.trim();
+        const password = document.getElementById("login-password").value;
+        if (!email || !password) {
+          showMsg(loginMsg, "من فضلك املأ البريد وكلمة المرور", false);
+          return;
+        }
+        const { error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) {
+          showMsg(loginMsg, "خطأ في تسجيل الدخول: " + error.message, false);
+          return;
+        }
+        checkSession();
+      });
+
+      document.getElementById("logout-btn").addEventListener("click", async () => {
+        await supabaseClient.auth.signOut();
+        checkSession();
+      });
+
+      document.getElementById("add-btn").addEventListener("click", async () => {
+        const btn = document.getElementById("add-btn");
+        const name = document.getElementById("cert-name").value.trim();
+        const fileInput = document.getElementById("cert-file");
+        const file = fileInput.files[0];
+
+        if (!name || !file) {
+          showMsg(addMsg, "من فضلك اكتب اسم الشهادة واختر ملف PDF", false);
+          return;
+        }
+
+        btn.disabled = true;
+        showMsg(addMsg, "جاري الرفع...", true);
+
+        try {
+          const filePath = `${Date.now()}-${file.name}`;
+          const { error: uploadError } = await supabaseClient.storage
+            .from("certificates")
+            .upload(filePath, file, { contentType: "application/pdf" });
+          if (uploadError) throw uploadError;
+
+          const { data: publicUrlData } = supabaseClient.storage
+            .from("certificates")
+            .getPublicUrl(filePath);
+
+          const { error: insertError } = await supabaseClient
+            .from("certificates")
+            .insert({ name, pdf_url: publicUrlData.publicUrl });
+          if (insertError) throw insertError;
+
+          showMsg(addMsg, "تم إضافة الشهادة بنجاح ✅", true);
+          document.getElementById("cert-name").value = "";
+          fileInput.value = "";
+          loadCertList();
+        } catch (err) {
+          showMsg(addMsg, "حصل خطأ: " + err.message, false);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      async function loadCertList() {
+        certList.innerHTML =
+          '<p class="text-muted text-sm">جاري التحميل...</p>';
+        const { data, error } = await supabaseClient
+          .from("certificates")
+          .select("id, name, pdf_url, created_at")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          certList.innerHTML =
+            '<p class="text-red-400 text-sm">تعذر تحميل القائمة</p>';
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          certList.innerHTML =
+            '<p class="text-muted text-sm">لا توجد شهادات بعد.</p>';
+          return;
+        }
+
+        certList.innerHTML = data
+          .map(
+            (c) => `
+          <div class="row-item">
+            <div>
+              <div class="text-sm font-bold text-white">${c.name}</div>
+              <a href="${c.pdf_url}" target="_blank" class="mono text-xs text-cyan hover:underline">عرض الملف</a>
+            </div>
+            <button data-id="${c.id}" class="delete-btn mono text-xs text-red-400 hover:underline">حذف</button>
+          </div>`,
+          )
+          .join("");
+
+        document.querySelectorAll(".delete-btn").forEach((b) => {
+          b.addEventListener("click", async () => {
+            if (!confirm("متأكد من حذف الشهادة؟")) return;
+            const { error } = await supabaseClient
+              .from("certificates")
+              .delete()
+              .eq("id", b.dataset.id);
+            if (!error) loadCertList();
+          });
+        });
+      }
+
+      checkSession();
+    </script>
+  </body>
+</html>

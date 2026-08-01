@@ -396,3 +396,53 @@ a.bg-cyan:hover::before { transform: translateX(120%); }
 ::-webkit-scrollbar-track { background: #070a10; }
 ::-webkit-scrollbar-thumb { background: #1c2433; border-radius: 6px; }
 ::-webkit-scrollbar-thumb:hover { background: #00e5c7; }
+
+/* =========================================================
+   Mobile menu (hamburger)
+========================================================= */
+.menu-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid #1c2433;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  padding: 0;
+}
+.menu-btn span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #00e5c7;
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.menu-btn.open span:nth-child(2) { opacity: 0; }
+.menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  border-top: 1px solid #1c2433;
+  background: #070a10;
+}
+.mobile-menu.open { display: flex; }
+.mobile-link {
+  padding: 0.9rem 1.5rem;
+  font-size: 0.95rem;
+  color: #cfd8e6;
+  border-bottom: 1px solid #1c2433;
+}
+.mobile-link:last-child { border-bottom: none; }
+.mobile-link:hover { color: #00e5c7; background: rgba(0, 229, 199, 0.04); }
+
+@media (min-width: 768px) {
+  .menu-btn { display: none; }
+  .mobile-menu { display: none !important; }
+}

@@ -107,8 +107,38 @@
         >
           <i class="fab fa-whatsapp"></i> تواصل الآن
         </a>
+        <button
+          id="menu-toggle"
+          class="menu-btn"
+          aria-label="فتح القائمة"
+          aria-expanded="false"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      <div id="mobile-menu" class="mobile-menu">
+        <a href="#home" class="mobile-link">الرئيسية</a>
+        <a href="#about" class="mobile-link">نبذة عني</a>
+        <a href="#skills" class="mobile-link">المهارات</a>
+        <a href="#identity" class="mobile-link">الهوية</a>
+        <a href="#design" class="mobile-link">التصميم</a>
+        <a href="#projects" class="mobile-link">أعمالي</a>
+        <a href="#certificates" class="mobile-link">الشهادات</a>
+        <a href="#why" class="mobile-link">ليه أنا</a>
+        <a href="#contact" class="mobile-link">تواصل</a>
+        <a
+          href="https://wa.me/201110742678"
+          target="_blank"
+          class="mobile-link mono text-cyan"
+        >
+          <i class="fab fa-whatsapp"></i> تواصل عبر واتساب
+        </a>
       </div>
     </nav>
+
 
     <section
       id="home"
@@ -1029,6 +1059,23 @@
         © 2026 Mohamed Ahmed Helmy — built with care.
       </p>
     </footer>
+
+    <script>
+      const menuToggle = document.getElementById("menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+      menuToggle.addEventListener("click", () => {
+        const isOpen = mobileMenu.classList.toggle("open");
+        menuToggle.classList.toggle("open", isOpen);
+        menuToggle.setAttribute("aria-expanded", isOpen);
+      });
+      mobileMenu.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          mobileMenu.classList.remove("open");
+          menuToggle.classList.remove("open");
+          menuToggle.setAttribute("aria-expanded", "false");
+        });
+      });
+    </script>
 
     <script>
       const reveals = document.querySelectorAll("section");

@@ -20,175 +20,418 @@
       onload="this.media='all'"
     />
     <style>
+      body { min-height: 100vh; }
+
+      .admin-header {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        background: rgba(7, 10, 16, 0.9);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid #1c2433;
+      }
+
       .admin-input {
         width: 100%;
         background: #0d121c;
         border: 1px solid #1c2433;
-        border-radius: 0.5rem;
-        padding: 0.7rem 0.9rem;
+        border-radius: 0.6rem;
+        padding: 0.75rem 1rem;
         color: #cfd8e6;
         font-family: "Tajawal", sans-serif;
         font-size: 0.95rem;
         outline: none;
-        transition: border-color 0.2s ease;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
       }
-      .admin-input:focus { border-color: #00e5c7; }
+      .admin-input:focus {
+        border-color: #00e5c7;
+        box-shadow: 0 0 0 3px rgba(0, 229, 199, 0.12);
+      }
       .admin-input::placeholder { color: #5a6579; }
       .admin-label {
         display: block;
         font-size: 0.85rem;
         color: #7c8aa3;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.5rem;
       }
+
       .admin-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
         background: #00e5c7;
         color: #070a10;
         font-weight: 700;
+        font-size: 0.9rem;
         border: none;
-        border-radius: 0.5rem;
-        padding: 0.75rem 1.5rem;
+        border-radius: 0.6rem;
+        padding: 0.8rem 1.6rem;
         cursor: pointer;
-        transition: filter 0.2s ease;
+        transition: filter 0.2s ease, transform 0.15s ease;
       }
-      .admin-btn:hover { filter: brightness(1.1); }
-      .admin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-      .admin-msg { font-size: 0.85rem; margin-top: 0.75rem; }
-      .admin-msg.ok { color: #00e5c7; }
-      .admin-msg.err { color: #f87171; }
-      .row-item {
+      .admin-btn:hover:not(:disabled) { filter: brightness(1.1); }
+      .admin-btn:active:not(:disabled) { transform: scale(0.98); }
+      .admin-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+      .admin-btn-ghost {
+        background: transparent;
+        border: 1px solid #1c2433;
+        color: #cfd8e6;
+      }
+      .admin-btn-ghost:hover:not(:disabled) {
+        border-color: #00e5c7;
+        color: #00e5c7;
+        filter: none;
+      }
+
+      /* Drop zone */
+      .drop-zone {
+        border: 1.5px dashed #2a3345;
+        border-radius: 0.75rem;
+        background: #0d121c;
+        padding: 1.75rem 1.25rem;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s ease, background-color 0.2s ease;
+      }
+      .drop-zone:hover, .drop-zone.drag-over {
+        border-color: #00e5c7;
+        background: rgba(0, 229, 199, 0.04);
+      }
+      .drop-zone i { font-size: 1.6rem; color: #00e5c7; margin-bottom: 0.6rem; }
+      .drop-zone .dz-hint { color: #5a6579; font-size: 0.75rem; margin-top: 0.3rem; }
+      .file-chip {
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        background: #0d121c;
+        border: 1px solid #1c2433;
+        border-radius: 0.6rem;
+        padding: 0.7rem 1rem;
+        margin-top: 0.75rem;
+      }
+      .file-chip.show { display: flex; }
+      .file-chip-remove {
+        color: #f87171;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+
+      /* Toasts */
+      #toast-wrap {
+        position: fixed;
+        bottom: 1.25rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: min(92vw, 380px);
+      }
+      .toast {
+        font-size: 0.85rem;
+        padding: 0.8rem 1.1rem;
+        border-radius: 0.6rem;
+        border: 1px solid #1c2433;
+        background: #0d121c;
+        color: #cfd8e6;
+        box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.6);
+        animation: toast-in 0.25s ease;
+      }
+      .toast.ok { border-color: rgba(0, 229, 199, 0.4); color: #00e5c7; }
+      .toast.err { border-color: rgba(248, 113, 113, 0.4); color: #f87171; }
+      @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+      /* Certificate rows */
+      .cert-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
         padding: 0.9rem 1rem;
         border: 1px solid #1c2433;
-        border-radius: 0.6rem;
-        margin-bottom: 0.6rem;
+        border-radius: 0.7rem;
+        margin-bottom: 0.65rem;
         background: #0d121c;
+        transition: border-color 0.2s ease;
+      }
+      .cert-row:hover { border-color: rgba(0, 229, 199, 0.3); }
+      .cert-icon {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 0.5rem;
+        background: rgba(0, 229, 199, 0.1);
+        border: 1px solid rgba(0, 229, 199, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #00e5c7;
+        font-size: 0.9rem;
+      }
+      .order-input {
+        width: 56px;
+        text-align: center;
+        padding: 0.45rem 0.3rem;
+      }
+      .stat-chip {
+        background: #0d121c;
+        border: 1px solid #1c2433;
+        border-radius: 0.6rem;
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+        color: #7c8aa3;
+      }
+      .stat-chip b { color: #fff; font-size: 1.1rem; }
+
+      .spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(7, 10, 16, 0.3);
+        border-top-color: #070a10;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      @media (max-width: 640px) {
+        .cert-row { flex-wrap: wrap; }
       }
     </style>
   </head>
   <body class="bg-ink text-fog antialiased">
-    <div class="container mx-auto px-6 py-16 max-w-2xl">
-      <div class="mono text-xl font-bold text-cyan mb-8">
-        &gt;_ لوحة التحكم — الشهادات
-      </div>
-
-      <!-- Login -->
-      <div id="login-box" class="bg-panel border border-line rounded-2xl p-7">
-        <h2 class="text-lg font-bold text-white mb-5">تسجيل الدخول</h2>
-        <div class="mb-4">
-          <label class="admin-label">البريد الإلكتروني</label>
-          <input
-            id="login-email"
-            type="email"
-            class="admin-input"
-            placeholder="admin@example.com"
-          />
+    <!-- Login screen -->
+    <div
+      id="login-screen"
+      class="flex items-center justify-center"
+      style="min-height: 100vh"
+    >
+      <div class="w-full" style="max-width: 380px" class="px-6">
+        <div class="mono text-xl font-bold text-cyan mb-8 text-center">
+          &gt;_ لوحة التحكم<span class="blink">_</span>
         </div>
-        <div class="mb-5">
-          <label class="admin-label">كلمة المرور</label>
-          <input
-            id="login-password"
-            type="password"
-            class="admin-input"
-            placeholder="••••••••"
-          />
-        </div>
-        <button id="login-btn" class="admin-btn">دخول</button>
-        <p id="login-msg" class="admin-msg"></p>
-      </div>
-
-      <!-- Panel (hidden until logged in) -->
-      <div id="panel" class="hidden">
-        <div class="flex items-center justify-between mb-6">
-          <span id="user-email" class="mono text-xs text-muted"></span>
-          <button id="logout-btn" class="mono text-xs text-cyan hover:underline">
-            تسجيل الخروج
+        <div id="login-box" class="bg-panel border border-line rounded-2xl p-7">
+          <h2 class="text-lg font-bold text-white mb-1">تسجيل الدخول</h2>
+          <p class="text-xs text-muted mb-6">دخول مخصص لإدارة الشهادات فقط</p>
+          <div class="mb-4">
+            <label class="admin-label">البريد الإلكتروني</label>
+            <input
+              id="login-email"
+              type="email"
+              class="admin-input"
+              placeholder="admin@example.com"
+            />
+          </div>
+          <div class="mb-6">
+            <label class="admin-label">كلمة المرور</label>
+            <input
+              id="login-password"
+              type="password"
+              class="admin-input"
+              placeholder="••••••••"
+            />
+          </div>
+          <button id="login-btn" class="admin-btn w-full">
+            <i class="fas fa-right-to-bracket"></i> دخول
           </button>
         </div>
+      </div>
+    </div>
 
+    <!-- Admin panel -->
+    <div id="panel" class="hidden">
+      <header class="admin-header">
+        <div
+          class="container mx-auto px-6 py-4 flex items-center justify-between"
+        >
+          <span class="mono text-lg font-bold text-cyan"
+            >&gt;_ لوحة التحكم</span
+          >
+          <div class="flex items-center gap-4">
+            <span id="user-email" class="mono text-xs text-muted hidden md:flex"></span>
+            <button id="logout-btn" class="admin-btn-ghost admin-btn">
+              <i class="fas fa-right-from-bracket"></i> خروج
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="container mx-auto px-6 py-10 max-w-3xl">
+        <div class="flex items-center gap-3 mb-8">
+          <span class="stat-chip">
+            إجمالي الشهادات: <b id="cert-count">0</b>
+          </span>
+        </div>
+
+        <!-- Add certificate -->
         <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
-          <h2 class="text-lg font-bold text-white mb-5">إضافة شهادة جديدة</h2>
-          <div class="mb-4">
+          <h2 class="text-lg font-bold text-white mb-1">إضافة شهادة جديدة</h2>
+          <p class="text-xs text-muted mb-6">
+            الاسم اللي هتكتبه هو اللي هيظهر للزوار في الموقع
+          </p>
+
+          <div class="mb-5">
             <label class="admin-label">اسم الشهادة</label>
             <input
               id="cert-name"
               type="text"
               class="admin-input"
-              placeholder="مثال: Security+ SY0-701"
+              placeholder="مثال: شهادة إتمام دورة HTML Fundamentals"
             />
           </div>
-          <div class="mb-5">
+
+          <div class="mb-2">
             <label class="admin-label">ملف الشهادة (PDF)</label>
-            <input
-              id="cert-file"
-              type="file"
-              accept="application/pdf"
-              class="admin-input"
-            />
+            <div id="drop-zone" class="drop-zone">
+              <i class="fas fa-cloud-arrow-up"></i>
+              <div class="text-sm text-fog/90">
+                اسحب ملف الـ PDF هنا أو دوس للاختيار
+              </div>
+              <div class="dz-hint">PDF فقط — حتى 10MB</div>
+              <input id="cert-file" type="file" accept="application/pdf" hidden />
+            </div>
+            <div id="file-chip" class="file-chip">
+              <div class="flex items-center gap-2 mono text-xs text-fog/90" style="overflow: hidden">
+                <i class="fas fa-file-pdf text-cyan"></i>
+                <span id="file-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"></span>
+                <span id="file-size" class="text-muted"></span>
+              </div>
+              <button id="file-remove" class="file-chip-remove" type="button">
+                <i class="fas fa-xmark"></i>
+              </button>
+            </div>
           </div>
-          <button id="add-btn" class="admin-btn">
+
+          <button id="add-btn" class="admin-btn mt-5">
             <i class="fas fa-upload"></i> رفع وإضافة
           </button>
-          <p id="add-msg" class="admin-msg"></p>
         </div>
 
+        <!-- List -->
         <div class="bg-panel border border-line rounded-2xl p-7">
-          <h2 class="text-lg font-bold text-white mb-2">الشهادات الحالية</h2>
+          <h2 class="text-lg font-bold text-white mb-1">الشهادات الحالية</h2>
           <p class="text-xs text-muted mb-5">
-            الرقم الأصغر يظهر أول. اكتب رقم الترتيب اللي تحبه لكل شهادة، ودوس
-            "حفظ الترتيب".
+            الرقم الأصغر يظهر أول في الموقع. عدّل الرقم ودوس أيقونة الحفظ.
           </p>
           <div id="cert-list"></div>
         </div>
-      </div>
+      </main>
     </div>
+
+    <div id="toast-wrap"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="supabase-config.js"></script>
     <script>
-      const loginBox = document.getElementById("login-box");
+      const loginScreen = document.getElementById("login-screen");
       const panel = document.getElementById("panel");
-      const loginMsg = document.getElementById("login-msg");
-      const addMsg = document.getElementById("add-msg");
       const userEmail = document.getElementById("user-email");
       const certList = document.getElementById("cert-list");
+      const certCount = document.getElementById("cert-count");
 
-      function showMsg(el, text, ok) {
+      const dropZone = document.getElementById("drop-zone");
+      const fileInput = document.getElementById("cert-file");
+      const fileChip = document.getElementById("file-chip");
+      const fileNameEl = document.getElementById("file-name");
+      const fileSizeEl = document.getElementById("file-size");
+
+      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+      function toast(text, ok = true) {
+        const wrap = document.getElementById("toast-wrap");
+        const el = document.createElement("div");
+        el.className = "toast " + (ok ? "ok" : "err");
         el.textContent = text;
-        el.className = "admin-msg " + (ok ? "ok" : "err");
+        wrap.appendChild(el);
+        setTimeout(() => el.remove(), 3800);
       }
+
+      function formatSize(bytes) {
+        return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+      }
+
+      function setSelectedFile(file) {
+        if (!file) return;
+        if (file.type !== "application/pdf") {
+          toast("الملف لازم يكون PDF فقط", false);
+          fileInput.value = "";
+          return;
+        }
+        if (file.size > MAX_SIZE) {
+          toast("حجم الملف أكبر من 10MB", false);
+          fileInput.value = "";
+          return;
+        }
+        fileNameEl.textContent = file.name;
+        fileSizeEl.textContent = "· " + formatSize(file.size);
+        fileChip.classList.add("show");
+      }
+
+      dropZone.addEventListener("click", () => fileInput.click());
+      dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("drag-over");
+      });
+      dropZone.addEventListener("dragleave", () =>
+        dropZone.classList.remove("drag-over"),
+      );
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("drag-over");
+        const file = e.dataTransfer.files[0];
+        if (file) {
+          fileInput.files = e.dataTransfer.files;
+          setSelectedFile(file);
+        }
+      });
+      fileInput.addEventListener("change", () => setSelectedFile(fileInput.files[0]));
+      document.getElementById("file-remove").addEventListener("click", (e) => {
+        e.stopPropagation();
+        fileInput.value = "";
+        fileChip.classList.remove("show");
+      });
 
       async function checkSession() {
         const { data } = await supabaseClient.auth.getSession();
         if (data.session) {
-          loginBox.classList.add("hidden");
+          loginScreen.classList.add("hidden");
           panel.classList.remove("hidden");
           userEmail.textContent = data.session.user.email;
           loadCertList();
         } else {
-          loginBox.classList.remove("hidden");
+          loginScreen.classList.remove("hidden");
           panel.classList.add("hidden");
         }
       }
 
       document.getElementById("login-btn").addEventListener("click", async () => {
+        const btn = document.getElementById("login-btn");
         const email = document.getElementById("login-email").value.trim();
         const password = document.getElementById("login-password").value;
         if (!email || !password) {
-          showMsg(loginMsg, "من فضلك املأ البريد وكلمة المرور", false);
+          toast("من فضلك املأ البريد وكلمة المرور", false);
           return;
         }
+        btn.disabled = true;
         const { error } = await supabaseClient.auth.signInWithPassword({
           email,
           password,
         });
+        btn.disabled = false;
         if (error) {
-          showMsg(loginMsg, "خطأ في تسجيل الدخول: " + error.message, false);
+          toast("خطأ في تسجيل الدخول: " + error.message, false);
           return;
         }
         checkSession();
+      });
+
+      document.getElementById("login-password").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("login-btn").click();
       });
 
       document.getElementById("logout-btn").addEventListener("click", async () => {
@@ -199,23 +442,22 @@
       document.getElementById("add-btn").addEventListener("click", async () => {
         const btn = document.getElementById("add-btn");
         const name = document.getElementById("cert-name").value.trim();
-        const fileInput = document.getElementById("cert-file");
         const file = fileInput.files[0];
 
         if (!name || !file) {
-          showMsg(addMsg, "من فضلك اكتب اسم الشهادة واختر ملف PDF", false);
+          toast("من فضلك اكتب اسم الشهادة واختر ملف PDF", false);
           return;
         }
 
         btn.disabled = true;
-        showMsg(addMsg, "جاري الرفع...", true);
+        btn.innerHTML = '<span class="spinner"></span> جاري الرفع...';
 
         try {
           const ext = file.name.split(".").pop().toLowerCase();
-          const safeName = `cert-${Date.now()}-${Math.random()
+          const filePath = `cert-${Date.now()}-${Math.random()
             .toString(36)
             .slice(2, 8)}.${ext}`;
-          const filePath = safeName;
+
           const { error: uploadError } = await supabaseClient.storage
             .from("certificates")
             .upload(filePath, file, { contentType: "application/pdf" });
@@ -235,17 +477,23 @@
 
           const { error: insertError } = await supabaseClient
             .from("certificates")
-            .insert({ name, pdf_url: publicUrlData.publicUrl, order_index: nextOrder });
+            .insert({
+              name,
+              pdf_url: publicUrlData.publicUrl,
+              order_index: nextOrder,
+            });
           if (insertError) throw insertError;
 
-          showMsg(addMsg, "تم إضافة الشهادة بنجاح ✅", true);
+          toast("تم إضافة الشهادة بنجاح ✅", true);
           document.getElementById("cert-name").value = "";
           fileInput.value = "";
+          fileChip.classList.remove("show");
           loadCertList();
         } catch (err) {
-          showMsg(addMsg, "حصل خطأ: " + err.message, false);
+          toast("حصل خطأ: " + err.message, false);
         } finally {
           btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-upload"></i> رفع وإضافة';
         }
       });
 
@@ -264,6 +512,8 @@
           return;
         }
 
+        certCount.textContent = data ? data.length : 0;
+
         if (!data || data.length === 0) {
           certList.innerHTML =
             '<p class="text-muted text-sm">لا توجد شهادات بعد.</p>';
@@ -273,23 +523,27 @@
         certList.innerHTML = data
           .map(
             (c) => `
-          <div class="row-item">
-            <div class="flex items-center gap-3">
+          <div class="cert-row">
+            <div class="flex items-center gap-3" style="min-width: 0">
+              <div class="cert-icon"><i class="fas fa-file-pdf"></i></div>
               <input
                 type="number"
                 data-id="${c.id}"
                 class="order-input admin-input"
-                style="width:64px;text-align:center;padding:0.4rem"
                 value="${c.order_index}"
               />
-              <div>
-                <div class="text-sm font-bold text-white">${c.name}</div>
+              <div style="min-width: 0">
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${c.name}</div>
                 <a href="${c.pdf_url}" target="_blank" class="mono text-xs text-cyan hover:underline">عرض الملف</a>
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <button data-id="${c.id}" class="save-order-btn mono text-xs text-cyan hover:underline">حفظ الترتيب</button>
-              <button data-id="${c.id}" class="delete-btn mono text-xs text-red-400 hover:underline">حذف</button>
+              <button data-id="${c.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem">
+                <i class="fas fa-floppy-disk"></i>
+              </button>
+              <button data-id="${c.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
+                <i class="fas fa-trash"></i>
+              </button>
             </div>
           </div>`,
           )
@@ -302,7 +556,12 @@
               .from("certificates")
               .delete()
               .eq("id", b.dataset.id);
-            if (!error) loadCertList();
+            if (!error) {
+              toast("تم الحذف", true);
+              loadCertList();
+            } else {
+              toast("تعذر الحذف: " + error.message, false);
+            }
           });
         });
 
@@ -312,7 +571,7 @@
             const input = document.querySelector(`.order-input[data-id="${id}"]`);
             const newOrder = parseInt(input.value, 10);
             if (isNaN(newOrder)) {
-              alert("اكتب رقم صحيح");
+              toast("اكتب رقم صحيح", false);
               return;
             }
             const { error } = await supabaseClient
@@ -320,9 +579,10 @@
               .update({ order_index: newOrder })
               .eq("id", id);
             if (error) {
-              alert("حصل خطأ: " + error.message);
+              toast("حصل خطأ: " + error.message, false);
               return;
             }
+            toast("تم حفظ الترتيب", true);
             loadCertList();
           });
         });

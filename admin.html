@@ -135,7 +135,11 @@
         </div>
 
         <div class="bg-panel border border-line rounded-2xl p-7">
-          <h2 class="text-lg font-bold text-white mb-5">الشهادات الحالية</h2>
+          <h2 class="text-lg font-bold text-white mb-2">الشهادات الحالية</h2>
+          <p class="text-xs text-muted mb-5">
+            الرقم الأصغر يظهر أول. اكتب رقم الترتيب اللي تحبه لكل شهادة، ودوس
+            "حفظ الترتيب".
+          </p>
           <div id="cert-list"></div>
         </div>
       </div>
@@ -268,19 +272,25 @@
 
         certList.innerHTML = data
           .map(
-            (c, i) => `
+            (c) => `
           <div class="row-item">
-            <div class="flex items-center gap-2">
-              <div class="flex flex-col gap-1">
-                <button data-id="${c.id}" data-dir="up" class="move-btn mono text-xs text-cyan hover:underline" ${i === 0 ? "disabled style='opacity:.3;cursor:default'" : ""}>▲</button>
-                <button data-id="${c.id}" data-dir="down" class="move-btn mono text-xs text-cyan hover:underline" ${i === data.length - 1 ? "disabled style='opacity:.3;cursor:default'" : ""}>▼</button>
-              </div>
+            <div class="flex items-center gap-3">
+              <input
+                type="number"
+                data-id="${c.id}"
+                class="order-input admin-input"
+                style="width:64px;text-align:center;padding:0.4rem"
+                value="${c.order_index}"
+              />
               <div>
                 <div class="text-sm font-bold text-white">${c.name}</div>
                 <a href="${c.pdf_url}" target="_blank" class="mono text-xs text-cyan hover:underline">عرض الملف</a>
               </div>
             </div>
-            <button data-id="${c.id}" class="delete-btn mono text-xs text-red-400 hover:underline">حذف</button>
+            <div class="flex items-center gap-3">
+              <button data-id="${c.id}" class="save-order-btn mono text-xs text-cyan hover:underline">حفظ الترتيب</button>
+              <button data-id="${c.id}" class="delete-btn mono text-xs text-red-400 hover:underline">حذف</button>
+            </div>
           </div>`,
           )
           .join("");
@@ -296,28 +306,23 @@
           });
         });
 
-        document.querySelectorAll(".move-btn").forEach((b) => {
+        document.querySelectorAll(".save-order-btn").forEach((b) => {
           b.addEventListener("click", async () => {
             const id = b.dataset.id;
-            const dir = b.dataset.dir;
-            const idx = data.findIndex((c) => c.id === id);
-            const swapIdx = dir === "up" ? idx - 1 : idx + 1;
-            if (swapIdx < 0 || swapIdx >= data.length) return;
-
-            const a = data[idx];
-            const bItem = data[swapIdx];
-            const aOrder = a.order_index;
-            const bOrder = bItem.order_index;
-
-            await supabaseClient
+            const input = document.querySelector(`.order-input[data-id="${id}"]`);
+            const newOrder = parseInt(input.value, 10);
+            if (isNaN(newOrder)) {
+              alert("اكتب رقم صحيح");
+              return;
+            }
+            const { error } = await supabaseClient
               .from("certificates")
-              .update({ order_index: bOrder })
-              .eq("id", a.id);
-            await supabaseClient
-              .from("certificates")
-              .update({ order_index: aOrder })
-              .eq("id", bItem.id);
-
+              .update({ order_index: newOrder })
+              .eq("id", id);
+            if (error) {
+              alert("حصل خطأ: " + error.message);
+              return;
+            }
             loadCertList();
           });
         });

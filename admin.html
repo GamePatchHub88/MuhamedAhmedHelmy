@@ -221,9 +221,17 @@
             .from("certificates")
             .getPublicUrl(filePath);
 
+          const { data: maxRow } = await supabaseClient
+            .from("certificates")
+            .select("order_index")
+            .order("order_index", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          const nextOrder = maxRow ? maxRow.order_index + 1 : 0;
+
           const { error: insertError } = await supabaseClient
             .from("certificates")
-            .insert({ name, pdf_url: publicUrlData.publicUrl });
+            .insert({ name, pdf_url: publicUrlData.publicUrl, order_index: nextOrder });
           if (insertError) throw insertError;
 
           showMsg(addMsg, "تم إضافة الشهادة بنجاح ✅", true);
@@ -242,7 +250,8 @@
           '<p class="text-muted text-sm">جاري التحميل...</p>';
         const { data, error } = await supabaseClient
           .from("certificates")
-          .select("id, name, pdf_url, created_at")
+          .select("id, name, pdf_url, order_index, created_at")
+          .order("order_index", { ascending: true })
           .order("created_at", { ascending: false });
 
         if (error) {
@@ -259,11 +268,17 @@
 
         certList.innerHTML = data
           .map(
-            (c) => `
+            (c, i) => `
           <div class="row-item">
-            <div>
-              <div class="text-sm font-bold text-white">${c.name}</div>
-              <a href="${c.pdf_url}" target="_blank" class="mono text-xs text-cyan hover:underline">عرض الملف</a>
+            <div class="flex items-center gap-2">
+              <div class="flex flex-col gap-1">
+                <button data-id="${c.id}" data-dir="up" class="move-btn mono text-xs text-cyan hover:underline" ${i === 0 ? "disabled style='opacity:.3;cursor:default'" : ""}>▲</button>
+                <button data-id="${c.id}" data-dir="down" class="move-btn mono text-xs text-cyan hover:underline" ${i === data.length - 1 ? "disabled style='opacity:.3;cursor:default'" : ""}>▼</button>
+              </div>
+              <div>
+                <div class="text-sm font-bold text-white">${c.name}</div>
+                <a href="${c.pdf_url}" target="_blank" class="mono text-xs text-cyan hover:underline">عرض الملف</a>
+              </div>
             </div>
             <button data-id="${c.id}" class="delete-btn mono text-xs text-red-400 hover:underline">حذف</button>
           </div>`,
@@ -278,6 +293,32 @@
               .delete()
               .eq("id", b.dataset.id);
             if (!error) loadCertList();
+          });
+        });
+
+        document.querySelectorAll(".move-btn").forEach((b) => {
+          b.addEventListener("click", async () => {
+            const id = b.dataset.id;
+            const dir = b.dataset.dir;
+            const idx = data.findIndex((c) => c.id === id);
+            const swapIdx = dir === "up" ? idx - 1 : idx + 1;
+            if (swapIdx < 0 || swapIdx >= data.length) return;
+
+            const a = data[idx];
+            const bItem = data[swapIdx];
+            const aOrder = a.order_index;
+            const bOrder = bItem.order_index;
+
+            await supabaseClient
+              .from("certificates")
+              .update({ order_index: bOrder })
+              .eq("id", a.id);
+            await supabaseClient
+              .from("certificates")
+              .update({ order_index: aOrder })
+              .eq("id", bItem.id);
+
+            loadCertList();
           });
         });
       }

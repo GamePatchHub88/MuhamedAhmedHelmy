@@ -5,8 +5,12 @@ create table if not exists certificates (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   pdf_url text not null,
+  order_index integer not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- لو الجدول كان متعمل قبل كده من غير عمود order_index، شغّل السطر ده لوحده:
+-- alter table certificates add column if not exists order_index integer not null default 0;
 
 alter table certificates enable row level security;
 
@@ -20,6 +24,13 @@ using (true);
 create policy "authenticated can insert certificates"
 on certificates for insert
 to authenticated
+with check (true);
+
+-- وبس هو يقدر يعدّل (لإعادة الترتيب)
+create policy "authenticated can update certificates"
+on certificates for update
+to authenticated
+using (true)
 with check (true);
 
 -- وبس هو يقدر يحذف

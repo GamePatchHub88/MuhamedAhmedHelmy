@@ -1091,15 +1091,37 @@
       reveals.forEach((s) => io.observe(s));
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="supabase-config.js"></script>
     <script>
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+      // يرسم أول صفحة من ملف PDF على canvas ويحوّلها لصورة، يُستخدم لأي
+      // شهادة قديمة معندهاش thumbnail_url محفوظ مسبقًا
+      async function renderPdfFirstPageToImg(url, imgEl) {
+        try {
+          const pdf = await pdfjsLib.getDocument(url).promise;
+          const page = await pdf.getPage(1);
+          const viewport = page.getViewport({ scale: 1.8 });
+          const canvas = document.createElement("canvas");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext("2d");
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          imgEl.src = canvas.toDataURL("image/png");
+        } catch (err) {
+          console.error("تعذر عرض الشهادة:", url, err);
+        }
+      }
+
       async function loadCertificates() {
         const grid = document.getElementById("certificates-grid");
         const empty = document.getElementById("certificates-empty");
         try {
           const { data, error } = await supabaseClient
             .from("certificates")
-            .select("id, name, pdf_url, order_index, created_at")
+            .select("id, name, pdf_url, thumbnail_url, order_index, created_at")
             .order("order_index", { ascending: true })
             .order("created_at", { ascending: false });
 
@@ -1117,11 +1139,14 @@
             <div class="rounded-2xl overflow-hidden bg-panel border border-line card-hover p-6">
               <div class="pdf-frame mb-4">
                 <div class="pdf-inner">
-                  ${
-                    cert.thumbnail_url
-                      ? `<img src="${cert.thumbnail_url}" alt="${cert.name}" loading="lazy" style="display:block;width:100%;height:auto;" />`
-                      : `<a href="${cert.pdf_url}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;aspect-ratio:1233/945;color:#0d121c;font-weight:bold;">اضغط لعرض الشهادة</a>`
-                  }
+                  <img
+                    class="cert-img"
+                    data-pdf-url="${cert.pdf_url}"
+                    ${cert.thumbnail_url ? `src="${cert.thumbnail_url}"` : ""}
+                    alt="${cert.name}"
+                    loading="lazy"
+                    style="display:block;width:100%;height:auto;aspect-ratio:1233/945;background:#fff;"
+                  />
                 </div>
               </div>
               <h3 class="text-lg font-bold text-white mb-3">${cert.name}</h3>
@@ -1136,6 +1161,13 @@
             </div>`,
             )
             .join("");
+
+          // لأي صورة معندهاش src (يعني مفيش thumbnail_url محفوظ)، ارسم الصفحة الأولى من الـ PDF مباشرة
+          document.querySelectorAll(".cert-img").forEach((img) => {
+            if (!img.getAttribute("src")) {
+              renderPdfFirstPageToImg(img.dataset.pdfUrl, img);
+            }
+          });
         } catch (err) {
           console.error("تعذر تحميل الشهادات:", err);
           grid.innerHTML = "";

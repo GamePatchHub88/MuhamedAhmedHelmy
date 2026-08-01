@@ -1117,7 +1117,11 @@
             <div class="rounded-2xl overflow-hidden bg-panel border border-line card-hover p-6">
               <div class="pdf-frame mb-4">
                 <div class="pdf-inner">
-                  <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(cert.pdf_url)}&embedded=true" title="${cert.name}" loading="lazy"></iframe>
+                  ${
+                    cert.thumbnail_url
+                      ? `<img src="${cert.thumbnail_url}" alt="${cert.name}" loading="lazy" style="display:block;width:100%;height:auto;" />`
+                      : `<a href="${cert.pdf_url}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;aspect-ratio:1233/945;color:#0d121c;font-weight:bold;">اضغط لعرض الشهادة</a>`
+                  }
                 </div>
               </div>
               <h3 class="text-lg font-bold text-white mb-3">${cert.name}</h3>

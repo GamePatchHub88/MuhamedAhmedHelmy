@@ -326,7 +326,28 @@
     <div id="toast-wrap"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="supabase-config.js"></script>
+    <script>
+      // مكتبة pdf.js لتوليد صورة مصغّرة من أول صفحة في الشهادة
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+      async function generatePdfThumbnail(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d");
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        return new Promise((resolve) =>
+          canvas.toBlob((blob) => resolve(blob), "image/png", 0.9),
+        );
+      }
+    </script>
     <script>
       const loginScreen = document.getElementById("login-screen");
       const panel = document.getElementById("panel");
@@ -467,6 +488,26 @@
             .from("certificates")
             .getPublicUrl(filePath);
 
+          // توليد صورة مصغّرة من الشهادة عشان تشتغل على كل الأجهزة (بدل عرض الـ PDF مباشرة)
+          let thumbnailUrl = null;
+          try {
+            const thumbBlob = await generatePdfThumbnail(file);
+            const thumbPath = `thumb-${Date.now()}-${Math.random()
+              .toString(36)
+              .slice(2, 8)}.png`;
+            const { error: thumbUploadError } = await supabaseClient.storage
+              .from("certificates")
+              .upload(thumbPath, thumbBlob, { contentType: "image/png" });
+            if (!thumbUploadError) {
+              const { data: thumbUrlData } = supabaseClient.storage
+                .from("certificates")
+                .getPublicUrl(thumbPath);
+              thumbnailUrl = thumbUrlData.publicUrl;
+            }
+          } catch (thumbErr) {
+            console.error("تعذر توليد الصورة المصغّرة:", thumbErr);
+          }
+
           const { data: maxRow } = await supabaseClient
             .from("certificates")
             .select("order_index")
@@ -480,6 +521,7 @@
             .insert({
               name,
               pdf_url: publicUrlData.publicUrl,
+              thumbnail_url: thumbnailUrl,
               order_index: nextOrder,
             });
           if (insertError) throw insertError;

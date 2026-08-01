@@ -1117,7 +1117,7 @@
             <div class="rounded-2xl overflow-hidden bg-panel border border-line card-hover p-6">
               <div class="pdf-frame mb-4">
                 <div class="pdf-inner">
-                  <iframe src="${cert.pdf_url}#toolbar=0" title="${cert.name}" loading="lazy"></iframe>
+                  <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(cert.pdf_url)}&embedded=true" title="${cert.name}" loading="lazy"></iframe>
                 </div>
               </div>
               <h3 class="text-lg font-bold text-white mb-3">${cert.name}</h3>

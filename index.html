@@ -1099,19 +1099,56 @@
 
       // يرسم أول صفحة من ملف PDF على canvas ويحوّلها لصورة، يُستخدم لأي
       // شهادة قديمة معندهاش thumbnail_url محفوظ مسبقًا
+      //
+      // ملاحظة: الرسم ده تقيل على الذاكرة/المعالج، وعلى الموبايل ممكن يفشل
+      // بصمت لو الـ canvas كبير جدًا (المتصفحات بتحدد أقصى بُعد/مساحة
+      // للـ canvas، خصوصًا iOS Safari). هنا بنقلل الـ scale على الشاشات
+      // الصغيرة، وبنحدد أقصى بُعد، وبنعرض رابط بديل واضح بدل صندوق فاضي
+      // لو الرسم فشل.
       async function renderPdfFirstPageToImg(url, imgEl) {
+        const frame = imgEl.closest(".pdf-frame");
+        const timeout = (ms) =>
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("انتهت المهلة أثناء تحميل/رسم الـ PDF")), ms),
+          );
         try {
-          const pdf = await pdfjsLib.getDocument(url).promise;
+          const pdf = await Promise.race([
+            pdfjsLib.getDocument(url).promise,
+            timeout(15000),
+          ]);
           const page = await pdf.getPage(1);
-          const viewport = page.getViewport({ scale: 1.8 });
+
+          const isSmallScreen = window.innerWidth < 640;
+          let scale = isSmallScreen ? 1 : 1.8;
+          let viewport = page.getViewport({ scale });
+
+          const MAX_DIM = 3000;
+          if (viewport.width > MAX_DIM || viewport.height > MAX_DIM) {
+            const factor = MAX_DIM / Math.max(viewport.width, viewport.height);
+            scale *= factor;
+            viewport = page.getViewport({ scale });
+          }
+
           const canvas = document.createElement("canvas");
           canvas.width = viewport.width;
           canvas.height = viewport.height;
           const ctx = canvas.getContext("2d");
           await page.render({ canvasContext: ctx, viewport }).promise;
-          imgEl.src = canvas.toDataURL("image/png");
+
+          const dataUrl = canvas.toDataURL("image/png");
+          if (!dataUrl || dataUrl === "data:,") {
+            throw new Error("canvas.toDataURL رجّع قيمة فاضية");
+          }
+          imgEl.src = dataUrl;
         } catch (err) {
           console.error("تعذر عرض الشهادة:", url, err);
+          if (frame) {
+            frame.innerHTML = `
+              <a href="${url}" target="_blank" rel="noopener" class="pdf-fallback-link">
+                <i class="fas fa-file-pdf"></i>
+                <span>اضغط لعرض الشهادة</span>
+              </a>`;
+          }
         }
       }
 

@@ -354,6 +354,24 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 }
 @keyframes skeleton-move { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+.pdf-fallback-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  aspect-ratio: 1233 / 945;
+  border-radius: 0.5rem;
+  background: #f4f4f5;
+  color: #0d121c;
+  text-decoration: none;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
+}
+.pdf-fallback-link i { font-size: 2rem; color: #e5484d; }
+.pdf-fallback-link:hover { background: #e7e7ea; }
+
 .nav-link { position: relative; }
 .nav-link::after {
   content: "";

@@ -1099,12 +1099,49 @@
       reveals.forEach((s) => io.observe(s));
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
     <script src="supabase-config.js" defer></script>
     <script defer>
     document.addEventListener("DOMContentLoaded", () => {
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      // pdf.js (~1MB) كان بيتحمّل في كل زيارة للصفحة حتى لو الزائر مش
+      // هيوصل لقسم الشهادات. دلوقتي بيتحمّل مرة واحدة بس، أول لحظة
+      // يحتاجها فيها الكود فعليًا (renderPdfFirstPageToImg)، وكمان
+      // بنبدأ تحميله مبكرًا شوية قبل ما قسم الشهادات يظهر في الشاشة
+      // (rootMargin) عشان يكون جاهز أو قريب من الجاهزية لما المستخدم يوصله.
+      let pdfJsPromise = null;
+      function loadPdfJs() {
+        if (pdfJsPromise) return pdfJsPromise;
+        pdfJsPromise = new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+          script.onload = () => {
+            pdfjsLib.GlobalWorkerOptions.workerSrc =
+              "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+            resolve();
+          };
+          script.onerror = () => reject(new Error("تعذر تحميل مكتبة عرض PDF"));
+          document.head.appendChild(script);
+        });
+        return pdfJsPromise;
+      }
+
+      // نبدأ تحميل pdf.js بمجرد ما قسم الشهادات يقرب من الشاشة (600px
+      // قبل ما يظهر فعليًا)، مش لما المستخدم يوصله بالظبط — عشان
+      // يكون التحميل خلص أو شارف على الخلاص لحظة ما يشوف القسم.
+      const certificatesSection = document.getElementById("certificates");
+      if (certificatesSection) {
+        const preloadObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                loadPdfJs().catch((err) => console.error(err));
+                preloadObserver.disconnect();
+              }
+            });
+          },
+          { rootMargin: "600px 0px" },
+        );
+        preloadObserver.observe(certificatesSection);
+      }
 
       // يرسم أول صفحة من ملف PDF على canvas ويحوّلها لصورة، يُستخدم لأي
       // شهادة قديمة معندهاش thumbnail_url محفوظ مسبقًا
@@ -1121,6 +1158,7 @@
             setTimeout(() => reject(new Error("انتهت المهلة أثناء تحميل/رسم الـ PDF")), ms),
           );
         try {
+          await loadPdfJs();
           const pdf = await Promise.race([
             pdfjsLib.getDocument(url).promise,
             timeout(15000),

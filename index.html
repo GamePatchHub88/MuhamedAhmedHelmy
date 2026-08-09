@@ -44,20 +44,48 @@
     <link rel="preload" as="image" href="2.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-      media="print"
-      onload="this.media='all'"
-    />
     <meta name="theme-color" content="#050505" />
   </head>
   <body class="bg-ink text-fog antialiased">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="icon-arrow-left" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-bolt" viewBox="0 0 448 512"></symbol>
+<symbol id="icon-bullseye" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-certificate" viewBox="0 0 576 512"></symbol>
+<symbol id="icon-check" viewBox="0 0 448 512"></symbol>
+<symbol id="icon-code" viewBox="0 0 576 512"></symbol>
+<symbol id="icon-comments" viewBox="0 0 576 512"></symbol>
+<symbol id="icon-compass" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-envelope" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-file-pdf" viewBox="0 0 576 512"></symbol>
+<symbol id="icon-film" viewBox="0 0 448 512"></symbol>
+<symbol id="icon-handshake" viewBox="0 0 576 512"></symbol>
+<symbol id="icon-headset" viewBox="0 0 448 512"></symbol>
+<symbol id="icon-language" viewBox="0 0 576 512"></symbol>
+<symbol id="icon-lightbulb" viewBox="0 0 384 512"></symbol>
+<symbol id="icon-medal" viewBox="0 0 448 512"></symbol>
+<symbol id="icon-mobile-screen" viewBox="0 0 384 512"></symbol>
+<symbol id="icon-mosque" viewBox="0 0 576 512"></symbol>
+<symbol id="icon-pen-nib" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-rocket" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-shapes" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-shield-halved" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-star" viewBox="0 0 576 512"></symbol>
+<symbol id="icon-user-circle" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-user-shield" viewBox="0 0 576 512"></symbol>
+<symbol id="icon-wind" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-up-right-from-square" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-facebook" viewBox="0 0 512 512"></symbol>
+<symbol id="icon-linkedin" viewBox="0 0 448 512"></symbol>
+<symbol id="icon-whatsapp" viewBox="0 0 448 512"></symbol>
+<symbol id="icon-html5" viewBox="0 0 384 512"></symbol>
+<symbol id="icon-js" viewBox="0 0 448 512"></symbol>
+<symbol id="icon-arrow-up-left" viewBox="0 0 512 512"></symbol>
+</svg>
     <nav
       class="sticky top-0 w-full bg-ink/90 backdrop-blur-md z-50 border-b border-line"
     >
@@ -105,7 +133,7 @@
           target="_blank"
           class="hidden md:flex items-center gap-2 px-4 py-2 rounded-md border border-cyan/40 text-cyan text-sm hover:bg-cyan hover:text-ink transition-colors mono"
         >
-          <i class="fab fa-whatsapp"></i> تواصل الآن
+          <svg class="icon" aria-hidden="true"><use href="#whatsapp"></use></svg> تواصل الآن
         </a>
         <button
           id="menu-toggle"
@@ -134,7 +162,7 @@
           target="_blank"
           class="mobile-link mono text-cyan"
         >
-          <i class="fab fa-whatsapp"></i> تواصل عبر واتساب
+          <svg class="icon" aria-hidden="true"><use href="#whatsapp"></use></svg> تواصل عبر واتساب
         </a>
       </div>
     </nav>
@@ -195,13 +223,13 @@
               target="_blank"
               class="relative px-6 py-3 rounded-md bg-cyan text-ink font-bold hover:brightness-110 transition-all flex items-center gap-2"
             >
-              <i class="fab fa-whatsapp text-lg"></i> تواصل عبر واتساب
+              <svg class="icon text-lg" aria-hidden="true"><use href="#whatsapp"></use></svg> تواصل عبر واتساب
             </a>
             <a
               href="#projects"
               class="px-6 py-3 rounded-md border border-line text-fog font-bold hover:border-cyan hover:text-cyan transition-all flex items-center gap-2 mono text-sm"
             >
-              عرض الأعمال <i class="fas fa-arrow-left"></i>
+              عرض الأعمال <svg class="icon" aria-hidden="true"><use href="#arrow-left"></use></svg>
             </a>
           </div>
 
@@ -210,20 +238,17 @@
               href="https://wa.me/201110742678"
               target="_blank"
               class="hover:text-cyan transition-all"
-              ><i class="fab fa-whatsapp"></i
-            ></a>
+              ><svg class="icon" aria-hidden="true"><use href="#whatsapp"></use></svg></a>
             <a
               href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/"
               target="_blank"
               class="hover:text-cyan transition-all"
-              ><i class="fab fa-linkedin"></i
-            ></a>
+              ><svg class="icon" aria-hidden="true"><use href="#linkedin"></use></svg></a>
             <a
               href="https://www.facebook.com/mohamed.dev27"
               target="_blank"
               class="hover:text-cyan transition-all"
-              ><i class="fab fa-facebook"></i
-            ></a>
+              ><svg class="icon" aria-hidden="true"><use href="#facebook"></use></svg></a>
           </div>
         </div>
 
@@ -372,64 +397,56 @@
         <div class="grid md:grid-cols-2 gap-12">
           <div>
             <h3 class="mono text-sm text-cyan mb-6 flex items-center gap-2">
-              <i class="fas fa-code"></i> FRONT-END
+              <svg class="icon" aria-hidden="true"><use href="#code"></use></svg> FRONT-END
             </h3>
             <div class="grid grid-cols-2 gap-4">
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <i class="fab fa-html5 text-2xl text-orange-400"></i
-                ><span class="font-medium text-sm">HTML5 / CSS3</span>
+                <svg class="icon text-2xl text-orange-400" aria-hidden="true"><use href="#html5"></use></svg><span class="font-medium text-sm">HTML5 / CSS3</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <i class="fab fa-js text-2xl text-yellow-400"></i
-                ><span class="font-medium text-sm">JavaScript</span>
+                <svg class="icon text-2xl text-yellow-400" aria-hidden="true"><use href="#js"></use></svg><span class="font-medium text-sm">JavaScript</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <i class="fas fa-wind text-2xl text-cyan"></i
-                ><span class="font-medium text-sm">Tailwind CSS</span>
+                <svg class="icon text-2xl text-cyan" aria-hidden="true"><use href="#wind"></use></svg><span class="font-medium text-sm">Tailwind CSS</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <i class="fas fa-mobile-screen text-2xl text-cyan"></i
-                ><span class="font-medium text-sm">تصميم متجاوب</span>
+                <svg class="icon text-2xl text-cyan" aria-hidden="true"><use href="#mobile-screen"></use></svg><span class="font-medium text-sm">تصميم متجاوب</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <i class="fas fa-language text-2xl text-cyan"></i
-                ><span class="font-medium text-sm">واجهات RTL</span>
+                <svg class="icon text-2xl text-cyan" aria-hidden="true"><use href="#language"></use></svg><span class="font-medium text-sm">واجهات RTL</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <i class="fas fa-bolt text-2xl text-amber"></i
-                ><span class="font-medium text-sm">PWA Apps</span>
+                <svg class="icon text-2xl text-amber" aria-hidden="true"><use href="#bolt"></use></svg><span class="font-medium text-sm">PWA Apps</span>
               </div>
             </div>
           </div>
 
           <div>
             <h3 class="mono text-sm text-amber mb-6 flex items-center gap-2">
-              <i class="fas fa-user-shield"></i> SECURITY & IT
+              <svg class="icon" aria-hidden="true"><use href="#user-shield"></use></svg> SECURITY & IT
             </h3>
             <div class="grid grid-cols-2 gap-4">
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <i class="fas fa-shield-halved text-2xl text-red-400"></i
-                ><span class="font-medium text-sm">Penetration Testing</span>
+                <svg class="icon text-2xl text-red-400" aria-hidden="true"><use href="#shield-halved"></use></svg><span class="font-medium text-sm">Penetration Testing</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <i class="fas fa-certificate text-2xl text-amber"></i
-                ><span class="font-medium text-sm">Security+ (مسار)</span>
+                <svg class="icon text-2xl text-amber" aria-hidden="true"><use href="#certificate"></use></svg><span class="font-medium text-sm">Security+ (مسار)</span>
               </div>
             </div>
           </div>
@@ -456,7 +473,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <i class="fas fa-compass"></i>
+              <svg class="icon" aria-hidden="true"><use href="#compass"></use></svg>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">الرؤية</h3>
@@ -474,7 +491,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <i class="fas fa-rocket"></i>
+              <svg class="icon" aria-hidden="true"><use href="#rocket"></use></svg>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">الرسالة</h3>
@@ -504,41 +521,41 @@
 
         <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-5 mb-16">
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <i class="fas fa-medal text-cyan text-xl mb-3"></i>
+            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#medal"></use></svg>
             <h4 class="font-bold text-white text-sm mb-1">الجودة أولًا</h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <i class="fas fa-handshake text-cyan text-xl mb-3"></i>
+            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#handshake"></use></svg>
             <h4 class="font-bold text-white text-sm mb-1">
               الصدق والشفافية
             </h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <i class="fas fa-bolt text-cyan text-xl mb-3"></i>
+            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#bolt"></use></svg>
             <h4 class="font-bold text-white text-sm mb-1">
               الالتزام بالمواعيد
             </h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <i class="fas fa-lightbulb text-cyan text-xl mb-3"></i>
+            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#lightbulb"></use></svg>
             <h4 class="font-bold text-white text-sm mb-1">
               الابتكار المستمر
             </h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <i class="fas fa-bullseye text-cyan text-xl mb-3"></i>
+            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#bullseye"></use></svg>
             <h4 class="font-bold text-white text-sm mb-1">
               التركيز على العميل
             </h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <i class="fas fa-shield-halved text-cyan text-xl mb-3"></i>
+            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#shield-halved"></use></svg>
             <h4 class="font-bold text-white text-sm mb-1">
               الأمان والموثوقية
             </h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <i class="fas fa-headset text-cyan text-xl mb-3"></i>
+            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#headset"></use></svg>
             <h4 class="font-bold text-white text-sm mb-1">دعم فني مستمر</h4>
           </div>
         </div>
@@ -596,7 +613,7 @@
             <div
               class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
             >
-              <i class="fas fa-pen-nib"></i>
+              <svg class="icon" aria-hidden="true"><use href="#pen-nib"></use></svg>
             </div>
             <h3 class="text-xl font-bold text-white mb-2">تصميم لوجو</h3>
             <p class="text-sm text-muted leading-relaxed">
@@ -609,7 +626,7 @@
             <div
               class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
             >
-              <i class="fas fa-film"></i>
+              <svg class="icon" aria-hidden="true"><use href="#film"></use></svg>
             </div>
             <h3 class="text-xl font-bold text-white mb-2">تصميم انترو</h3>
             <p class="text-sm text-muted leading-relaxed">
@@ -622,7 +639,7 @@
             <div
               class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
             >
-              <i class="fas fa-shapes"></i>
+              <svg class="icon" aria-hidden="true"><use href="#shapes"></use></svg>
             </div>
             <h3 class="text-xl font-bold text-white mb-2">تصميم Canvas</h3>
             <p class="text-sm text-muted leading-relaxed">
@@ -650,7 +667,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <i class="fas fa-handshake"></i>
+              <svg class="icon" aria-hidden="true"><use href="#handshake"></use></svg>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">أمانة في التعامل</h3>
@@ -667,7 +684,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <i class="fas fa-shield-halved"></i>
+              <svg class="icon" aria-hidden="true"><use href="#shield-halved"></use></svg>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">موقع آمن من الأساس</h3>
@@ -684,7 +701,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <i class="fas fa-bullseye"></i>
+              <svg class="icon" aria-hidden="true"><use href="#bullseye"></use></svg>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">تركيز على هدف المشروع</h3>
@@ -701,7 +718,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <i class="fas fa-comments"></i>
+              <svg class="icon" aria-hidden="true"><use href="#comments"></use></svg>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">تواصل مستمر</h3>
@@ -760,7 +777,7 @@
               class="h-44 bg-panel2 flex items-center justify-center relative overflow-hidden"
             >
               <div class="absolute inset-0 grid-texture opacity-40"></div>
-              <i class="fas fa-mosque text-5xl text-cyan/70 relative z-10"></i>
+              <svg class="icon text-5xl text-cyan/70 relative z-10" aria-hidden="true"><use href="#mosque"></use></svg>
             </div>
             <div class="p-6">
               <span class="mono badge text-amber">WEB APP · PWA</span>
@@ -814,16 +831,14 @@
                 وتجربة استخدام سلسة من التصفح لحد الشراء.
               </p>
               <div class="flex gap-1 text-amber text-xs mb-3">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i
-                ><i class="fas fa-star"></i><i class="fas fa-star"></i
-                ><i class="fas fa-star"></i>
+                <svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg>
               </div>
               <a
                 href="https://www.abosofyanbrand.com/"
                 target="_blank"
                 class="mono text-xs text-cyan hover:underline flex items-center gap-1.5"
               >
-                زيارة الموقع <i class="fas fa-arrow-up-left"></i>
+                زيارة الموقع <svg class="icon icon-arrow-up-left" aria-hidden="true"><use href="#arrow-up-left"></use></svg>
               </a>
             </div>
           </div>
@@ -930,9 +945,7 @@
         <div class="grid md:grid-cols-3 gap-7">
           <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
             <div class="flex gap-1 text-amber mb-4 text-sm">
-              <i class="fas fa-star"></i><i class="fas fa-star"></i
-              ><i class="fas fa-star"></i><i class="fas fa-star"></i
-              ><i class="fas fa-star"></i>
+              <svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg>
             </div>
             <p class="text-sm text-fog/90 leading-relaxed mb-5">
               "تعامل محترف من أول يوم، وسلّم الموقع في الميعاد بالظبط زي ما
@@ -955,9 +968,7 @@
 
           <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
             <div class="flex gap-1 text-amber mb-4 text-sm">
-              <i class="fas fa-star"></i><i class="fas fa-star"></i
-              ><i class="fas fa-star"></i><i class="fas fa-star"></i
-              ><i class="fas fa-star"></i>
+              <svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg>
             </div>
             <p class="text-sm text-fog/90 leading-relaxed mb-5">
               "تجربة رائعة من أول استشارة لحد التسليم، منصة الكورسات طلعت
@@ -1009,26 +1020,26 @@
             target="_blank"
             class="px-7 py-3.5 rounded-md bg-cyan text-ink font-bold hover:brightness-110 transition-all flex items-center gap-2"
           >
-            <i class="fab fa-whatsapp text-lg"></i> واتساب
+            <svg class="icon text-lg" aria-hidden="true"><use href="#whatsapp"></use></svg> واتساب
           </a>
           <a
             href="mailto:mh3976698@gmail.com"
             class="px-7 py-3.5 rounded-md border border-line text-fog font-bold hover:border-cyan hover:text-cyan transition-all flex items-center gap-2 mono text-sm"
           >
-            <i class="fas fa-envelope text-cyan"></i> mh3976698@gmail.com
+            <svg class="icon text-cyan" aria-hidden="true"><use href="#envelope"></use></svg> mh3976698@gmail.com
           </a>
         </div>
         <div
           class="flex flex-wrap items-center justify-center gap-6 text-xs text-muted mono"
         >
           <span class="flex items-center gap-1.5"
-            ><i class="fas fa-check text-cyan"></i> استشارة مجانية</span
+            ><svg class="icon text-cyan" aria-hidden="true"><use href="#check"></use></svg> استشارة مجانية</span
           >
           <span class="flex items-center gap-1.5"
-            ><i class="fas fa-check text-cyan"></i> رد خلال ساعة</span
+            ><svg class="icon text-cyan" aria-hidden="true"><use href="#check"></use></svg> رد خلال ساعة</span
           >
           <span class="flex items-center gap-1.5"
-            ><i class="fas fa-check text-cyan"></i> دعم بعد التسليم</span
+            ><svg class="icon text-cyan" aria-hidden="true"><use href="#check"></use></svg> دعم بعد التسليم</span
           >
         </div>
       </div>
@@ -1040,20 +1051,17 @@
           href="https://wa.me/201110742678"
           target="_blank"
           class="hover:text-cyan transition-colors"
-          ><i class="fab fa-whatsapp"></i
-        ></a>
+          ><svg class="icon" aria-hidden="true"><use href="#whatsapp"></use></svg></a>
         <a
           href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/"
           target="_blank"
           class="hover:text-cyan transition-colors"
-          ><i class="fab fa-linkedin"></i
-        ></a>
+          ><svg class="icon" aria-hidden="true"><use href="#linkedin"></use></svg></a>
         <a
           href="https://www.facebook.com/mohamed.dev27"
           target="_blank"
           class="hover:text-cyan transition-colors"
-          ><i class="fab fa-facebook"></i
-        ></a>
+          ><svg class="icon" aria-hidden="true"><use href="#facebook"></use></svg></a>
       </div>
       <p class="mono text-xs text-muted tracking-widest">
         © 2026 Mohamed Ahmed Helmy — built with care.
@@ -1090,10 +1098,11 @@
       );
       reveals.forEach((s) => io.observe(s));
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="supabase-config.js"></script>
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+    <script src="supabase-config.js" defer></script>
+    <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
       pdfjsLib.GlobalWorkerOptions.workerSrc =
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
@@ -1145,7 +1154,7 @@
           if (frame) {
             frame.innerHTML = `
               <a href="${url}" target="_blank" rel="noopener" class="pdf-fallback-link">
-                <i class="fas fa-file-pdf"></i>
+                <svg class="icon" aria-hidden="true"><use href="#file-pdf"></use></svg>
                 <span>اضغط لعرض الشهادة</span>
               </a>`;
           }
@@ -1193,7 +1202,7 @@
                 rel="noopener"
                 class="mono text-xs text-cyan hover:underline flex items-center gap-1.5"
               >
-                فتح الشهادة كاملة <i class="fas fa-arrow-up-left"></i>
+                فتح الشهادة كاملة <svg class="icon icon-arrow-up-left" aria-hidden="true"><use href="#arrow-up-left"></use></svg>
               </a>
             </div>`,
             )
@@ -1213,6 +1222,7 @@
         }
       }
       loadCertificates();
+    });
     </script>
   </body>
 </html>

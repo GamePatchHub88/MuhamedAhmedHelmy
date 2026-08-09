@@ -464,3 +464,15 @@ a.bg-cyan:hover::before { transform: translateX(120%); }
   .menu-btn { display: none; }
   .mobile-menu { display: none !important; }
 }
+
+/* Icons: inline SVG sprite replaces Font Awesome CDN */
+.icon {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  display: inline-block;
+  vertical-align: -0.125em;
+}
+.icon-arrow-up-left {
+  transform: scaleX(-1);
+}

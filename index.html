@@ -44,48 +44,20 @@
     <link rel="preload" as="image" href="2.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      media="print"
+      onload="this.media='all'"
+    />
     <meta name="theme-color" content="#050505" />
   </head>
   <body class="bg-ink text-fog antialiased">
-    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-<symbol id="icon-arrow-left" viewBox="0 0 512 512"><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 288 480 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-370.7 0 105.4-105.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></symbol>
-<symbol id="icon-bolt" viewBox="0 0 448 512"><path d="M338.8-9.9c11.9 8.6 16.3 24.2 10.9 37.8L271.3 224 416 224c13.5 0 25.5 8.4 30.1 21.1s.7 26.9-9.6 35.5l-288 240c-11.3 9.4-27.4 9.9-39.3 1.3s-16.3-24.2-10.9-37.8L176.7 288 32 288c-13.5 0-25.5-8.4-30.1-21.1s-.7-26.9 9.6-35.5l288-240c11.3-9.4 27.4-9.9 39.3-1.3z"/></symbol>
-<symbol id="icon-bullseye" viewBox="0 0 512 512"><path d="M448 256a192 192 0 1 0 -384 0 192 192 0 1 0 384 0zM0 256a256 256 0 1 1 512 0 256 256 0 1 1 -512 0zm256 80a80 80 0 1 0 0-160 80 80 0 1 0 0 160zm0-224a144 144 0 1 1 0 288 144 144 0 1 1 0-288zM224 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></symbol>
-<symbol id="icon-certificate" viewBox="0 0 576 512"><path d="M239.2-8c-6.1-6.2-15-8.7-23.4-6.4S200.9-5.6 198.8 2.8L183.5 63c-1.1 4.4-5.6 7-9.9 5.7L113.8 51.9c-8.4-2.4-17.4 0-23.5 6.1s-8.5 15.1-6.1 23.5l16.9 59.8c1.2 4.3-1.4 8.8-5.7 9.9L35.1 166.5c-8.4 2.1-15 8.7-17.3 17.1s.2 17.3 6.4 23.4l44.5 43.3c3.2 3.1 3.2 8.3 0 11.5L24.3 305.1c-6.2 6.1-8.7 15-6.4 23.4s8.9 14.9 17.3 17.1l60.2 15.3c4.4 1.1 7 5.6 5.7 9.9L84.2 430.5c-2.4 8.4 0 17.4 6.1 23.5s15.1 8.5 23.5 6.1l59.8-16.9c4.3-1.2 8.8 1.4 9.9 5.7l15.3 60.2c2.1 8.4 8.7 15 17.1 17.3s17.3-.2 23.4-6.4l43.3-44.5c3.1-3.2 8.3-3.2 11.5 0L337.3 520c6.1 6.2 15 8.7 23.4 6.4s14.9-8.9 17.1-17.3L393.1 449c1.1-4.4 5.6-7 9.9-5.7l59.8 16.9c8.4 2.4 17.4 0 23.5-6.1s8.5-15.1 6.1-23.5l-16.9-59.8c-1.2-4.3 1.4-8.8 5.7-9.9l60.2-15.3c8.4-2.1 15-8.7 17.3-17.1s-.2-17.4-6.4-23.4l-44.5-43.3c-3.2-3.1-3.2-8.3 0-11.5l44.5-43.3c6.2-6.1 8.7-15 6.4-23.4s-8.9-14.9-17.3-17.1l-60.2-15.3c-4.4-1.1-7-5.6-5.7-9.9l16.9-59.8c2.4-8.4 0-17.4-6.1-23.5s-15.1-8.5-23.5-6.1L403 68.8c-4.3 1.2-8.8-1.4-9.9-5.7L377.8 2.8c-2.1-8.4-8.7-15-17.1-17.3s-17.3 .2-23.4 6.4L294 36.5c-3.1 3.2-8.3 3.2-11.5 0L239.2-8z"/></symbol>
-<symbol id="icon-check" viewBox="0 0 448 512"><path d="M434.8 70.1c14.3 10.4 17.5 30.4 7.1 44.7l-256 352c-5.5 7.6-14 12.3-23.4 13.1s-18.5-2.7-25.1-9.3l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l101.5 101.5 234-321.7c10.4-14.3 30.4-17.5 44.7-7.1z"/></symbol>
-<symbol id="icon-code" viewBox="0 0 576 512"><path d="M360.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm64.6 136.1c-12.5 12.5-12.5 32.8 0 45.3l73.4 73.4-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l96-96c12.5-12.5 12.5-32.8 0-45.3l-96-96c-12.5-12.5-32.8-12.5-45.3 0zm-274.7 0c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 150.6 182.6c12.5-12.5 12.5-32.8 0-45.3z"/></symbol>
-<symbol id="icon-comments" viewBox="0 0 576 512"><path d="M384 144c0 97.2-86 176-192 176-26.7 0-52.1-5-75.2-14L35.2 349.2c-9.3 4.9-20.7 3.2-28.2-4.2s-9.2-18.9-4.2-28.2l35.6-67.2C14.3 220.2 0 183.6 0 144 0 46.8 86-32 192-32S384 46.8 384 144zm0 368c-94.1 0-172.4-62.1-188.8-144 120-1.5 224.3-86.9 235.8-202.7 83.3 19.2 145 88.3 145 170.7 0 39.6-14.3 76.2-38.4 105.6l35.6 67.2c4.9 9.3 3.2 20.7-4.2 28.2s-18.9 9.2-28.2 4.2L459.2 498c-23.1 9-48.5 14-75.2 14z"/></symbol>
-<symbol id="icon-compass" viewBox="0 0 512 512"><path d="M256 512a256 256 0 1 0 0-512 256 256 0 1 0 0 512zm50.7-186.9L162.4 380.6c-19.4 7.5-38.5-11.6-31-31l55.5-144.3c3.3-8.5 9.9-15.1 18.4-18.4l144.3-55.5c19.4-7.5 38.5 11.6 31 31L325.1 306.7c-3.2 8.5-9.9 15.1-18.4 18.4zM288 256a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></symbol>
-<symbol id="icon-envelope" viewBox="0 0 512 512"><path d="M48 64c-26.5 0-48 21.5-48 48 0 15.1 7.1 29.3 19.2 38.4l208 156c17.1 12.8 40.5 12.8 57.6 0l208-156c12.1-9.1 19.2-23.3 19.2-38.4 0-26.5-21.5-48-48-48L48 64zM0 196L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-188-198.4 148.8c-34.1 25.6-81.1 25.6-115.2 0L0 196z"/></symbol>
-<symbol id="icon-file-pdf" viewBox="0 0 576 512"><path d="M96 0C60.7 0 32 28.7 32 64l0 384c0 35.3 28.7 64 64 64l80 0 0-112c0-35.3 28.7-64 64-64l176 0 0-165.5c0-17-6.7-33.3-18.7-45.3L290.7 18.7C278.7 6.7 262.5 0 245.5 0L96 0zM357.5 176L264 176c-13.3 0-24-10.7-24-24L240 58.5 357.5 176zM240 380c-11 0-20 9-20 20l0 128c0 11 9 20 20 20s20-9 20-20l0-28 12 0c33.1 0 60-26.9 60-60s-26.9-60-60-60l-32 0zm32 80l-12 0 0-40 12 0c11 0 20 9 20 20s-9 20-20 20zm96-80c-11 0-20 9-20 20l0 128c0 11 9 20 20 20l32 0c28.7 0 52-23.3 52-52l0-64c0-28.7-23.3-52-52-52l-32 0zm20 128l0-88 12 0c6.6 0 12 5.4 12 12l0 64c0 6.6-5.4 12-12 12l-12 0zm88-108l0 128c0 11 9 20 20 20s20-9 20-20l0-44 28 0c11 0 20-9 20-20s-9-20-20-20l-28 0 0-24 28 0c11 0 20-9 20-20s-9-20-20-20l-48 0c-11 0-20 9-20 20z"/></symbol>
-<symbol id="icon-film" viewBox="0 0 448 512"><path d="M0 96C0 60.7 28.7 32 64 32l320 0c35.3 0 64 28.7 64 64l0 320c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 96zM48 368l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm304-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM48 240l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm304-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM48 112l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16L64 96c-8.8 0-16 7.2-16 16zM352 96c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0z"/></symbol>
-<symbol id="icon-handshake" viewBox="0 0 576 512"><path d="M268.9 85.2L152.3 214.8c-4.6 5.1-4.4 13 .5 17.9 30.5 30.5 80 30.5 110.5 0l31.8-31.8c4.2-4.2 9.5-6.5 14.9-6.9 6.8-.6 13.8 1.7 19 6.9L505.6 376 576 320 576 32 464 96 440.2 80.1C424.4 69.6 405.9 64 386.9 64l-70.4 0c-1.1 0-2.3 0-3.4 .1-16.9 .9-32.8 8.5-44.2 21.1zM116.6 182.7L223.4 64 183.8 64c-25.5 0-49.9 10.1-67.9 28.1L112 96 0 32 0 320 156.4 450.3c23 19.2 52 29.7 81.9 29.7l15.7 0-7-7c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l41 41 9 0c19.1 0 37.8-4.3 54.8-12.3L359 441c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l32 32 17.5-17.5c8.9-8.9 11.5-21.8 7.6-33.1l-137.9-136.8-14.9 14.9c-49.3 49.3-129.1 49.3-178.4 0-23-23-23.9-59.9-2.2-84z"/></symbol>
-<symbol id="icon-headset" viewBox="0 0 448 512"><path d="M224 64c-79 0-144.7 57.3-157.7 132.7 9.3-3 19.3-4.7 29.7-4.7l16 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48l-16 0c-53 0-96-43-96-96l0-64C0 100.3 100.3 0 224 0S448 100.3 448 224l0 168.1c0 66.3-53.8 120-120.1 120l-87.9-.1-32 0c-26.5 0-48-21.5-48-48s21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 0 40 0c39.8 0 72-32.2 72-72l0-20.9c-14.1 8.2-30.5 12.8-48 12.8l-16 0c-26.5 0-48-21.5-48-48l0-96c0-26.5 21.5-48 48-48l16 0c10.4 0 20.3 1.6 29.7 4.7-13-75.3-78.6-132.7-157.7-132.7z"/></symbol>
-<symbol id="icon-language" viewBox="0 0 576 512"><path d="M160 0c17.7 0 32 14.3 32 32l0 32 128 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-9.6 0-8.4 23.1c-16.4 45.2-41.1 86.5-72.2 122 14.2 8.8 29 16.6 44.4 23.5l50.4 22.4 62.2-140c5.1-11.6 16.6-19 29.2-19s24.1 7.4 29.2 19l128 288c7.2 16.2-.1 35.1-16.2 42.2s-35.1-.1-42.2-16.2l-20-45-157.5 0-20 45c-7.2 16.2-26.1 23.4-42.2 16.2s-23.4-26.1-16.2-42.2l39.8-89.5-50.4-22.4c-23-10.2-45-22.4-65.8-36.4-21.3 17.2-44.6 32.2-69.5 44.7L78.3 380.6c-15.8 7.9-35 1.5-42.9-14.3s-1.5-35 14.3-42.9l34.5-17.3c16.3-8.2 31.8-17.7 46.4-28.3-13.8-12.7-26.8-26.4-38.9-40.9L81.6 224.7c-11.3-13.6-9.5-33.8 4.1-45.1s33.8-9.5 45.1 4.1l10.2 12.2c11.5 13.9 24.1 26.8 37.4 38.7 27.5-30.4 49.2-66.1 63.5-105.4l.5-1.2-210.3 0C14.3 128 0 113.7 0 96S14.3 64 32 64l96 0 0-32c0-17.7 14.3-32 32-32zM416 270.8L365.7 384 466.3 384 416 270.8z"/></symbol>
-<symbol id="icon-lightbulb" viewBox="0 0 384 512"><path d="M292.9 384c7.3-22.3 21.9-42.5 38.4-59.9 32.7-34.4 52.7-80.9 52.7-132.1 0-106-86-192-192-192S0 86 0 192c0 51.2 20 97.7 52.7 132.1 16.5 17.4 31.2 37.6 38.4 59.9l201.7 0zM288 432l-192 0 0 16c0 44.2 35.8 80 80 80l32 0c44.2 0 80-35.8 80-80l0-16zM184 112c-39.8 0-72 32.2-72 72 0 13.3-10.7 24-24 24s-24-10.7-24-24c0-66.3 53.7-120 120-120 13.3 0 24 10.7 24 24s-10.7 24-24 24z"/></symbol>
-<symbol id="icon-medal" viewBox="0 0 448 512"><path d="M224.3 128L139.7-12.9c-6.5-10.8-20.1-14.7-31.3-9.1L21.8 21.3C9.9 27.2 5.1 41.6 11 53.5L80.6 192.6c-30.1 33.9-48.3 78.5-48.3 127.4 0 106 86 192 192 192s192-86 192-192c0-48.9-18.3-93.5-48.3-127.4L437.6 53.5c5.9-11.9 1.1-26.3-10.7-32.2L340.2-22.1c-11.2-5.6-24.9-1.6-31.3 9.1L224.3 128zm30.8 142.5c1.4 2.8 4 4.7 7 5.1l50.1 7.3c7.7 1.1 10.7 10.5 5.2 16l-36.3 35.4c-2.2 2.2-3.2 5.2-2.7 8.3l8.6 49.9c1.3 7.6-6.7 13.5-13.6 9.9l-44.8-23.6c-2.7-1.4-6-1.4-8.7 0l-44.8 23.6c-6.9 3.6-14.9-2.2-13.6-9.9l8.6-49.9c.5-3-.5-6.1-2.7-8.3l-36.3-35.4c-5.6-5.4-2.5-14.8 5.2-16l50.1-7.3c3-.4 5.7-2.4 7-5.1l22.4-45.4c3.4-7 13.3-7 16.8 0l22.4 45.4z"/></symbol>
-<symbol id="icon-mobile-screen" viewBox="0 0 384 512"><path d="M16 64C16 28.7 44.7 0 80 0L304 0c35.3 0 64 28.7 64 64l0 384c0 35.3-28.7 64-64 64L80 512c-35.3 0-64-28.7-64-64L16 64zM128 440c0 13.3 10.7 24 24 24l80 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-80 0c-13.3 0-24 10.7-24 24zM304 64l-224 0 0 304 224 0 0-304z"/></symbol>
-<symbol id="icon-mosque" viewBox="0 0 576 512"><path d="M174.8 224l226.4 0c43.5 0 78.8-35.3 78.8-78.8 0-25.5-12.3-49.4-33.1-64.2L297.3-25.4c-5.6-3.9-13-3.9-18.5 0L129.1 81C108.3 95.8 96 119.7 96 145.2 96 188.7 131.3 224 174.8 224zM512 512c35.3 0 64-28.7 64-64l0-224c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 48-448 0 0-48c0-17.7-14.3-32-32-32S0 206.3 0 224L0 448c0 35.3 28.7 64 64 64l448 0zM240 384c0-26.5 21.5-48 48-48s48 21.5 48 48l0 80-96 0 0-80z"/></symbol>
-<symbol id="icon-pen-nib" viewBox="0 0 512 512"><path d="M368.5 18.3l-50.1 50.1 125.3 125.3 50.1-50.1c21.9-21.9 21.9-57.3 0-79.2L447.7 18.3c-21.9-21.9-57.3-21.9-79.2 0zM279.3 97.2l-.5 .1-144.1 43.2c-19.9 6-35.7 21.2-42.3 41L3.8 445.8c-2.9 8.7-1.9 18.2 2.5 26L161.7 316.4c-1.1-4-1.6-8.1-1.6-12.4 0-26.5 21.5-48 48-48s48 21.5 48 48-21.5 48-48 48c-4.3 0-8.5-.6-12.4-1.6L40.3 505.7c7.8 4.4 17.2 5.4 26 2.5l264.3-88.6c19.7-6.6 35-22.4 41-42.3l43.2-144.1 .1-.5-135.5-135.5z"/></symbol>
-<symbol id="icon-rocket" viewBox="0 0 512 512"><path d="M128 320L24.5 320c-24.9 0-40.2-27.1-27.4-48.5L50 183.3C58.7 168.8 74.3 160 91.2 160l95 0c76.1-128.9 189.6-135.4 265.5-124.3 12.8 1.9 22.8 11.9 24.6 24.6 11.1 75.9 4.6 189.4-124.3 265.5l0 95c0 16.9-8.8 32.5-23.3 41.2l-88.2 52.9c-21.3 12.8-48.5-2.6-48.5-27.4L192 384c0-35.3-28.7-64-64-64l-.1 0zM400 160a48 48 0 1 0 -96 0 48 48 0 1 0 96 0z"/></symbol>
-<symbol id="icon-shapes" viewBox="0 0 512 512"><path d="M256 0c11.2 0 21.7 5.9 27.4 15.5l96 160c5.9 9.9 6.1 22.2 .4 32.2S363.5 224 352 224l-192 0c-11.5 0-22.2-6.2-27.8-16.2s-5.5-22.3 .4-32.2l96-160C234.3 5.9 244.8 0 256 0zM128 272a112 112 0 1 1 0 224 112 112 0 1 1 0-224zm200 16l112 0c22.1 0 40 17.9 40 40l0 112c0 22.1-17.9 40-40 40l-112 0c-22.1 0-40-17.9-40-40l0-112c0-22.1 17.9-40 40-40z"/></symbol>
-<symbol id="icon-shield-halved" viewBox="0 0 512 512"><path d="M256 0c4.6 0 9.2 1 13.4 2.9L457.8 82.8c22 9.3 38.4 31 38.3 57.2-.5 99.2-41.3 280.7-213.6 363.2-16.7 8-36.1 8-52.8 0-172.4-82.5-213.1-264-213.6-363.2-.1-26.2 16.3-47.9 38.3-57.2L242.7 2.9C246.9 1 251.4 0 256 0zm0 66.8l0 378.1c138-66.8 175.1-214.8 176-303.4l-176-74.6 0 0z"/></symbol>
-<symbol id="icon-star" viewBox="0 0 576 512"><path d="M309.5-18.9c-4.1-8-12.4-13.1-21.4-13.1s-17.3 5.1-21.4 13.1L193.1 125.3 33.2 150.7c-8.9 1.4-16.3 7.7-19.1 16.3s-.5 18 5.8 24.4l114.4 114.5-25.2 159.9c-1.4 8.9 2.3 17.9 9.6 23.2s16.9 6.1 25 2L288.1 417.6 432.4 491c8 4.1 17.7 3.3 25-2s11-14.2 9.6-23.2L441.7 305.9 556.1 191.4c6.4-6.4 8.6-15.8 5.8-24.4s-10.1-14.9-19.1-16.3L383 125.3 309.5-18.9z"/></symbol>
-<symbol id="icon-store" viewBox="0 0 512 512"><path d="M30.7 72.3C37.6 48.4 59.5 32 84.4 32l344 0c24.9 0 46.8 16.4 53.8 40.3l23.4 80.2c12.8 43.7-20.1 87.5-65.6 87.5-26.3 0-49.4-14.9-60.8-37.1-11.6 21.9-34.6 37.1-61.4 37.1-26.6 0-49.7-15-61.3-37-11.6 22-34.7 37-61.3 37-26.8 0-49.8-15.1-61.4-37.1-11.4 22.1-34.5 37.1-60.8 37.1-45.6 0-78.4-43.7-65.6-87.5L30.7 72.3zM96.4 352l320 0 0-66.4c7.6 1.6 15.5 2.4 23.5 2.4 14.3 0 28-2.6 40.5-7.2l0 151.2c0 26.5-21.5 48-48 48l-352 0c-26.5 0-48-21.5-48-48l0-151.2c12.5 4.6 26.1 7.2 40.5 7.2 8.1 0 15.9-.8 23.5-2.4l0 66.4z"/></symbol>
-<symbol id="icon-user-circle" viewBox="0 0 512 512"><path d="M399 384.2C376.9 345.8 335.4 320 288 320l-64 0c-47.4 0-88.9 25.8-111 64.2 35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0 256 256 0 1 1 -512 0zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></symbol>
-<symbol id="icon-user-shield" viewBox="0 0 576 512"><path d="M224 248a120 120 0 1 0 0-240 120 120 0 1 0 0 240zm-29.7 56C95.8 304 16 383.8 16 482.3 16 498.7 29.3 512 45.7 512l251.5 0C261 469.4 240 414.5 240 356.4l0-31.1c0-7.3 1-14.5 2.9-21.3l-48.6 0zm251 184.5l-13.3 6.3 0-188.1 96 32 0 19.6c0 55.8-32.2 106.5-82.7 130.3zM421.9 259.5l-112 37.3c-13.1 4.4-21.9 16.6-21.9 30.4l0 31.1c0 74.4 43 142.1 110.2 173.7l18.5 8.7c4.8 2.2 10 3.4 15.2 3.4s10.5-1.2 15.2-3.4l18.5-8.7C533 500.3 576 432.6 576 358.2l0-31.1c0-13.8-8.8-26-21.9-30.4l-112-37.3c-6.6-2.2-13.7-2.2-20.2 0z"/></symbol>
-<symbol id="icon-wind" viewBox="0 0 512 512"><path d="M288 32c0 17.7 14.3 32 32 32l40 0c13.3 0 24 10.7 24 24s-10.7 24-24 24L32 112c-17.7 0-32 14.3-32 32s14.3 32 32 32l328 0c48.6 0 88-39.4 88-88S408.6 0 360 0L320 0c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32l32 0c53 0 96-43 96-96s-43-96-96-96L32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-32 0c-17.7 0-32 14.3-32 32zM128 512l40 0c48.6 0 88-39.4 88-88s-39.4-88-88-88L32 336c-17.7 0-32 14.3-32 32s14.3 32 32 32l136 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-40 0c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></symbol>
-<symbol id="icon-facebook" viewBox="0 0 512 512"><path d="M512 256C512 114.6 397.4 0 256 0S0 114.6 0 256C0 376 82.7 476.8 194.2 504.5l0-170.3-52.8 0 0-78.2 52.8 0 0-33.7c0-87.1 39.4-127.5 125-127.5 16.2 0 44.2 3.2 55.7 6.4l0 70.8c-6-.6-16.5-1-29.6-1-42 0-58.2 15.9-58.2 57.2l0 27.8 83.6 0-14.4 78.2-69.3 0 0 175.9C413.8 494.8 512 386.9 512 256z"/></symbol>
-<symbol id="icon-linkedin" viewBox="0 0 448 512"><path d="M416 32L31.9 32C14.3 32 0 46.5 0 64.3L0 447.7C0 465.5 14.3 480 31.9 480L416 480c17.6 0 32-14.5 32-32.3l0-383.4C448 46.5 433.6 32 416 32zM135.4 416l-66.4 0 0-213.8 66.5 0 0 213.8-.1 0zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77zM384.3 416l-66.4 0 0-104c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9l0 105.8-66.4 0 0-213.8 63.7 0 0 29.2 .9 0c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9l0 117.2z"/></symbol>
-<symbol id="icon-whatsapp" viewBox="0 0 448 512"><path d="M380.9 97.1c-41.9-42-97.7-65.1-157-65.1-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480 117.7 449.1c32.4 17.7 68.9 27 106.1 27l.1 0c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3 18.6-68.1-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1s56.2 81.2 56.1 130.5c0 101.8-84.9 184.6-186.6 184.6zM325.1 300.5c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8s-14.3 18-17.6 21.8c-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7 .9-6.9-.5-9.7s-12.5-30.1-17.1-41.2c-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.7 1.4-14.8 6.9c-5.1 5.6-19.4 19-19.4 46.3s19.9 53.7 22.6 57.4c2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4s4.6-24.1 3.2-26.4c-1.3-2.5-5-3.9-10.5-6.6z"/></symbol>
-<symbol id="icon-html5" viewBox="0 0 384 512"><path d="M0 32L34.9 427.8 191.5 480 349.1 427.8 384 32 0 32zM308.2 159.9l-183.8 0 4.1 49.4 175.6 0-13.6 148.4-97.9 27 0 .3-1.1 0-98.7-27.3-6-75.8 47.7 0 3.5 38.1 53.5 14.5 53.7-14.5 6-62.2-166.9 0-12.8-145.6 241.1 0-4.4 47.7z"/></symbol>
-<symbol id="icon-js" viewBox="0 0 448 512"><path d="M0 32l0 448 448 0 0-448-448 0zM243.8 381.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5L152 385.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5l0-143.1 42.1 0 0 143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43L301 382.1c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></symbol>
-<symbol id="icon-arrow-up-left" viewBox="0 0 512 512"><path d="M290.4 19.8C295.4 7.8 307.1 0 320 0L480 0c17.7 0 32 14.3 32 32l0 160c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9L400 157.3 246.6 310.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L354.7 112 297.4 54.6c-9.2-9.2-11.9-22.9-6.9-34.9zM0 176c0-44.2 35.8-80 80-80l80 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-80 0c-8.8 0-16 7.2-16 16l0 256c0 8.8 7.2 16 16 16l256 0c8.8 0 16-7.2 16-16l0-80c0-17.7 14.3-32 32-32s32 14.3 32 32l0 80c0 44.2-35.8 80-80 80L80 512c-44.2 0-80-35.8-80-80L0 176z"/></symbol>
-</svg>
     <nav
       class="sticky top-0 w-full bg-ink/90 backdrop-blur-md z-50 border-b border-line"
     >
@@ -133,7 +105,7 @@
           target="_blank"
           class="hidden md:flex items-center gap-2 px-4 py-2 rounded-md border border-cyan/40 text-cyan text-sm hover:bg-cyan hover:text-ink transition-colors mono"
         >
-          <svg class="icon" aria-hidden="true"><use href="#whatsapp"></use></svg> تواصل الآن
+          <i class="fab fa-whatsapp"></i> تواصل الآن
         </a>
         <button
           id="menu-toggle"
@@ -162,7 +134,7 @@
           target="_blank"
           class="mobile-link mono text-cyan"
         >
-          <svg class="icon" aria-hidden="true"><use href="#whatsapp"></use></svg> تواصل عبر واتساب
+          <i class="fab fa-whatsapp"></i> تواصل عبر واتساب
         </a>
       </div>
     </nav>
@@ -223,13 +195,13 @@
               target="_blank"
               class="relative px-6 py-3 rounded-md bg-cyan text-ink font-bold hover:brightness-110 transition-all flex items-center gap-2"
             >
-              <svg class="icon text-lg" aria-hidden="true"><use href="#whatsapp"></use></svg> تواصل عبر واتساب
+              <i class="fab fa-whatsapp text-lg"></i> تواصل عبر واتساب
             </a>
             <a
               href="#projects"
               class="px-6 py-3 rounded-md border border-line text-fog font-bold hover:border-cyan hover:text-cyan transition-all flex items-center gap-2 mono text-sm"
             >
-              عرض الأعمال <svg class="icon" aria-hidden="true"><use href="#arrow-left"></use></svg>
+              عرض الأعمال <i class="fas fa-arrow-left"></i>
             </a>
           </div>
 
@@ -238,17 +210,20 @@
               href="https://wa.me/201110742678"
               target="_blank"
               class="hover:text-cyan transition-all"
-              ><svg class="icon" aria-hidden="true"><use href="#whatsapp"></use></svg></a>
+              ><i class="fab fa-whatsapp"></i
+            ></a>
             <a
               href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/"
               target="_blank"
               class="hover:text-cyan transition-all"
-              ><svg class="icon" aria-hidden="true"><use href="#linkedin"></use></svg></a>
+              ><i class="fab fa-linkedin"></i
+            ></a>
             <a
               href="https://www.facebook.com/mohamed.dev27"
               target="_blank"
               class="hover:text-cyan transition-all"
-              ><svg class="icon" aria-hidden="true"><use href="#facebook"></use></svg></a>
+              ><i class="fab fa-facebook"></i
+            ></a>
           </div>
         </div>
 
@@ -397,56 +372,64 @@
         <div class="grid md:grid-cols-2 gap-12">
           <div>
             <h3 class="mono text-sm text-cyan mb-6 flex items-center gap-2">
-              <svg class="icon" aria-hidden="true"><use href="#code"></use></svg> FRONT-END
+              <i class="fas fa-code"></i> FRONT-END
             </h3>
             <div class="grid grid-cols-2 gap-4">
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <svg class="icon text-2xl text-orange-400" aria-hidden="true"><use href="#html5"></use></svg><span class="font-medium text-sm">HTML5 / CSS3</span>
+                <i class="fab fa-html5 text-2xl text-orange-400"></i
+                ><span class="font-medium text-sm">HTML5 / CSS3</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <svg class="icon text-2xl text-yellow-400" aria-hidden="true"><use href="#js"></use></svg><span class="font-medium text-sm">JavaScript</span>
+                <i class="fab fa-js text-2xl text-yellow-400"></i
+                ><span class="font-medium text-sm">JavaScript</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <svg class="icon text-2xl text-cyan" aria-hidden="true"><use href="#wind"></use></svg><span class="font-medium text-sm">Tailwind CSS</span>
+                <i class="fas fa-wind text-2xl text-cyan"></i
+                ><span class="font-medium text-sm">Tailwind CSS</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <svg class="icon text-2xl text-cyan" aria-hidden="true"><use href="#mobile-screen"></use></svg><span class="font-medium text-sm">تصميم متجاوب</span>
+                <i class="fas fa-mobile-screen text-2xl text-cyan"></i
+                ><span class="font-medium text-sm">تصميم متجاوب</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <svg class="icon text-2xl text-cyan" aria-hidden="true"><use href="#language"></use></svg><span class="font-medium text-sm">واجهات RTL</span>
+                <i class="fas fa-language text-2xl text-cyan"></i
+                ><span class="font-medium text-sm">واجهات RTL</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <svg class="icon text-2xl text-amber" aria-hidden="true"><use href="#bolt"></use></svg><span class="font-medium text-sm">PWA Apps</span>
+                <i class="fas fa-bolt text-2xl text-amber"></i
+                ><span class="font-medium text-sm">PWA Apps</span>
               </div>
             </div>
           </div>
 
           <div>
             <h3 class="mono text-sm text-amber mb-6 flex items-center gap-2">
-              <svg class="icon" aria-hidden="true"><use href="#user-shield"></use></svg> SECURITY & IT
+              <i class="fas fa-user-shield"></i> SECURITY & IT
             </h3>
             <div class="grid grid-cols-2 gap-4">
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <svg class="icon text-2xl text-red-400" aria-hidden="true"><use href="#shield-halved"></use></svg><span class="font-medium text-sm">Penetration Testing</span>
+                <i class="fas fa-shield-halved text-2xl text-red-400"></i
+                ><span class="font-medium text-sm">Penetration Testing</span>
               </div>
               <div
                 class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover"
               >
-                <svg class="icon text-2xl text-amber" aria-hidden="true"><use href="#certificate"></use></svg><span class="font-medium text-sm">Security+ (مسار)</span>
+                <i class="fas fa-certificate text-2xl text-amber"></i
+                ><span class="font-medium text-sm">Security+ (مسار)</span>
               </div>
             </div>
           </div>
@@ -473,7 +456,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <svg class="icon" aria-hidden="true"><use href="#compass"></use></svg>
+              <i class="fas fa-compass"></i>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">الرؤية</h3>
@@ -491,7 +474,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <svg class="icon" aria-hidden="true"><use href="#rocket"></use></svg>
+              <i class="fas fa-rocket"></i>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">الرسالة</h3>
@@ -521,41 +504,41 @@
 
         <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-5 mb-16">
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#medal"></use></svg>
+            <i class="fas fa-medal text-cyan text-xl mb-3"></i>
             <h4 class="font-bold text-white text-sm mb-1">الجودة أولًا</h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#handshake"></use></svg>
+            <i class="fas fa-handshake text-cyan text-xl mb-3"></i>
             <h4 class="font-bold text-white text-sm mb-1">
               الصدق والشفافية
             </h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#bolt"></use></svg>
+            <i class="fas fa-bolt text-cyan text-xl mb-3"></i>
             <h4 class="font-bold text-white text-sm mb-1">
               الالتزام بالمواعيد
             </h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#lightbulb"></use></svg>
+            <i class="fas fa-lightbulb text-cyan text-xl mb-3"></i>
             <h4 class="font-bold text-white text-sm mb-1">
               الابتكار المستمر
             </h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#bullseye"></use></svg>
+            <i class="fas fa-bullseye text-cyan text-xl mb-3"></i>
             <h4 class="font-bold text-white text-sm mb-1">
               التركيز على العميل
             </h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#shield-halved"></use></svg>
+            <i class="fas fa-shield-halved text-cyan text-xl mb-3"></i>
             <h4 class="font-bold text-white text-sm mb-1">
               الأمان والموثوقية
             </h4>
           </div>
           <div class="p-5 rounded-xl bg-panel border border-line card-hover">
-            <svg class="icon text-cyan text-xl mb-3" aria-hidden="true"><use href="#headset"></use></svg>
+            <i class="fas fa-headset text-cyan text-xl mb-3"></i>
             <h4 class="font-bold text-white text-sm mb-1">دعم فني مستمر</h4>
           </div>
         </div>
@@ -613,7 +596,7 @@
             <div
               class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
             >
-              <svg class="icon" aria-hidden="true"><use href="#pen-nib"></use></svg>
+              <i class="fas fa-pen-nib"></i>
             </div>
             <h3 class="text-xl font-bold text-white mb-2">تصميم لوجو</h3>
             <p class="text-sm text-muted leading-relaxed">
@@ -626,7 +609,7 @@
             <div
               class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
             >
-              <svg class="icon" aria-hidden="true"><use href="#film"></use></svg>
+              <i class="fas fa-film"></i>
             </div>
             <h3 class="text-xl font-bold text-white mb-2">تصميم انترو</h3>
             <p class="text-sm text-muted leading-relaxed">
@@ -639,7 +622,7 @@
             <div
               class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
             >
-              <svg class="icon" aria-hidden="true"><use href="#shapes"></use></svg>
+              <i class="fas fa-shapes"></i>
             </div>
             <h3 class="text-xl font-bold text-white mb-2">تصميم Canvas</h3>
             <p class="text-sm text-muted leading-relaxed">
@@ -667,7 +650,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <svg class="icon" aria-hidden="true"><use href="#handshake"></use></svg>
+              <i class="fas fa-handshake"></i>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">أمانة في التعامل</h3>
@@ -684,7 +667,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <svg class="icon" aria-hidden="true"><use href="#shield-halved"></use></svg>
+              <i class="fas fa-shield-halved"></i>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">موقع آمن من الأساس</h3>
@@ -701,7 +684,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <svg class="icon" aria-hidden="true"><use href="#bullseye"></use></svg>
+              <i class="fas fa-bullseye"></i>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">تركيز على هدف المشروع</h3>
@@ -718,7 +701,7 @@
             <div
               class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
             >
-              <svg class="icon" aria-hidden="true"><use href="#comments"></use></svg>
+              <i class="fas fa-comments"></i>
             </div>
             <div>
               <h3 class="font-bold text-white mb-1.5">تواصل مستمر</h3>
@@ -777,7 +760,7 @@
               class="h-44 bg-panel2 flex items-center justify-center relative overflow-hidden"
             >
               <div class="absolute inset-0 grid-texture opacity-40"></div>
-              <svg class="icon text-5xl text-cyan/70 relative z-10" aria-hidden="true"><use href="#mosque"></use></svg>
+              <i class="fas fa-mosque text-5xl text-cyan/70 relative z-10"></i>
             </div>
             <div class="p-6">
               <span class="mono badge text-amber">WEB APP · PWA</span>
@@ -796,7 +779,9 @@
               class="h-44 bg-panel2 flex items-center justify-center relative overflow-hidden"
             >
               <div class="absolute inset-0 grid-texture opacity-40"></div>
-              <svg class="icon text-5xl text-cyan/70 relative z-10" aria-hidden="true"><use href="#user-circle"></use></svg>
+              <i
+                class="fas fa-user-circle text-5xl text-cyan/70 relative z-10"
+              ></i>
             </div>
             <div class="p-6">
               <span class="mono badge text-amber">WEB APP · PWA</span>
@@ -815,7 +800,9 @@
               class="h-44 bg-panel2 flex items-center justify-center relative overflow-hidden"
             >
               <div class="absolute inset-0 grid-texture opacity-40"></div>
-              <svg class="icon text-5xl text-cyan/70 relative z-10" aria-hidden="true"><use href="#store"></use></svg>
+              <i
+                class="fas fa-store text-5xl text-cyan/70 relative z-10"
+              ></i>
             </div>
             <div class="p-6">
               <span class="mono badge text-amber">WEB APP · E-COMMERCE</span>
@@ -827,14 +814,16 @@
                 وتجربة استخدام سلسة من التصفح لحد الشراء.
               </p>
               <div class="flex gap-1 text-amber text-xs mb-3">
-                <svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg>
+                <i class="fas fa-star"></i><i class="fas fa-star"></i
+                ><i class="fas fa-star"></i><i class="fas fa-star"></i
+                ><i class="fas fa-star"></i>
               </div>
               <a
                 href="https://www.abosofyanbrand.com/"
                 target="_blank"
                 class="mono text-xs text-cyan hover:underline flex items-center gap-1.5"
               >
-                زيارة الموقع <svg class="icon icon-arrow-up-left" aria-hidden="true"><use href="#arrow-up-left"></use></svg>
+                زيارة الموقع <i class="fas fa-arrow-up-left"></i>
               </a>
             </div>
           </div>
@@ -941,7 +930,9 @@
         <div class="grid md:grid-cols-3 gap-7">
           <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
             <div class="flex gap-1 text-amber mb-4 text-sm">
-              <svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg>
+              <i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i>
             </div>
             <p class="text-sm text-fog/90 leading-relaxed mb-5">
               "تعامل محترف من أول يوم، وسلّم الموقع في الميعاد بالظبط زي ما
@@ -964,7 +955,9 @@
 
           <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
             <div class="flex gap-1 text-amber mb-4 text-sm">
-              <svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg><svg class="icon" aria-hidden="true"><use href="#star"></use></svg>
+              <i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i><i class="fas fa-star"></i
+              ><i class="fas fa-star"></i>
             </div>
             <p class="text-sm text-fog/90 leading-relaxed mb-5">
               "تجربة رائعة من أول استشارة لحد التسليم، منصة الكورسات طلعت
@@ -1016,26 +1009,26 @@
             target="_blank"
             class="px-7 py-3.5 rounded-md bg-cyan text-ink font-bold hover:brightness-110 transition-all flex items-center gap-2"
           >
-            <svg class="icon text-lg" aria-hidden="true"><use href="#whatsapp"></use></svg> واتساب
+            <i class="fab fa-whatsapp text-lg"></i> واتساب
           </a>
           <a
             href="mailto:mh3976698@gmail.com"
             class="px-7 py-3.5 rounded-md border border-line text-fog font-bold hover:border-cyan hover:text-cyan transition-all flex items-center gap-2 mono text-sm"
           >
-            <svg class="icon text-cyan" aria-hidden="true"><use href="#envelope"></use></svg> mh3976698@gmail.com
+            <i class="fas fa-envelope text-cyan"></i> mh3976698@gmail.com
           </a>
         </div>
         <div
           class="flex flex-wrap items-center justify-center gap-6 text-xs text-muted mono"
         >
           <span class="flex items-center gap-1.5"
-            ><svg class="icon text-cyan" aria-hidden="true"><use href="#check"></use></svg> استشارة مجانية</span
+            ><i class="fas fa-check text-cyan"></i> استشارة مجانية</span
           >
           <span class="flex items-center gap-1.5"
-            ><svg class="icon text-cyan" aria-hidden="true"><use href="#check"></use></svg> رد خلال ساعة</span
+            ><i class="fas fa-check text-cyan"></i> رد خلال ساعة</span
           >
           <span class="flex items-center gap-1.5"
-            ><svg class="icon text-cyan" aria-hidden="true"><use href="#check"></use></svg> دعم بعد التسليم</span
+            ><i class="fas fa-check text-cyan"></i> دعم بعد التسليم</span
           >
         </div>
       </div>
@@ -1047,17 +1040,20 @@
           href="https://wa.me/201110742678"
           target="_blank"
           class="hover:text-cyan transition-colors"
-          ><svg class="icon" aria-hidden="true"><use href="#whatsapp"></use></svg></a>
+          ><i class="fab fa-whatsapp"></i
+        ></a>
         <a
           href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/"
           target="_blank"
           class="hover:text-cyan transition-colors"
-          ><svg class="icon" aria-hidden="true"><use href="#linkedin"></use></svg></a>
+          ><i class="fab fa-linkedin"></i
+        ></a>
         <a
           href="https://www.facebook.com/mohamed.dev27"
           target="_blank"
           class="hover:text-cyan transition-colors"
-          ><svg class="icon" aria-hidden="true"><use href="#facebook"></use></svg></a>
+          ><i class="fab fa-facebook"></i
+        ></a>
       </div>
       <p class="mono text-xs text-muted tracking-widest">
         © 2026 Mohamed Ahmed Helmy — built with care.
@@ -1094,50 +1090,12 @@
       );
       reveals.forEach((s) => io.observe(s));
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
-    <script src="supabase-config.js" defer></script>
-    <script defer>
-    document.addEventListener("DOMContentLoaded", () => {
-      // pdf.js (~1MB) كان بيتحمّل في كل زيارة للصفحة حتى لو الزائر مش
-      // هيوصل لقسم الشهادات. دلوقتي بيتحمّل مرة واحدة بس، أول لحظة
-      // يحتاجها فيها الكود فعليًا (renderPdfFirstPageToImg)، وكمان
-      // بنبدأ تحميله مبكرًا شوية قبل ما قسم الشهادات يظهر في الشاشة
-      // (rootMargin) عشان يكون جاهز أو قريب من الجاهزية لما المستخدم يوصله.
-      let pdfJsPromise = null;
-      function loadPdfJs() {
-        if (pdfJsPromise) return pdfJsPromise;
-        pdfJsPromise = new Promise((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-          script.onload = () => {
-            pdfjsLib.GlobalWorkerOptions.workerSrc =
-              "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-            resolve();
-          };
-          script.onerror = () => reject(new Error("تعذر تحميل مكتبة عرض PDF"));
-          document.head.appendChild(script);
-        });
-        return pdfJsPromise;
-      }
-
-      // نبدأ تحميل pdf.js بمجرد ما قسم الشهادات يقرب من الشاشة (600px
-      // قبل ما يظهر فعليًا)، مش لما المستخدم يوصله بالظبط — عشان
-      // يكون التحميل خلص أو شارف على الخلاص لحظة ما يشوف القسم.
-      const certificatesSection = document.getElementById("certificates");
-      if (certificatesSection) {
-        const preloadObserver = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                loadPdfJs().catch((err) => console.error(err));
-                preloadObserver.disconnect();
-              }
-            });
-          },
-          { rootMargin: "600px 0px" },
-        );
-        preloadObserver.observe(certificatesSection);
-      }
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <script>
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
       // يرسم أول صفحة من ملف PDF على canvas ويحوّلها لصورة، يُستخدم لأي
       // شهادة قديمة معندهاش thumbnail_url محفوظ مسبقًا
@@ -1154,7 +1112,6 @@
             setTimeout(() => reject(new Error("انتهت المهلة أثناء تحميل/رسم الـ PDF")), ms),
           );
         try {
-          await loadPdfJs();
           const pdf = await Promise.race([
             pdfjsLib.getDocument(url).promise,
             timeout(15000),
@@ -1188,7 +1145,7 @@
           if (frame) {
             frame.innerHTML = `
               <a href="${url}" target="_blank" rel="noopener" class="pdf-fallback-link">
-                <svg class="icon" aria-hidden="true"><use href="#file-pdf"></use></svg>
+                <i class="fas fa-file-pdf"></i>
                 <span>اضغط لعرض الشهادة</span>
               </a>`;
           }
@@ -1236,7 +1193,7 @@
                 rel="noopener"
                 class="mono text-xs text-cyan hover:underline flex items-center gap-1.5"
               >
-                فتح الشهادة كاملة <svg class="icon icon-arrow-up-left" aria-hidden="true"><use href="#arrow-up-left"></use></svg>
+                فتح الشهادة كاملة <i class="fas fa-arrow-up-left"></i>
               </a>
             </div>`,
             )
@@ -1256,7 +1213,6 @@
         }
       }
       loadCertificates();
-    });
     </script>
   </body>
 </html>

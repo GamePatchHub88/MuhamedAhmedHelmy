@@ -324,54 +324,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   white-space: nowrap;
 }
 
-/* Frame for embedded white content (PDFs, images) so it doesn't clash with the dark theme */
-.pdf-frame {
-  position: relative;
-  border-radius: 0.75rem;
-  padding: 10px;
-  background: linear-gradient(160deg, #121826, #0d121c);
-  border: 1px solid #1c2433;
-}
-.pdf-frame .pdf-inner {
-  border-radius: 0.5rem;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.65);
-}
-.pdf-frame iframe {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1233 / 945;
-  height: auto;
-  border: 0;
-}
-.cert-skeleton {
-  aspect-ratio: 1233 / 945;
-  border-radius: 0.5rem;
-  background: linear-gradient(100deg, #121826 30%, #1a2332 50%, #121826 70%);
-  background-size: 200% 100%;
-  animation: skeleton-move 1.4s ease-in-out infinite;
-}
-@keyframes skeleton-move { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-.pdf-fallback-link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  aspect-ratio: 1233 / 945;
-  border-radius: 0.5rem;
-  background: #f4f4f5;
-  color: #0d121c;
-  text-decoration: none;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.85rem;
-  transition: background 0.2s ease;
-}
-.pdf-fallback-link i { font-size: 2rem; color: #e5484d; }
-.pdf-fallback-link:hover { background: #e7e7ea; }
-
 .nav-link { position: relative; }
 .nav-link::after {
   content: "";

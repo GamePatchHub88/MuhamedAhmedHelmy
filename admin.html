@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <title>لوحة التحكم | الشهادات</title>
+    <title>لوحة التحكم</title>
     <meta name="robots" content="noindex, nofollow" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -31,7 +31,9 @@
         border-bottom: 1px solid #1c2433;
       }
 
-      .admin-input {
+      .admin-input,
+      .admin-select,
+      .admin-textarea {
         width: 100%;
         background: #0d121c;
         border: 1px solid #1c2433;
@@ -43,11 +45,15 @@
         outline: none;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
       }
-      .admin-input:focus {
+      .admin-textarea { resize: vertical; min-height: 90px; }
+      .admin-input:focus,
+      .admin-select:focus,
+      .admin-textarea:focus {
         border-color: #00e5c7;
         box-shadow: 0 0 0 3px rgba(0, 229, 199, 0.12);
       }
-      .admin-input::placeholder { color: #5a6579; }
+      .admin-input::placeholder,
+      .admin-textarea::placeholder { color: #5a6579; }
       .admin-label {
         display: block;
         font-size: 0.85rem;
@@ -85,42 +91,6 @@
         filter: none;
       }
 
-      /* Drop zone */
-      .drop-zone {
-        border: 1.5px dashed #2a3345;
-        border-radius: 0.75rem;
-        background: #0d121c;
-        padding: 1.75rem 1.25rem;
-        text-align: center;
-        cursor: pointer;
-        transition: border-color 0.2s ease, background-color 0.2s ease;
-      }
-      .drop-zone:hover, .drop-zone.drag-over {
-        border-color: #00e5c7;
-        background: rgba(0, 229, 199, 0.04);
-      }
-      .drop-zone i { font-size: 1.6rem; color: #00e5c7; margin-bottom: 0.6rem; }
-      .drop-zone .dz-hint { color: #5a6579; font-size: 0.75rem; margin-top: 0.3rem; }
-      .file-chip {
-        display: none;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-        background: #0d121c;
-        border: 1px solid #1c2433;
-        border-radius: 0.6rem;
-        padding: 0.7rem 1rem;
-        margin-top: 0.75rem;
-      }
-      .file-chip.show { display: flex; }
-      .file-chip-remove {
-        color: #f87171;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-
       /* Toasts */
       #toast-wrap {
         position: fixed;
@@ -147,8 +117,8 @@
       .toast.err { border-color: rgba(248, 113, 113, 0.4); color: #f87171; }
       @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-      /* Certificate rows */
-      .cert-row {
+      /* Generic row (skills / projects / reviews) */
+      .item-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -160,8 +130,8 @@
         background: #0d121c;
         transition: border-color 0.2s ease;
       }
-      .cert-row:hover { border-color: rgba(0, 229, 199, 0.3); }
-      .cert-icon {
+      .item-row:hover { border-color: rgba(0, 229, 199, 0.3); }
+      .item-icon {
         width: 38px;
         height: 38px;
         flex-shrink: 0;
@@ -199,8 +169,38 @@
       }
       @keyframes spin { to { transform: rotate(360deg); } }
 
+      /* Tabs */
+      .tab-bar {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+      .tab-btn {
+        background: #0d121c;
+        border: 1px solid #1c2433;
+        color: #7c8aa3;
+        font-weight: 700;
+        font-size: 0.85rem;
+        border-radius: 0.6rem;
+        padding: 0.65rem 1.1rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+      }
+      .tab-btn:hover { color: #cfd8e6; border-color: #2a3345; }
+      .tab-btn.active {
+        background: rgba(0, 229, 199, 0.1);
+        border-color: #00e5c7;
+        color: #00e5c7;
+      }
+      .tab-panel { display: none; }
+      .tab-panel.active { display: block; }
+
       @media (max-width: 640px) {
-        .cert-row { flex-wrap: wrap; }
+        .item-row { flex-wrap: wrap; }
       }
     </style>
   </head>
@@ -217,7 +217,7 @@
         </div>
         <div id="login-box" class="bg-panel border border-line rounded-2xl p-7">
           <h2 class="text-lg font-bold text-white mb-1">تسجيل الدخول</h2>
-          <p class="text-xs text-muted mb-6">دخول مخصص لإدارة الشهادات فقط</p>
+          <p class="text-xs text-muted mb-6">دخول مخصص لإدارة محتوى الموقع</p>
           <div class="mb-4">
             <label class="admin-label">البريد الإلكتروني</label>
             <input
@@ -262,63 +262,139 @@
       </header>
 
       <main class="container mx-auto px-6 py-10 max-w-3xl">
-        <div class="flex items-center gap-3 mb-8">
-          <span class="stat-chip">
-            إجمالي الشهادات: <b id="cert-count">0</b>
-          </span>
-        </div>
-
-        <!-- Add certificate -->
-        <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
-          <h2 class="text-lg font-bold text-white mb-1">إضافة شهادة جديدة</h2>
-          <p class="text-xs text-muted mb-6">
-            الاسم اللي هتكتبه هو اللي هيظهر للزوار في الموقع
-          </p>
-
-          <div class="mb-5">
-            <label class="admin-label">اسم الشهادة</label>
-            <input
-              id="cert-name"
-              type="text"
-              class="admin-input"
-              placeholder="مثال: شهادة إتمام دورة HTML Fundamentals"
-            />
-          </div>
-
-          <div class="mb-2">
-            <label class="admin-label">ملف الشهادة (PDF)</label>
-            <div id="drop-zone" class="drop-zone">
-              <i class="fas fa-cloud-arrow-up"></i>
-              <div class="text-sm text-fog/90">
-                اسحب ملف الـ PDF هنا أو دوس للاختيار
-              </div>
-              <div class="dz-hint">PDF فقط — حتى 10MB</div>
-              <input id="cert-file" type="file" accept="application/pdf" hidden />
-            </div>
-            <div id="file-chip" class="file-chip">
-              <div class="flex items-center gap-2 mono text-xs text-fog/90" style="overflow: hidden">
-                <i class="fas fa-file-pdf text-cyan"></i>
-                <span id="file-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"></span>
-                <span id="file-size" class="text-muted"></span>
-              </div>
-              <button id="file-remove" class="file-chip-remove" type="button">
-                <i class="fas fa-xmark"></i>
-              </button>
-            </div>
-          </div>
-
-          <button id="add-btn" class="admin-btn mt-5">
-            <i class="fas fa-upload"></i> رفع وإضافة
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="skills">
+            <i class="fas fa-code"></i> المهارات
+          </button>
+          <button class="tab-btn" data-tab="projects">
+            <i class="fas fa-diagram-project"></i> الأعمال والمشاريع
+          </button>
+          <button class="tab-btn" data-tab="reviews">
+            <i class="fas fa-star"></i> تقييمات العملاء
           </button>
         </div>
 
-        <!-- List -->
-        <div class="bg-panel border border-line rounded-2xl p-7">
-          <h2 class="text-lg font-bold text-white mb-1">الشهادات الحالية</h2>
-          <p class="text-xs text-muted mb-5">
-            الرقم الأصغر يظهر أول في الموقع. عدّل الرقم ودوس أيقونة الحفظ.
-          </p>
-          <div id="cert-list"></div>
+        <!-- ===================== SKILLS TAB ===================== -->
+        <div class="tab-panel active" id="tab-skills">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="stat-chip">إجمالي المهارات: <b id="skills-count">0</b></span>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
+            <h2 class="text-lg font-bold text-white mb-1">إضافة مهارة جديدة</h2>
+            <p class="text-xs text-muted mb-6">هتظهر مع باقي المهارات في قسم "المهارات التقنية" بالموقع</p>
+
+            <div class="mb-5">
+              <label class="admin-label">اسم المهارة</label>
+              <input id="skill-name" type="text" class="admin-input" placeholder="مثال: React.js" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">التصنيف</label>
+              <input id="skill-category" type="text" class="admin-input" placeholder="مثال: Front-end أو Security & IT" />
+            </div>
+            <div class="mb-2">
+              <label class="admin-label">كلاس الأيقونة (Font Awesome) — اختياري</label>
+              <input id="skill-icon" type="text" class="admin-input" placeholder="مثال: fab fa-react" />
+            </div>
+
+            <button id="add-skill-btn" class="admin-btn mt-5">
+              <i class="fas fa-plus"></i> إضافة المهارة
+            </button>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7">
+            <h2 class="text-lg font-bold text-white mb-1">المهارات الحالية</h2>
+            <p class="text-xs text-muted mb-5">الرقم الأصغر يظهر أول في الموقع. عدّل الرقم ودوس أيقونة الحفظ.</p>
+            <div id="skills-list"></div>
+          </div>
+        </div>
+
+        <!-- ===================== PROJECTS TAB ===================== -->
+        <div class="tab-panel" id="tab-projects">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="stat-chip">إجمالي الأعمال: <b id="projects-count">0</b></span>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
+            <h2 class="text-lg font-bold text-white mb-1">إضافة عمل / مشروع جديد</h2>
+            <p class="text-xs text-muted mb-6">هيظهر في قسم "أحدث أعمالي" بالموقع</p>
+
+            <div class="mb-5">
+              <label class="admin-label">اسم المشروع</label>
+              <input id="project-title" type="text" class="admin-input" placeholder="مثال: منصة خُطي" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">وصف المشروع</label>
+              <textarea id="project-description" class="admin-textarea" placeholder="وصف مختصر عن المشروع..."></textarea>
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">تصنيف المشروع (Badge)</label>
+              <input id="project-badge" type="text" class="admin-input" placeholder="مثال: WEB APP · PWA" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">كلاس الأيقونة (Font Awesome) — اختياري</label>
+              <input id="project-icon" type="text" class="admin-input" placeholder="مثال: fas fa-store" />
+            </div>
+            <div class="mb-2">
+              <label class="admin-label">رابط الموقع — اختياري</label>
+              <input id="project-link" type="url" class="admin-input" placeholder="https://example.com" />
+            </div>
+
+            <button id="add-project-btn" class="admin-btn mt-5">
+              <i class="fas fa-plus"></i> إضافة المشروع
+            </button>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7">
+            <h2 class="text-lg font-bold text-white mb-1">الأعمال الحالية</h2>
+            <p class="text-xs text-muted mb-5">الرقم الأصغر يظهر أول في الموقع. عدّل الرقم ودوس أيقونة الحفظ.</p>
+            <div id="projects-list"></div>
+          </div>
+        </div>
+
+        <!-- ===================== REVIEWS TAB ===================== -->
+        <div class="tab-panel" id="tab-reviews">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="stat-chip">إجمالي التقييمات: <b id="reviews-count">0</b></span>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
+            <h2 class="text-lg font-bold text-white mb-1">إضافة تقييم عميل جديد</h2>
+            <p class="text-xs text-muted mb-6">هيظهر في قسم "آراء العملاء" بالموقع</p>
+
+            <div class="mb-5">
+              <label class="admin-label">اسم العميل</label>
+              <input id="review-name" type="text" class="admin-input" placeholder="مثال: أحمد محمد" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">وصف العميل</label>
+              <input id="review-role" type="text" class="admin-input" placeholder="مثال: عميل — منصة كورسات" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">نص التقييم</label>
+              <textarea id="review-text" class="admin-textarea" placeholder="اكتب رأي العميل هنا..."></textarea>
+            </div>
+            <div class="mb-2">
+              <label class="admin-label">التقييم (من 1 إلى 5)</label>
+              <select id="review-rating" class="admin-select">
+                <option value="5" selected>5 نجوم</option>
+                <option value="4">4 نجوم</option>
+                <option value="3">3 نجوم</option>
+                <option value="2">نجمتين</option>
+                <option value="1">نجمة واحدة</option>
+              </select>
+            </div>
+
+            <button id="add-review-btn" class="admin-btn mt-5">
+              <i class="fas fa-plus"></i> إضافة التقييم
+            </button>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7">
+            <h2 class="text-lg font-bold text-white mb-1">التقييمات الحالية</h2>
+            <p class="text-xs text-muted mb-5">الرقم الأصغر يظهر أول في الموقع. عدّل الرقم ودوس أيقونة الحفظ.</p>
+            <div id="reviews-list"></div>
+          </div>
         </div>
       </main>
     </div>
@@ -326,43 +402,8 @@
     <div id="toast-wrap"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="supabase-config.js"></script>
     <script>
-      // مكتبة pdf.js لتوليد صورة مصغّرة من أول صفحة في الشهادة
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-      async function generatePdfThumbnail(file) {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 2 });
-        const canvas = document.createElement("canvas");
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        const ctx = canvas.getContext("2d");
-        await page.render({ canvasContext: ctx, viewport }).promise;
-        return new Promise((resolve) =>
-          canvas.toBlob((blob) => resolve(blob), "image/png", 0.9),
-        );
-      }
-    </script>
-    <script>
-      const loginScreen = document.getElementById("login-screen");
-      const panel = document.getElementById("panel");
-      const userEmail = document.getElementById("user-email");
-      const certList = document.getElementById("cert-list");
-      const certCount = document.getElementById("cert-count");
-
-      const dropZone = document.getElementById("drop-zone");
-      const fileInput = document.getElementById("cert-file");
-      const fileChip = document.getElementById("file-chip");
-      const fileNameEl = document.getElementById("file-name");
-      const fileSizeEl = document.getElementById("file-size");
-
-      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
-
       function toast(text, ok = true) {
         const wrap = document.getElementById("toast-wrap");
         const el = document.createElement("div");
@@ -372,50 +413,20 @@
         setTimeout(() => el.remove(), 3800);
       }
 
-      function formatSize(bytes) {
-        return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-      }
+      /* ---------- Tabs ---------- */
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+          document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+          btn.classList.add("active");
+          document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+        });
+      });
 
-      function setSelectedFile(file) {
-        if (!file) return;
-        if (file.type !== "application/pdf") {
-          toast("الملف لازم يكون PDF فقط", false);
-          fileInput.value = "";
-          return;
-        }
-        if (file.size > MAX_SIZE) {
-          toast("حجم الملف أكبر من 10MB", false);
-          fileInput.value = "";
-          return;
-        }
-        fileNameEl.textContent = file.name;
-        fileSizeEl.textContent = "· " + formatSize(file.size);
-        fileChip.classList.add("show");
-      }
-
-      dropZone.addEventListener("click", () => fileInput.click());
-      dropZone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropZone.classList.add("drag-over");
-      });
-      dropZone.addEventListener("dragleave", () =>
-        dropZone.classList.remove("drag-over"),
-      );
-      dropZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropZone.classList.remove("drag-over");
-        const file = e.dataTransfer.files[0];
-        if (file) {
-          fileInput.files = e.dataTransfer.files;
-          setSelectedFile(file);
-        }
-      });
-      fileInput.addEventListener("change", () => setSelectedFile(fileInput.files[0]));
-      document.getElementById("file-remove").addEventListener("click", (e) => {
-        e.stopPropagation();
-        fileInput.value = "";
-        fileChip.classList.remove("show");
-      });
+      /* ---------- Auth ---------- */
+      const loginScreen = document.getElementById("login-screen");
+      const panel = document.getElementById("panel");
+      const userEmail = document.getElementById("user-email");
 
       async function checkSession() {
         const { data } = await supabaseClient.auth.getSession();
@@ -423,7 +434,9 @@
           loginScreen.classList.add("hidden");
           panel.classList.remove("hidden");
           userEmail.textContent = data.session.user.email;
-          loadCertList();
+          loadSkills();
+          loadProjects();
+          loadReviews();
         } else {
           loginScreen.classList.remove("hidden");
           panel.classList.add("hidden");
@@ -439,10 +452,7 @@
           return;
         }
         btn.disabled = true;
-        const { error } = await supabaseClient.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
         btn.disabled = false;
         if (error) {
           toast("خطأ في تسجيل الدخول: " + error.message, false);
@@ -460,130 +470,123 @@
         checkSession();
       });
 
-      document.getElementById("add-btn").addEventListener("click", async () => {
-        const btn = document.getElementById("add-btn");
-        const name = document.getElementById("cert-name").value.trim();
-        const file = fileInput.files[0];
+      /* ---------- Generic helpers ---------- */
+      async function nextOrderIndex(table) {
+        const { data } = await supabaseClient
+          .from(table)
+          .select("order_index")
+          .order("order_index", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        return data ? data.order_index + 1 : 0;
+      }
 
-        if (!name || !file) {
-          toast("من فضلك اكتب اسم الشهادة واختر ملف PDF", false);
+      function wireRowActions(table, reload) {
+        document.querySelectorAll(`.delete-btn[data-table="${table}"]`).forEach((b) => {
+          b.addEventListener("click", async () => {
+            if (!confirm("متأكد من الحذف؟")) return;
+            const { error } = await supabaseClient.from(table).delete().eq("id", b.dataset.id);
+            if (!error) {
+              toast("تم الحذف", true);
+              reload();
+            } else {
+              toast("تعذر الحذف: " + error.message, false);
+            }
+          });
+        });
+
+        document.querySelectorAll(`.save-order-btn[data-table="${table}"]`).forEach((b) => {
+          b.addEventListener("click", async () => {
+            const id = b.dataset.id;
+            const input = document.querySelector(`.order-input[data-table="${table}"][data-id="${id}"]`);
+            const newOrder = parseInt(input.value, 10);
+            if (isNaN(newOrder)) {
+              toast("اكتب رقم صحيح", false);
+              return;
+            }
+            const { error } = await supabaseClient.from(table).update({ order_index: newOrder }).eq("id", id);
+            if (error) {
+              toast("حصل خطأ: " + error.message, false);
+              return;
+            }
+            toast("تم حفظ الترتيب", true);
+            reload();
+          });
+        });
+      }
+
+      /* ---------- Skills ---------- */
+      const skillsList = document.getElementById("skills-list");
+      const skillsCount = document.getElementById("skills-count");
+
+      document.getElementById("add-skill-btn").addEventListener("click", async () => {
+        const btn = document.getElementById("add-skill-btn");
+        const name = document.getElementById("skill-name").value.trim();
+        const category = document.getElementById("skill-category").value.trim() || "عام";
+        const icon = document.getElementById("skill-icon").value.trim() || "fas fa-code";
+
+        if (!name) {
+          toast("من فضلك اكتب اسم المهارة", false);
           return;
         }
 
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> جاري الرفع...';
-
+        btn.innerHTML = '<span class="spinner"></span> جاري الإضافة...';
         try {
-          const ext = file.name.split(".").pop().toLowerCase();
-          const filePath = `cert-${Date.now()}-${Math.random()
-            .toString(36)
-            .slice(2, 8)}.${ext}`;
+          const order_index = await nextOrderIndex("skills");
+          const { error } = await supabaseClient.from("skills").insert({ name, category, icon, order_index });
+          if (error) throw error;
 
-          const { error: uploadError } = await supabaseClient.storage
-            .from("certificates")
-            .upload(filePath, file, { contentType: "application/pdf" });
-          if (uploadError) throw uploadError;
-
-          const { data: publicUrlData } = supabaseClient.storage
-            .from("certificates")
-            .getPublicUrl(filePath);
-
-          // توليد صورة مصغّرة من الشهادة عشان تشتغل على كل الأجهزة (بدل عرض الـ PDF مباشرة)
-          let thumbnailUrl = null;
-          try {
-            const thumbBlob = await generatePdfThumbnail(file);
-            const thumbPath = `thumb-${Date.now()}-${Math.random()
-              .toString(36)
-              .slice(2, 8)}.png`;
-            const { error: thumbUploadError } = await supabaseClient.storage
-              .from("certificates")
-              .upload(thumbPath, thumbBlob, { contentType: "image/png" });
-            if (!thumbUploadError) {
-              const { data: thumbUrlData } = supabaseClient.storage
-                .from("certificates")
-                .getPublicUrl(thumbPath);
-              thumbnailUrl = thumbUrlData.publicUrl;
-            }
-          } catch (thumbErr) {
-            console.error("تعذر توليد الصورة المصغّرة:", thumbErr);
-          }
-
-          const { data: maxRow } = await supabaseClient
-            .from("certificates")
-            .select("order_index")
-            .order("order_index", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-          const nextOrder = maxRow ? maxRow.order_index + 1 : 0;
-
-          const { error: insertError } = await supabaseClient
-            .from("certificates")
-            .insert({
-              name,
-              pdf_url: publicUrlData.publicUrl,
-              thumbnail_url: thumbnailUrl,
-              order_index: nextOrder,
-            });
-          if (insertError) throw insertError;
-
-          toast("تم إضافة الشهادة بنجاح ✅", true);
-          document.getElementById("cert-name").value = "";
-          fileInput.value = "";
-          fileChip.classList.remove("show");
-          loadCertList();
+          toast("تم إضافة المهارة بنجاح ✅", true);
+          document.getElementById("skill-name").value = "";
+          document.getElementById("skill-category").value = "";
+          document.getElementById("skill-icon").value = "";
+          loadSkills();
         } catch (err) {
           toast("حصل خطأ: " + err.message, false);
         } finally {
           btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-upload"></i> رفع وإضافة';
+          btn.innerHTML = '<i class="fas fa-plus"></i> إضافة المهارة';
         }
       });
 
-      async function loadCertList() {
-        certList.innerHTML =
-          '<p class="text-muted text-sm">جاري التحميل...</p>';
+      async function loadSkills() {
+        skillsList.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
         const { data, error } = await supabaseClient
-          .from("certificates")
-          .select("id, name, pdf_url, order_index, created_at")
+          .from("skills")
+          .select("id, name, category, icon, order_index")
           .order("order_index", { ascending: true })
           .order("created_at", { ascending: false });
 
         if (error) {
-          certList.innerHTML =
-            '<p class="text-red-400 text-sm">تعذر تحميل القائمة</p>';
+          skillsList.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل القائمة</p>';
           return;
         }
 
-        certCount.textContent = data ? data.length : 0;
+        skillsCount.textContent = data ? data.length : 0;
 
         if (!data || data.length === 0) {
-          certList.innerHTML =
-            '<p class="text-muted text-sm">لا توجد شهادات بعد.</p>';
+          skillsList.innerHTML = '<p class="text-muted text-sm">لا توجد مهارات بعد.</p>';
           return;
         }
 
-        certList.innerHTML = data
+        skillsList.innerHTML = data
           .map(
-            (c) => `
-          <div class="cert-row">
+            (s) => `
+          <div class="item-row">
             <div class="flex items-center gap-3" style="min-width: 0">
-              <div class="cert-icon"><i class="fas fa-file-pdf"></i></div>
-              <input
-                type="number"
-                data-id="${c.id}"
-                class="order-input admin-input"
-                value="${c.order_index}"
-              />
+              <div class="item-icon"><i class="${s.icon}"></i></div>
+              <input type="number" data-table="skills" data-id="${s.id}" class="order-input admin-input" value="${s.order_index}" />
               <div style="min-width: 0">
-                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${c.name}</div>
-                <a href="${c.pdf_url}" target="_blank" class="mono text-xs text-cyan hover:underline">عرض الملف</a>
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${s.name}</div>
+                <div class="mono text-xs text-muted">${s.category}</div>
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <button data-id="${c.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem">
+              <button data-table="skills" data-id="${s.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem">
                 <i class="fas fa-floppy-disk"></i>
               </button>
-              <button data-id="${c.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
+              <button data-table="skills" data-id="${s.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -591,43 +594,181 @@
           )
           .join("");
 
-        document.querySelectorAll(".delete-btn").forEach((b) => {
-          b.addEventListener("click", async () => {
-            if (!confirm("متأكد من حذف الشهادة؟")) return;
-            const { error } = await supabaseClient
-              .from("certificates")
-              .delete()
-              .eq("id", b.dataset.id);
-            if (!error) {
-              toast("تم الحذف", true);
-              loadCertList();
-            } else {
-              toast("تعذر الحذف: " + error.message, false);
-            }
-          });
-        });
+        wireRowActions("skills", loadSkills);
+      }
 
-        document.querySelectorAll(".save-order-btn").forEach((b) => {
-          b.addEventListener("click", async () => {
-            const id = b.dataset.id;
-            const input = document.querySelector(`.order-input[data-id="${id}"]`);
-            const newOrder = parseInt(input.value, 10);
-            if (isNaN(newOrder)) {
-              toast("اكتب رقم صحيح", false);
-              return;
-            }
-            const { error } = await supabaseClient
-              .from("certificates")
-              .update({ order_index: newOrder })
-              .eq("id", id);
-            if (error) {
-              toast("حصل خطأ: " + error.message, false);
-              return;
-            }
-            toast("تم حفظ الترتيب", true);
-            loadCertList();
-          });
-        });
+      /* ---------- Projects ---------- */
+      const projectsList = document.getElementById("projects-list");
+      const projectsCount = document.getElementById("projects-count");
+
+      document.getElementById("add-project-btn").addEventListener("click", async () => {
+        const btn = document.getElementById("add-project-btn");
+        const title = document.getElementById("project-title").value.trim();
+        const description = document.getElementById("project-description").value.trim();
+        const badge = document.getElementById("project-badge").value.trim() || "WEB APP";
+        const icon = document.getElementById("project-icon").value.trim() || "fas fa-globe";
+        const link_url = document.getElementById("project-link").value.trim() || null;
+
+        if (!title || !description) {
+          toast("من فضلك اكتب اسم المشروع ووصفه", false);
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> جاري الإضافة...';
+        try {
+          const order_index = await nextOrderIndex("projects");
+          const { error } = await supabaseClient
+            .from("projects")
+            .insert({ title, description, badge, icon, link_url, order_index });
+          if (error) throw error;
+
+          toast("تم إضافة المشروع بنجاح ✅", true);
+          document.getElementById("project-title").value = "";
+          document.getElementById("project-description").value = "";
+          document.getElementById("project-badge").value = "";
+          document.getElementById("project-icon").value = "";
+          document.getElementById("project-link").value = "";
+          loadProjects();
+        } catch (err) {
+          toast("حصل خطأ: " + err.message, false);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-plus"></i> إضافة المشروع';
+        }
+      });
+
+      async function loadProjects() {
+        projectsList.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
+        const { data, error } = await supabaseClient
+          .from("projects")
+          .select("id, title, description, badge, icon, link_url, order_index")
+          .order("order_index", { ascending: true })
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          projectsList.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل القائمة</p>';
+          return;
+        }
+
+        projectsCount.textContent = data ? data.length : 0;
+
+        if (!data || data.length === 0) {
+          projectsList.innerHTML = '<p class="text-muted text-sm">لا توجد أعمال بعد.</p>';
+          return;
+        }
+
+        projectsList.innerHTML = data
+          .map(
+            (p) => `
+          <div class="item-row">
+            <div class="flex items-center gap-3" style="min-width: 0">
+              <div class="item-icon"><i class="${p.icon}"></i></div>
+              <input type="number" data-table="projects" data-id="${p.id}" class="order-input admin-input" value="${p.order_index}" />
+              <div style="min-width: 0">
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${p.title}</div>
+                <div class="mono text-xs text-muted">${p.badge}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <button data-table="projects" data-id="${p.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem">
+                <i class="fas fa-floppy-disk"></i>
+              </button>
+              <button data-table="projects" data-id="${p.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>`,
+          )
+          .join("");
+
+        wireRowActions("projects", loadProjects);
+      }
+
+      /* ---------- Reviews ---------- */
+      const reviewsList = document.getElementById("reviews-list");
+      const reviewsCount = document.getElementById("reviews-count");
+
+      document.getElementById("add-review-btn").addEventListener("click", async () => {
+        const btn = document.getElementById("add-review-btn");
+        const client_name = document.getElementById("review-name").value.trim();
+        const client_role = document.getElementById("review-role").value.trim() || "عميل";
+        const review_text = document.getElementById("review-text").value.trim();
+        const rating = parseInt(document.getElementById("review-rating").value, 10);
+
+        if (!client_name || !review_text) {
+          toast("من فضلك اكتب اسم العميل ونص التقييم", false);
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> جاري الإضافة...';
+        try {
+          const order_index = await nextOrderIndex("reviews");
+          const { error } = await supabaseClient
+            .from("reviews")
+            .insert({ client_name, client_role, review_text, rating, order_index });
+          if (error) throw error;
+
+          toast("تم إضافة التقييم بنجاح ✅", true);
+          document.getElementById("review-name").value = "";
+          document.getElementById("review-role").value = "";
+          document.getElementById("review-text").value = "";
+          document.getElementById("review-rating").value = "5";
+          loadReviews();
+        } catch (err) {
+          toast("حصل خطأ: " + err.message, false);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-plus"></i> إضافة التقييم';
+        }
+      });
+
+      async function loadReviews() {
+        reviewsList.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
+        const { data, error } = await supabaseClient
+          .from("reviews")
+          .select("id, client_name, client_role, review_text, rating, order_index")
+          .order("order_index", { ascending: true })
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          reviewsList.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل القائمة</p>';
+          return;
+        }
+
+        reviewsCount.textContent = data ? data.length : 0;
+
+        if (!data || data.length === 0) {
+          reviewsList.innerHTML = '<p class="text-muted text-sm">لا توجد تقييمات بعد.</p>';
+          return;
+        }
+
+        reviewsList.innerHTML = data
+          .map(
+            (r) => `
+          <div class="item-row">
+            <div class="flex items-center gap-3" style="min-width: 0">
+              <div class="item-icon"><i class="fas fa-star"></i></div>
+              <input type="number" data-table="reviews" data-id="${r.id}" class="order-input admin-input" value="${r.order_index}" />
+              <div style="min-width: 0">
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${r.client_name} — ${r.rating}★</div>
+                <div class="mono text-xs text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${r.client_role}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <button data-table="reviews" data-id="${r.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem">
+                <i class="fas fa-floppy-disk"></i>
+              </button>
+              <button data-table="reviews" data-id="${r.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>`,
+          )
+          .join("");
+
+        wireRowActions("reviews", loadReviews);
       }
 
       checkSession();

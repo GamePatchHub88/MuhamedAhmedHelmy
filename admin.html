@@ -117,6 +117,77 @@
       .toast.err { border-color: rgba(248, 113, 113, 0.4); color: #f87171; }
       @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+      /* Drop zone (project image upload) */
+      .drop-zone {
+        border: 1.5px dashed #2a3345;
+        border-radius: 0.75rem;
+        background: #0d121c;
+        padding: 1.5rem 1.25rem;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s ease, background-color 0.2s ease;
+      }
+      .drop-zone:hover, .drop-zone.drag-over {
+        border-color: #00e5c7;
+        background: rgba(0, 229, 199, 0.04);
+      }
+      .drop-zone i { font-size: 1.5rem; color: #00e5c7; margin-bottom: 0.5rem; }
+      .drop-zone .dz-hint { color: #5a6579; font-size: 0.75rem; margin-top: 0.3rem; }
+      .file-chip {
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        background: #0d121c;
+        border: 1px solid #1c2433;
+        border-radius: 0.6rem;
+        padding: 0.7rem 1rem;
+        margin-top: 0.75rem;
+      }
+      .file-chip.show { display: flex; }
+      .file-chip-remove {
+        color: #f87171;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+      .file-chip img {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+        border-radius: 0.4rem;
+      }
+
+      .color-input-wrap {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .color-input-wrap input[type="color"] {
+        width: 46px;
+        height: 42px;
+        padding: 2px;
+        background: #0d121c;
+        border: 1px solid #1c2433;
+        border-radius: 0.5rem;
+        cursor: pointer;
+      }
+      .color-input-wrap span {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.8rem;
+        color: #7c8aa3;
+      }
+
+      .item-thumb {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 0.5rem;
+        object-fit: cover;
+        border: 1px solid #1c2433;
+      }
+
       /* Generic row (skills / projects / reviews) */
       .item-row {
         display: flex;
@@ -296,6 +367,13 @@
               <label class="admin-label">كلاس الأيقونة (Font Awesome) — اختياري</label>
               <input id="skill-icon" type="text" class="admin-input" placeholder="مثال: fab fa-react" />
             </div>
+            <div class="mb-2">
+              <label class="admin-label">لون الأيقونة</label>
+              <div class="color-input-wrap">
+                <input id="skill-icon-color" type="color" value="#00e5c7" />
+                <span id="skill-icon-color-hex">#00e5c7</span>
+              </div>
+            </div>
 
             <button id="add-skill-btn" class="admin-btn mt-5">
               <i class="fas fa-plus"></i> إضافة المهارة
@@ -332,8 +410,26 @@
               <input id="project-badge" type="text" class="admin-input" placeholder="مثال: WEB APP · PWA" />
             </div>
             <div class="mb-5">
-              <label class="admin-label">كلاس الأيقونة (Font Awesome) — اختياري</label>
+              <label class="admin-label">كلاس الأيقونة (Font Awesome) — تظهر لو مفيش صورة</label>
               <input id="project-icon" type="text" class="admin-input" placeholder="مثال: fas fa-store" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">صورة المشروع — اختياري</label>
+              <div id="project-drop-zone" class="drop-zone">
+                <i class="fas fa-cloud-arrow-up"></i>
+                <div class="text-sm text-fog/90">اسحب صورة هنا أو دوس للاختيار</div>
+                <div class="dz-hint">JPG / PNG / WebP — حتى 5MB</div>
+                <input id="project-image" type="file" accept="image/*" hidden />
+              </div>
+              <div id="project-file-chip" class="file-chip">
+                <div class="flex items-center gap-2 mono text-xs text-fog/90" style="overflow: hidden">
+                  <img id="project-file-preview" alt="" />
+                  <span id="project-file-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"></span>
+                </div>
+                <button id="project-file-remove" class="file-chip-remove" type="button">
+                  <i class="fas fa-xmark"></i>
+                </button>
+              </div>
             </div>
             <div class="mb-2">
               <label class="admin-label">رابط الموقع — اختياري</label>
@@ -412,6 +508,64 @@
         wrap.appendChild(el);
         setTimeout(() => el.remove(), 3800);
       }
+
+      /* ---------- Skill icon color live preview ---------- */
+      const skillColorInput = document.getElementById("skill-icon-color");
+      const skillColorHex = document.getElementById("skill-icon-color-hex");
+      skillColorInput.addEventListener("input", () => {
+        skillColorHex.textContent = skillColorInput.value;
+      });
+
+      /* ---------- Project image drop zone ---------- */
+      const projectDropZone = document.getElementById("project-drop-zone");
+      const projectImageInput = document.getElementById("project-image");
+      const projectFileChip = document.getElementById("project-file-chip");
+      const projectFileName = document.getElementById("project-file-name");
+      const projectFilePreview = document.getElementById("project-file-preview");
+      const MAX_IMG_SIZE = 5 * 1024 * 1024; // 5MB
+
+      function setSelectedProjectImage(file) {
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+          toast("الملف لازم يكون صورة", false);
+          projectImageInput.value = "";
+          return;
+        }
+        if (file.size > MAX_IMG_SIZE) {
+          toast("حجم الصورة أكبر من 5MB", false);
+          projectImageInput.value = "";
+          return;
+        }
+        projectFileName.textContent = file.name;
+        projectFilePreview.src = URL.createObjectURL(file);
+        projectFileChip.classList.add("show");
+      }
+
+      projectDropZone.addEventListener("click", () => projectImageInput.click());
+      projectDropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        projectDropZone.classList.add("drag-over");
+      });
+      projectDropZone.addEventListener("dragleave", () =>
+        projectDropZone.classList.remove("drag-over"),
+      );
+      projectDropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        projectDropZone.classList.remove("drag-over");
+        const file = e.dataTransfer.files[0];
+        if (file) {
+          projectImageInput.files = e.dataTransfer.files;
+          setSelectedProjectImage(file);
+        }
+      });
+      projectImageInput.addEventListener("change", () =>
+        setSelectedProjectImage(projectImageInput.files[0]),
+      );
+      document.getElementById("project-file-remove").addEventListener("click", (e) => {
+        e.stopPropagation();
+        projectImageInput.value = "";
+        projectFileChip.classList.remove("show");
+      });
 
       /* ---------- Tabs ---------- */
       document.querySelectorAll(".tab-btn").forEach((btn) => {
@@ -524,6 +678,7 @@
         const name = document.getElementById("skill-name").value.trim();
         const category = document.getElementById("skill-category").value.trim() || "عام";
         const icon = document.getElementById("skill-icon").value.trim() || "fas fa-code";
+        const icon_color = document.getElementById("skill-icon-color").value || "#00e5c7";
 
         if (!name) {
           toast("من فضلك اكتب اسم المهارة", false);
@@ -534,13 +689,17 @@
         btn.innerHTML = '<span class="spinner"></span> جاري الإضافة...';
         try {
           const order_index = await nextOrderIndex("skills");
-          const { error } = await supabaseClient.from("skills").insert({ name, category, icon, order_index });
+          const { error } = await supabaseClient
+            .from("skills")
+            .insert({ name, category, icon, icon_color, order_index });
           if (error) throw error;
 
           toast("تم إضافة المهارة بنجاح ✅", true);
           document.getElementById("skill-name").value = "";
           document.getElementById("skill-category").value = "";
           document.getElementById("skill-icon").value = "";
+          document.getElementById("skill-icon-color").value = "#00e5c7";
+          skillColorHex.textContent = "#00e5c7";
           loadSkills();
         } catch (err) {
           toast("حصل خطأ: " + err.message, false);
@@ -554,7 +713,7 @@
         skillsList.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
         const { data, error } = await supabaseClient
           .from("skills")
-          .select("id, name, category, icon, order_index")
+          .select("id, name, category, icon, icon_color, order_index")
           .order("order_index", { ascending: true })
           .order("created_at", { ascending: false });
 
@@ -575,7 +734,7 @@
             (s) => `
           <div class="item-row">
             <div class="flex items-center gap-3" style="min-width: 0">
-              <div class="item-icon"><i class="${s.icon}"></i></div>
+              <div class="item-icon" style="color:${s.icon_color || "#00e5c7"}"><i class="${s.icon}"></i></div>
               <input type="number" data-table="skills" data-id="${s.id}" class="order-input admin-input" value="${s.order_index}" />
               <div style="min-width: 0">
                 <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${s.name}</div>
@@ -608,6 +767,7 @@
         const badge = document.getElementById("project-badge").value.trim() || "WEB APP";
         const icon = document.getElementById("project-icon").value.trim() || "fas fa-globe";
         const link_url = document.getElementById("project-link").value.trim() || null;
+        const imageFile = projectImageInput.files[0] || null;
 
         if (!title || !description) {
           toast("من فضلك اكتب اسم المشروع ووصفه", false);
@@ -617,10 +777,24 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner"></span> جاري الإضافة...';
         try {
+          let image_url = null;
+          if (imageFile) {
+            const ext = imageFile.name.split(".").pop().toLowerCase();
+            const filePath = `project-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { error: uploadError } = await supabaseClient.storage
+              .from("project-images")
+              .upload(filePath, imageFile, { contentType: imageFile.type });
+            if (uploadError) throw uploadError;
+            const { data: publicUrlData } = supabaseClient.storage
+              .from("project-images")
+              .getPublicUrl(filePath);
+            image_url = publicUrlData.publicUrl;
+          }
+
           const order_index = await nextOrderIndex("projects");
           const { error } = await supabaseClient
             .from("projects")
-            .insert({ title, description, badge, icon, link_url, order_index });
+            .insert({ title, description, badge, icon, image_url, link_url, order_index });
           if (error) throw error;
 
           toast("تم إضافة المشروع بنجاح ✅", true);
@@ -629,6 +803,8 @@
           document.getElementById("project-badge").value = "";
           document.getElementById("project-icon").value = "";
           document.getElementById("project-link").value = "";
+          projectImageInput.value = "";
+          projectFileChip.classList.remove("show");
           loadProjects();
         } catch (err) {
           toast("حصل خطأ: " + err.message, false);
@@ -642,7 +818,7 @@
         projectsList.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
         const { data, error } = await supabaseClient
           .from("projects")
-          .select("id, title, description, badge, icon, link_url, order_index")
+          .select("id, title, description, badge, icon, image_url, link_url, order_index")
           .order("order_index", { ascending: true })
           .order("created_at", { ascending: false });
 
@@ -663,7 +839,11 @@
             (p) => `
           <div class="item-row">
             <div class="flex items-center gap-3" style="min-width: 0">
-              <div class="item-icon"><i class="${p.icon}"></i></div>
+              ${
+                p.image_url
+                  ? `<img src="${p.image_url}" class="item-thumb" alt="" />`
+                  : `<div class="item-icon"><i class="${p.icon}"></i></div>`
+              }
               <input type="number" data-table="projects" data-id="${p.id}" class="order-input admin-input" value="${p.order_index}" />
               <div style="min-width: 0">
                 <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${p.title}</div>

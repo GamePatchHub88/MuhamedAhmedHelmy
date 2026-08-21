@@ -1,4 +1,13 @@
 -- شغّل الكود ده مرة واحدة بس في Supabase Dashboard → SQL Editor
+--
+-- ⚠️ لو سبق وشغّلت نسخة قديمة من الملف ده (بدون ألوان المهارات وصور
+-- المشاريع)، تقدر تشغّل الأسطر دي بس بدل الملف كامل تاني:
+--   alter table skills add column if not exists icon_color text not null default '#00e5c7';
+--   alter table projects add column if not exists image_url text;
+--   insert into storage.buckets (id, name, public) values ('project-images', 'project-images', true) on conflict (id) do nothing;
+--   create policy "public read project images" on storage.objects for select to anon, authenticated using (bucket_id = 'project-images');
+--   create policy "authenticated upload project images" on storage.objects for insert to authenticated with check (bucket_id = 'project-images');
+--   create policy "authenticated delete project images" on storage.objects for delete to authenticated using (bucket_id = 'project-images');
 
 -- ==========================================================
 -- 1) جدول المهارات (Skills)
@@ -8,9 +17,13 @@ create table if not exists skills (
   name text not null,
   category text not null default 'عام', -- مثال: Front-end / Security & IT / عام
   icon text not null default 'fas fa-code', -- كلاس أيقونة Font Awesome
+  icon_color text not null default '#00e5c7', -- لون الأيقونة (hex)
   order_index integer not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- لو الجدول كان متعمل قبل كده من غير عمود icon_color، شغّل السطر ده لوحده:
+-- alter table skills add column if not exists icon_color text not null default '#00e5c7';
 
 alter table skills enable row level security;
 
@@ -43,11 +56,15 @@ create table if not exists projects (
   title text not null,
   description text not null,
   badge text not null default 'WEB APP', -- مثال: WEB APP · PWA
-  icon text not null default 'fas fa-globe', -- كلاس أيقونة Font Awesome
+  icon text not null default 'fas fa-globe', -- كلاس أيقونة Font Awesome (تظهر لو مفيش صورة)
+  image_url text, -- رابط صورة المشروع (اختياري)
   link_url text, -- رابط الموقع (اختياري)
   order_index integer not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- لو الجدول كان متعمل قبل كده من غير عمود image_url، شغّل السطر ده لوحده:
+-- alter table projects add column if not exists image_url text;
 
 alter table projects enable row level security;
 
@@ -71,6 +88,28 @@ create policy "authenticated can delete projects"
 on projects for delete
 to authenticated
 using (true);
+
+-- ==========================================================
+-- 2ب) مساحة تخزين صور المشاريع
+-- ==========================================================
+insert into storage.buckets (id, name, public)
+values ('project-images', 'project-images', true)
+on conflict (id) do nothing;
+
+create policy "public read project images"
+on storage.objects for select
+to anon, authenticated
+using (bucket_id = 'project-images');
+
+create policy "authenticated upload project images"
+on storage.objects for insert
+to authenticated
+with check (bucket_id = 'project-images');
+
+create policy "authenticated delete project images"
+on storage.objects for delete
+to authenticated
+using (bucket_id = 'project-images');
 
 -- ==========================================================
 -- 3) جدول تقييمات العملاء (Reviews / Testimonials)
@@ -107,6 +146,19 @@ create policy "authenticated can delete reviews"
 on reviews for delete
 to authenticated
 using (true);
+
+-- ==========================================================
+-- 3ب) صلاحيات قراءة إضافية (احتياطي)
+--    عادة الـ policies اللي فوق كافية، بس لو ظهر خطأ "permission denied"
+--    شغّل السطور دي كمان
+-- ==========================================================
+grant usage on schema public to anon, authenticated;
+grant select on public.skills to anon, authenticated;
+grant select on public.projects to anon, authenticated;
+grant select on public.reviews to anon, authenticated;
+grant insert, update, delete on public.skills to authenticated;
+grant insert, update, delete on public.projects to authenticated;
+grant insert, update, delete on public.reviews to authenticated;
 
 -- ==========================================================
 -- 4) بيانات مبدئية (اختياري) — نفس المحتوى اللي كان ظاهر في الموقع قبل كده

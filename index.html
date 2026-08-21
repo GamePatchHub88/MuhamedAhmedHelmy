@@ -910,7 +910,7 @@
         try {
           const { data, error } = await supabaseClient
             .from("skills")
-            .select("id, name, category, icon, order_index, created_at")
+            .select("id, name, category, icon, icon_color, order_index, created_at")
             .order("order_index", { ascending: true })
             .order("created_at", { ascending: false });
 
@@ -944,7 +944,7 @@
                   .map(
                     (s) => `
                   <div class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover">
-                    <i class="${escapeHtml(s.icon || "fas fa-code")} text-2xl text-cyan"></i>
+                    <i class="${escapeHtml(s.icon || "fas fa-code")} text-2xl" style="color:${escapeHtml(s.icon_color || "#00e5c7")}"></i>
                     <span class="font-medium text-sm">${escapeHtml(s.name)}</span>
                   </div>`,
                   )
@@ -968,7 +968,7 @@
         try {
           const { data, error } = await supabaseClient
             .from("projects")
-            .select("id, title, description, badge, icon, link_url, order_index, created_at")
+            .select("id, title, description, badge, icon, image_url, link_url, order_index, created_at")
             .order("order_index", { ascending: true })
             .order("created_at", { ascending: false });
 
@@ -987,8 +987,12 @@
               (p) => `
             <div class="group rounded-2xl overflow-hidden bg-panel border border-line card-hover">
               <div class="h-44 bg-panel2 flex items-center justify-center relative overflow-hidden">
-                <div class="absolute inset-0 grid-texture opacity-40"></div>
-                <i class="${escapeHtml(p.icon || "fas fa-globe")} text-5xl text-cyan/70 relative z-10"></i>
+                ${
+                  p.image_url
+                    ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />`
+                    : `<div class="absolute inset-0 grid-texture opacity-40"></div>
+                       <i class="${escapeHtml(p.icon || "fas fa-globe")} text-5xl text-cyan/70 relative z-10"></i>`
+                }
               </div>
               <div class="p-6">
                 <span class="mono badge text-amber">${escapeHtml(p.badge || "WEB APP")}</span>

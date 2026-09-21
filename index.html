@@ -1094,13 +1094,23 @@
       }
 
       /* ---------- Projects ---------- */
+      function ribbonHtml(p) {
+        const text = (p.ribbon_text || "").trim();
+        if (!text) return "";
+        const bg = /^#[0-9a-fA-F]{6}$/.test(p.ribbon_color || "") ? p.ribbon_color : "#ffb454";
+        const n = parseInt(bg.slice(1), 16);
+        const lum = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+        const fg = lum > 0.6 ? "#070a10" : "#ffffff";
+        return `<span class="project-ribbon" style="background:${bg};color:${fg}">${escapeHtml(text)}</span>`;
+      }
+
       async function loadProjects() {
         const grid = document.getElementById("projects-grid");
         const empty = document.getElementById("projects-empty");
         try {
           const { data, error } = await supabaseClient
             .from("projects")
-            .select("id, title, description, badge, icon, image_url, link_url, order_index, created_at")
+            .select("*")
             .order("order_index", { ascending: true })
             .order("created_at", { ascending: false });
 
@@ -1119,6 +1129,7 @@
               (p) => `
             <div class="group rounded-2xl overflow-hidden bg-panel border border-line card-hover">
               <div class="h-44 bg-panel2 flex items-center justify-center relative overflow-hidden">
+                ${ribbonHtml(p)}
                 ${
                   p.image_url
                     ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />`

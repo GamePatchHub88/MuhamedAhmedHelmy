@@ -270,6 +270,52 @@
       .tab-panel { display: none; }
       .tab-panel.active { display: block; }
 
+      /* Ribbon badge + edit mode */
+      .force-hide { display: none !important; }
+      .preset-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.65rem; }
+      .preset-chip {
+        background: #0d121c;
+        border: 1px solid #1c2433;
+        color: #cfd8e6;
+        font-family: "Tajawal", sans-serif;
+        font-size: 0.78rem;
+        border-radius: 999px;
+        padding: 0.3rem 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .preset-chip:hover { border-color: #00e5c7; color: #00e5c7; }
+      .ribbon-preview {
+        display: inline-block;
+        padding: 0.3rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        margin-inline-start: auto;
+      }
+      .ribbon-tag {
+        display: inline-block;
+        padding: 0.1rem 0.55rem;
+        border-radius: 999px;
+        font-size: 0.65rem;
+        font-weight: 800;
+        margin-inline-start: 0.4rem;
+        vertical-align: middle;
+      }
+      .edit-mode-card { border-color: #ffb454 !important; box-shadow: 0 0 0 3px rgba(255, 180, 84, 0.12); }
+      .edit-mode-note {
+        display: none;
+        background: rgba(255, 180, 84, 0.08);
+        border: 1px solid rgba(255, 180, 84, 0.35);
+        color: #ffb454;
+        border-radius: 0.6rem;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.8rem;
+        margin-bottom: 1.25rem;
+      }
+      .edit-mode-card .edit-mode-note { display: block; }
+      .item-row.is-editing { border-color: #ffb454; }
+
       @media (max-width: 640px) {
         .item-row { flex-wrap: wrap; }
       }
@@ -393,9 +439,19 @@
             <span class="stat-chip">إجمالي الأعمال: <b id="projects-count">0</b></span>
           </div>
 
-          <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
-            <h2 class="text-lg font-bold text-white mb-1">إضافة عمل / مشروع جديد</h2>
-            <p class="text-xs text-muted mb-6">هيظهر في قسم "أحدث أعمالي" بالموقع</p>
+          <div id="project-form-card" class="bg-panel border border-line rounded-2xl p-7 mb-8">
+            <div class="flex items-start justify-between gap-3 mb-6">
+              <div>
+                <h2 id="project-form-title" class="text-lg font-bold text-white mb-1">إضافة عمل / مشروع جديد</h2>
+                <p id="project-form-sub" class="text-xs text-muted">هيظهر في قسم "أحدث أعمالي" بالموقع</p>
+              </div>
+              <button id="cancel-edit-btn" type="button" class="admin-btn admin-btn-ghost force-hide">
+                <i class="fas fa-xmark"></i> إلغاء التعديل
+              </button>
+            </div>
+            <div id="edit-mode-note" class="edit-mode-note">
+              <i class="fas fa-pen"></i> أنت الآن بتعدّل: <b id="edit-mode-name"></b>
+            </div>
 
             <div class="mb-5">
               <label class="admin-label">اسم المشروع</label>
@@ -406,8 +462,29 @@
               <textarea id="project-description" class="admin-textarea" placeholder="وصف مختصر عن المشروع..."></textarea>
             </div>
             <div class="mb-5">
-              <label class="admin-label">تصنيف المشروع (Badge)</label>
+              <label class="admin-label">تصنيف المشروع (النص الصغير فوق اسم المشروع)</label>
               <input id="project-badge" type="text" class="admin-input" placeholder="مثال: WEB APP · PWA" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">شارة مميزة على صورة المشروع — اختياري</label>
+              <input id="project-ribbon-text" type="text" maxlength="24" class="admin-input" placeholder="مثال: جديد / مميز / الأكثر طلبًا" />
+              <div class="preset-row" id="ribbon-presets">
+                <button type="button" class="preset-chip" data-text="جديد" data-color="#00e5c7">جديد</button>
+                <button type="button" class="preset-chip" data-text="مميز" data-color="#ffb454">مميز</button>
+                <button type="button" class="preset-chip" data-text="الأكثر طلبًا" data-color="#ff6b6b">الأكثر طلبًا</button>
+                <button type="button" class="preset-chip" data-text="قيد التطوير" data-color="#7c8aa3">قيد التطوير</button>
+                <button type="button" class="preset-chip" data-text="" data-color="#ffb454" style="color:#f87171">
+                  <i class="fas fa-xmark"></i> بدون شارة
+                </button>
+              </div>
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">لون الشارة</label>
+              <div class="color-input-wrap">
+                <input id="project-ribbon-color" type="color" value="#ffb454" />
+                <span id="project-ribbon-color-hex">#ffb454</span>
+                <span id="ribbon-preview" class="ribbon-preview force-hide"></span>
+              </div>
             </div>
             <div class="mb-5">
               <label class="admin-label">كلاس الأيقونة (Font Awesome) — تظهر لو مفيش صورة</label>
@@ -443,7 +520,7 @@
 
           <div class="bg-panel border border-line rounded-2xl p-7">
             <h2 class="text-lg font-bold text-white mb-1">الأعمال الحالية</h2>
-            <p class="text-xs text-muted mb-5">الرقم الأصغر يظهر أول في الموقع. عدّل الرقم ودوس أيقونة الحفظ.</p>
+            <p class="text-xs text-muted mb-5">الرقم الأصغر يظهر أول في الموقع. عدّل الرقم ودوس أيقونة الحفظ، أو دوس القلم لتعديل بيانات المشروع كاملة.</p>
             <div id="projects-list"></div>
           </div>
         </div>
@@ -500,6 +577,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="supabase-config.js"></script>
     <script>
+      function escapeHtml(str) {
+        const div = document.createElement("div");
+        div.textContent = str == null ? "" : str;
+        return div.innerHTML;
+      }
+
+      function safeHex(c, fallback) {
+        return /^#[0-9a-fA-F]{6}$/.test(c || "") ? c : fallback;
+      }
+
+      function readableTextColor(hex) {
+        const n = parseInt(hex.slice(1), 16);
+        const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+        return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6 ? "#070a10" : "#ffffff";
+      }
+
       function toast(text, ok = true) {
         const wrap = document.getElementById("toast-wrap");
         const el = document.createElement("div");
@@ -523,6 +616,17 @@
       const projectFileName = document.getElementById("project-file-name");
       const projectFilePreview = document.getElementById("project-file-preview");
       const MAX_IMG_SIZE = 5 * 1024 * 1024; // 5MB
+
+      // حالة وضع التعديل
+      let editingProject = null; // المشروع اللي بيتعدل حاليًا (أو null لو بنضيف جديد)
+      let imageMarkedRemoved = false; // المستخدم شال الصورة الحالية
+
+      function showExistingImageChip() {
+        if (!editingProject || !editingProject.image_url) return;
+        projectFileName.textContent = "الصورة الحالية";
+        projectFilePreview.src = editingProject.image_url;
+        projectFileChip.classList.add("show");
+      }
 
       function setSelectedProjectImage(file) {
         if (!file) return;
@@ -563,8 +667,46 @@
       );
       document.getElementById("project-file-remove").addEventListener("click", (e) => {
         e.stopPropagation();
+        const hadNewFile = !!projectImageInput.files[0];
         projectImageInput.value = "";
+        if (editingProject) {
+          if (hadNewFile && editingProject.image_url && !imageMarkedRemoved) {
+            // تراجع عن الصورة الجديدة → نرجع نعرض الصورة الحالية
+            showExistingImageChip();
+            return;
+          }
+          if (!hadNewFile) imageMarkedRemoved = true;
+        }
         projectFileChip.classList.remove("show");
+      });
+
+      /* ---------- Project ribbon badge (color + preview + presets) ---------- */
+      const ribbonTextInput = document.getElementById("project-ribbon-text");
+      const ribbonColorInput = document.getElementById("project-ribbon-color");
+      const ribbonColorHex = document.getElementById("project-ribbon-color-hex");
+      const ribbonPreview = document.getElementById("ribbon-preview");
+
+      function updateRibbonPreview() {
+        const text = ribbonTextInput.value.trim();
+        const bg = safeHex(ribbonColorInput.value, "#ffb454");
+        ribbonColorHex.textContent = bg;
+        if (!text) {
+          ribbonPreview.classList.add("force-hide");
+          return;
+        }
+        ribbonPreview.classList.remove("force-hide");
+        ribbonPreview.textContent = text;
+        ribbonPreview.style.background = bg;
+        ribbonPreview.style.color = readableTextColor(bg);
+      }
+      ribbonTextInput.addEventListener("input", updateRibbonPreview);
+      ribbonColorInput.addEventListener("input", updateRibbonPreview);
+      document.querySelectorAll("#ribbon-presets .preset-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          ribbonTextInput.value = chip.dataset.text;
+          if (chip.dataset.text) ribbonColorInput.value = chip.dataset.color;
+          updateRibbonPreview();
+        });
       });
 
       /* ---------- Tabs ---------- */
@@ -759,14 +901,87 @@
       /* ---------- Projects ---------- */
       const projectsList = document.getElementById("projects-list");
       const projectsCount = document.getElementById("projects-count");
+      const projectFormCard = document.getElementById("project-form-card");
+      const projectSubmitBtn = document.getElementById("add-project-btn");
+      const cancelEditBtn = document.getElementById("cancel-edit-btn");
+      let projectsCache = [];
 
-      document.getElementById("add-project-btn").addEventListener("click", async () => {
-        const btn = document.getElementById("add-project-btn");
+      const SUBMIT_ADD_HTML = '<i class="fas fa-plus"></i> إضافة المشروع';
+      const SUBMIT_EDIT_HTML = '<i class="fas fa-floppy-disk"></i> حفظ التعديلات';
+
+      function resetProjectForm() {
+        editingProject = null;
+        imageMarkedRemoved = false;
+        document.getElementById("project-title").value = "";
+        document.getElementById("project-description").value = "";
+        document.getElementById("project-badge").value = "";
+        document.getElementById("project-icon").value = "";
+        document.getElementById("project-link").value = "";
+        ribbonTextInput.value = "";
+        ribbonColorInput.value = "#ffb454";
+        updateRibbonPreview();
+        projectImageInput.value = "";
+        projectFileChip.classList.remove("show");
+
+        projectFormCard.classList.remove("edit-mode-card");
+        document.getElementById("project-form-title").textContent = "إضافة عمل / مشروع جديد";
+        document.getElementById("project-form-sub").textContent = 'هيظهر في قسم "أحدث أعمالي" بالموقع';
+        cancelEditBtn.classList.add("force-hide");
+        projectSubmitBtn.innerHTML = SUBMIT_ADD_HTML;
+        document.querySelectorAll("#projects-list .item-row.is-editing").forEach((r) => r.classList.remove("is-editing"));
+      }
+
+      function startEditProject(id) {
+        const p = projectsCache.find((x) => x.id === id);
+        if (!p) return;
+        resetProjectForm();
+        editingProject = p;
+
+        document.getElementById("project-title").value = p.title || "";
+        document.getElementById("project-description").value = p.description || "";
+        document.getElementById("project-badge").value = p.badge || "";
+        document.getElementById("project-icon").value = p.icon || "";
+        document.getElementById("project-link").value = p.link_url || "";
+        ribbonTextInput.value = p.ribbon_text || "";
+        ribbonColorInput.value = safeHex(p.ribbon_color, "#ffb454");
+        updateRibbonPreview();
+        showExistingImageChip();
+
+        projectFormCard.classList.add("edit-mode-card");
+        document.getElementById("project-form-title").textContent = "تعديل المشروع";
+        document.getElementById("project-form-sub").textContent = "غيّر اللي تحتاجه ثم دوس حفظ التعديلات";
+        document.getElementById("edit-mode-name").textContent = p.title;
+        cancelEditBtn.classList.remove("force-hide");
+        projectSubmitBtn.innerHTML = SUBMIT_EDIT_HTML;
+
+        const row = document.querySelector(`#projects-list .item-row[data-project-id="${p.id}"]`);
+        if (row) row.classList.add("is-editing");
+        projectFormCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      cancelEditBtn.addEventListener("click", resetProjectForm);
+
+      // حذف صورة قديمة من التخزين (محاولة بدون تعطيل العملية لو فشلت)
+      async function removeStoredImage(url) {
+        try {
+          if (!url || !url.includes("/project-images/")) return;
+          const path = decodeURIComponent(url.split("/project-images/")[1].split("?")[0]);
+          await supabaseClient.storage.from("project-images").remove([path]);
+        } catch (e) {
+          console.warn("تعذر حذف الصورة القديمة:", e);
+        }
+      }
+
+      projectSubmitBtn.addEventListener("click", async () => {
+        const btn = projectSubmitBtn;
+        const isEdit = !!editingProject;
         const title = document.getElementById("project-title").value.trim();
         const description = document.getElementById("project-description").value.trim();
         const badge = document.getElementById("project-badge").value.trim() || "WEB APP";
         const icon = document.getElementById("project-icon").value.trim() || "fas fa-globe";
         const link_url = document.getElementById("project-link").value.trim() || null;
+        const ribbon_text = ribbonTextInput.value.trim() || null;
+        const ribbon_color = safeHex(ribbonColorInput.value, "#ffb454");
         const imageFile = projectImageInput.files[0] || null;
 
         if (!title || !description) {
@@ -775,9 +990,11 @@
         }
 
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> جاري الإضافة...';
+        btn.innerHTML = `<span class="spinner"></span> ${isEdit ? "جاري الحفظ..." : "جاري الإضافة..."}`;
         try {
-          let image_url = null;
+          const oldImageUrl = isEdit ? editingProject.image_url : null;
+          let image_url = oldImageUrl;
+
           if (imageFile) {
             const ext = imageFile.name.split(".").pop().toLowerCase();
             const filePath = `project-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
@@ -789,28 +1006,46 @@
               .from("project-images")
               .getPublicUrl(filePath);
             image_url = publicUrlData.publicUrl;
+          } else if (isEdit && imageMarkedRemoved) {
+            image_url = null;
           }
 
-          const order_index = await nextOrderIndex("projects");
-          const { error } = await supabaseClient
-            .from("projects")
-            .insert({ title, description, badge, icon, image_url, link_url, order_index });
-          if (error) throw error;
+          const payload = { title, description, badge, icon, image_url, link_url };
+          // نبعت بيانات الشارة بس لو مستخدمة (أو كانت مستخدمة قبل كده عشان نقدر نمسحها)
+          if (ribbon_text || (isEdit && editingProject.ribbon_text)) {
+            payload.ribbon_text = ribbon_text;
+            payload.ribbon_color = ribbon_color;
+          }
 
-          toast("تم إضافة المشروع بنجاح ✅", true);
-          document.getElementById("project-title").value = "";
-          document.getElementById("project-description").value = "";
-          document.getElementById("project-badge").value = "";
-          document.getElementById("project-icon").value = "";
-          document.getElementById("project-link").value = "";
-          projectImageInput.value = "";
-          projectFileChip.classList.remove("show");
+          if (isEdit) {
+            const { error } = await supabaseClient
+              .from("projects")
+              .update(payload)
+              .eq("id", editingProject.id);
+            if (error) throw error;
+            if (oldImageUrl && oldImageUrl !== image_url) removeStoredImage(oldImageUrl);
+            toast("تم حفظ التعديلات ✅", true);
+          } else {
+            const order_index = await nextOrderIndex("projects");
+            const { error } = await supabaseClient
+              .from("projects")
+              .insert({ ...payload, order_index });
+            if (error) throw error;
+            toast("تم إضافة المشروع بنجاح ✅", true);
+          }
+
+          resetProjectForm();
           loadProjects();
         } catch (err) {
-          toast("حصل خطأ: " + err.message, false);
+          const msg = String(err && err.message ? err.message : err);
+          if (/ribbon_/.test(msg)) {
+            toast("لازم تشغّل أمر الـ SQL الخاص بالشارة في Supabase أولًا (موجود في supabase-setup.sql)", false);
+          } else {
+            toast("حصل خطأ: " + msg, false);
+          }
         } finally {
           btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-plus"></i> إضافة المشروع';
+          btn.innerHTML = editingProject ? SUBMIT_EDIT_HTML : SUBMIT_ADD_HTML;
         }
       });
 
@@ -818,7 +1053,7 @@
         projectsList.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
         const { data, error } = await supabaseClient
           .from("projects")
-          .select("id, title, description, badge, icon, image_url, link_url, order_index")
+          .select("*")
           .order("order_index", { ascending: true })
           .order("created_at", { ascending: false });
 
@@ -827,30 +1062,44 @@
           return;
         }
 
-        projectsCount.textContent = data ? data.length : 0;
+        projectsCache = data || [];
+        projectsCount.textContent = projectsCache.length;
 
-        if (!data || data.length === 0) {
+        // لو المشروع اللي بيتعدل اتحذف، نقفل وضع التعديل
+        if (editingProject && !projectsCache.some((x) => x.id === editingProject.id)) {
+          resetProjectForm();
+        }
+
+        if (projectsCache.length === 0) {
           projectsList.innerHTML = '<p class="text-muted text-sm">لا توجد أعمال بعد.</p>';
           return;
         }
 
-        projectsList.innerHTML = data
-          .map(
-            (p) => `
-          <div class="item-row">
+        projectsList.innerHTML = projectsCache
+          .map((p) => {
+            const rText = (p.ribbon_text || "").trim();
+            const rBg = safeHex(p.ribbon_color, "#ffb454");
+            const ribbonTag = rText
+              ? `<span class="ribbon-tag" style="background:${rBg};color:${readableTextColor(rBg)}">${escapeHtml(rText)}</span>`
+              : "";
+            return `
+          <div class="item-row${editingProject && editingProject.id === p.id ? " is-editing" : ""}" data-project-id="${p.id}">
             <div class="flex items-center gap-3" style="min-width: 0">
               ${
                 p.image_url
-                  ? `<img src="${p.image_url}" class="item-thumb" alt="" />`
-                  : `<div class="item-icon"><i class="${p.icon}"></i></div>`
+                  ? `<img src="${escapeHtml(p.image_url)}" class="item-thumb" alt="" />`
+                  : `<div class="item-icon"><i class="${escapeHtml(p.icon)}"></i></div>`
               }
               <input type="number" data-table="projects" data-id="${p.id}" class="order-input admin-input" value="${p.order_index}" />
               <div style="min-width: 0">
-                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${p.title}</div>
-                <div class="mono text-xs text-muted">${p.badge}</div>
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(p.title)}${ribbonTag}</div>
+                <div class="mono text-xs text-muted">${escapeHtml(p.badge)}</div>
               </div>
             </div>
             <div class="flex items-center gap-3">
+              <button data-id="${p.id}" class="edit-project-btn" title="تعديل" style="background:none;border:none;color:#ffb454;cursor:pointer;font-size:0.95rem">
+                <i class="fas fa-pen"></i>
+              </button>
               <button data-table="projects" data-id="${p.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem">
                 <i class="fas fa-floppy-disk"></i>
               </button>
@@ -858,10 +1107,13 @@
                 <i class="fas fa-trash"></i>
               </button>
             </div>
-          </div>`,
-          )
+          </div>`;
+          })
           .join("");
 
+        projectsList.querySelectorAll(".edit-project-btn").forEach((b) => {
+          b.addEventListener("click", () => startEditProject(b.dataset.id));
+        });
         wireRowActions("projects", loadProjects);
       }
 

@@ -4,6 +4,8 @@
 -- المشاريع)، تقدر تشغّل الأسطر دي بس بدل الملف كامل تاني:
 --   alter table skills add column if not exists icon_color text not null default '#00e5c7';
 --   alter table projects add column if not exists image_url text;
+--   alter table projects add column if not exists ribbon_text text;
+--   alter table projects add column if not exists ribbon_color text not null default '#ffb454';
 --   insert into storage.buckets (id, name, public) values ('project-images', 'project-images', true) on conflict (id) do nothing;
 --   create policy "public read project images" on storage.objects for select to anon, authenticated using (bucket_id = 'project-images');
 --   create policy "authenticated upload project images" on storage.objects for insert to authenticated with check (bucket_id = 'project-images');
@@ -58,6 +60,8 @@ create table if not exists projects (
   badge text not null default 'WEB APP', -- مثال: WEB APP · PWA
   icon text not null default 'fas fa-globe', -- كلاس أيقونة Font Awesome (تظهر لو مفيش صورة)
   image_url text, -- رابط صورة المشروع (اختياري)
+  ribbon_text text, -- نص الشارة المميزة على صورة المشروع (اختياري) مثال: جديد / مميز
+  ribbon_color text not null default '#ffb454', -- لون الشارة (hex)
   link_url text, -- رابط الموقع (اختياري)
   order_index integer not null default 0,
   created_at timestamptz not null default now()
@@ -65,6 +69,10 @@ create table if not exists projects (
 
 -- لو الجدول كان متعمل قبل كده من غير عمود image_url، شغّل السطر ده لوحده:
 -- alter table projects add column if not exists image_url text;
+
+-- لو الجدول كان متعمل قبل كده من غير أعمدة الشارة، شغّل السطرين دول لوحدهم:
+-- alter table projects add column if not exists ribbon_text text;
+-- alter table projects add column if not exists ribbon_color text not null default '#ffb454';
 
 alter table projects enable row level security;
 

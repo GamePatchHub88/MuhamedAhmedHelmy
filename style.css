@@ -416,3 +416,18 @@ a.bg-cyan:hover::before { transform: translateX(120%); }
   .menu-btn { display: none; }
   .mobile-menu { display: none !important; }
 }
+
+/* Project ribbon badge (شارة المشروع) */
+.project-ribbon {
+  position: absolute;
+  top: 0.75rem;
+  inset-inline-start: 0.75rem;
+  z-index: 20;
+  padding: 0.28rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.4;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}

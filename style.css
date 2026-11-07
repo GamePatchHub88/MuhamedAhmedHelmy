@@ -492,3 +492,10 @@ img { max-width: 100%; height: auto; }
 .share-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #1c2433; }
 .share-btn { display: inline-flex; align-items: center; gap: .5rem; font-family: inherit; font-size: .85rem; color: #cfd8e6; background: transparent; border: 1px solid #1c2433; border-radius: .6rem; padding: .6rem 1rem; cursor: pointer; transition: color .2s, border-color .2s; }
 .share-btn:hover { color: #00e5c7; border-color: #00e5c7; }
+/* ألوان مقالات أوضح */
+.prose h2 { color: #00e5c7; border-inline-start: 3px solid #00e5c7; padding-inline-start: 0.75rem; }
+.prose h3 { color: #ffb454; }
+.prose strong { color: #fff; background: rgba(255, 180, 84, 0.16); padding: 0 0.3rem; border-radius: 0.3rem; }
+.prose a { color: #7aa7ff; }
+.prose li::marker { color: #00e5c7; font-weight: 700; }
+.prose blockquote { border-inline-start-color: #ffb454; background: rgba(255, 180, 84, 0.06); color: #e6d3b3; }

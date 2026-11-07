@@ -389,6 +389,9 @@
           <button class="tab-btn" data-tab="reviews">
             <i class="fas fa-star"></i> تقييمات العملاء
           </button>
+          <button class="tab-btn" data-tab="articles">
+            <i class="fas fa-pen-nib"></i> المقالات
+          </button>
         </div>
 
         <!-- ===================== SKILLS TAB ===================== -->
@@ -569,6 +572,60 @@
             <div id="reviews-list"></div>
           </div>
         </div>
+
+        <!-- ===================== ARTICLES TAB ===================== -->
+        <div class="tab-panel" id="tab-articles">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="stat-chip">إجمالي المقالات: <b id="articles-count">0</b></span>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7 mb-8" id="article-form-card">
+            <h2 class="text-lg font-bold text-white mb-1" id="article-form-title">إضافة مقال جديد</h2>
+            <p class="text-xs text-muted mb-6">هيظهر في صفحة المقالات. المحتوى بيدعم: ## عنوان، ### عنوان فرعي، **غامق**، [نص](رابط)، - قائمة، 1. قائمة مرقمة، &gt; اقتباس، ``` كود ```</p>
+
+            <div class="mb-5">
+              <label class="admin-label">عنوان المقال</label>
+              <input id="article-title" type="text" class="admin-input" placeholder="مثال: إزاي تسرّع موقعك" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">الرابط المختصر (slug) — بيتولّد تلقائيًا ويمكن تعديله</label>
+              <input id="article-slug" type="text" class="admin-input mono" dir="ltr" placeholder="speed-up-your-site" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">التصنيف</label>
+              <input id="article-category" type="text" class="admin-input" placeholder="مثال: برمجة" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">ملخص قصير (يظهر في الكارت وجوجل)</label>
+              <textarea id="article-excerpt" class="admin-textarea" maxlength="300" placeholder="سطرين عن المقال..."></textarea>
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">المحتوى</label>
+              <textarea id="article-content" class="admin-textarea" style="min-height:280px" placeholder="اكتب المقال هنا..."></textarea>
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">صورة الغلاف (اختياري)</label>
+              <input id="article-cover-file" type="file" accept="image/*" class="admin-input" />
+              <p class="text-xs text-muted mt-2" id="article-cover-note"></p>
+            </div>
+            <div class="mb-2">
+              <label class="admin-label" style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+                <input id="article-published" type="checkbox" checked /> نشر المقال (لو متلغّي يتحفظ كمسودة)
+              </label>
+            </div>
+
+            <div class="flex gap-3 mt-5">
+              <button id="save-article-btn" class="admin-btn"><i class="fas fa-plus"></i> إضافة المقال</button>
+              <button id="cancel-article-btn" class="admin-btn hidden" style="background:#121826;color:#cfd8e6;border:1px solid #1c2433">إلغاء التعديل</button>
+            </div>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7">
+            <h2 class="text-lg font-bold text-white mb-1">المقالات الحالية</h2>
+            <p class="text-xs text-muted mb-5">دوس القلم للتعديل، أو العين لتبديل النشر/المسودة.</p>
+            <div id="articles-list"></div>
+          </div>
+        </div>
       </main>
     </div>
 
@@ -733,6 +790,7 @@
           loadSkills();
           loadProjects();
           loadReviews();
+          loadArticles();
         } else {
           loginScreen.classList.remove("hidden");
           panel.classList.add("hidden");
@@ -876,10 +934,10 @@
             (s) => `
           <div class="item-row">
             <div class="flex items-center gap-3" style="min-width: 0">
-              <div class="item-icon" style="color:${s.icon_color || "#00e5c7"}"><i class="${s.icon}"></i></div>
+              <div class="item-icon" style="color:${safeHex(s.icon_color, "#00e5c7")}"><i class="${escapeHtml(s.icon)}"></i></div>
               <input type="number" data-table="skills" data-id="${s.id}" class="order-input admin-input" value="${s.order_index}" />
               <div style="min-width: 0">
-                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${s.name}</div>
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(s.name)}</div>
                 <div class="mono text-xs text-muted">${s.category}</div>
               </div>
             </div>
@@ -1184,8 +1242,8 @@
               <div class="item-icon"><i class="fas fa-star"></i></div>
               <input type="number" data-table="reviews" data-id="${r.id}" class="order-input admin-input" value="${r.order_index}" />
               <div style="min-width: 0">
-                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${r.client_name} — ${r.rating}★</div>
-                <div class="mono text-xs text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${r.client_role}</div>
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(r.client_name)} — ${r.rating}★</div>
+                <div class="mono text-xs text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(r.client_role)}</div>
               </div>
             </div>
             <div class="flex items-center gap-3">
@@ -1201,6 +1259,186 @@
           .join("");
 
         wireRowActions("reviews", loadReviews);
+      }
+
+      /* ---------- Articles ---------- */
+      const articlesList = document.getElementById("articles-list");
+      const articlesCount = document.getElementById("articles-count");
+      const artEls = {
+        title: document.getElementById("article-title"),
+        slug: document.getElementById("article-slug"),
+        category: document.getElementById("article-category"),
+        excerpt: document.getElementById("article-excerpt"),
+        content: document.getElementById("article-content"),
+        file: document.getElementById("article-cover-file"),
+        note: document.getElementById("article-cover-note"),
+        published: document.getElementById("article-published"),
+        btn: document.getElementById("save-article-btn"),
+        cancel: document.getElementById("cancel-article-btn"),
+        heading: document.getElementById("article-form-title"),
+      };
+      let editingArticle = null;
+      let articlesCache = [];
+      let slugTouched = false;
+
+      function makeSlug(s) {
+        return (s || "")
+          .trim()
+          .toLowerCase()
+          .replace(/[^\u0600-\u06FFa-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
+      }
+
+      artEls.title.addEventListener("input", () => {
+        if (!slugTouched && !editingArticle) artEls.slug.value = makeSlug(artEls.title.value);
+      });
+      artEls.slug.addEventListener("input", () => { slugTouched = true; });
+
+      function resetArticleForm() {
+        editingArticle = null;
+        slugTouched = false;
+        ["title", "slug", "category", "excerpt", "content"].forEach((k) => (artEls[k].value = ""));
+        artEls.file.value = "";
+        artEls.note.textContent = "";
+        artEls.published.checked = true;
+        artEls.heading.textContent = "إضافة مقال جديد";
+        artEls.btn.innerHTML = '<i class="fas fa-plus"></i> إضافة المقال';
+        artEls.cancel.classList.add("hidden");
+      }
+      artEls.cancel.addEventListener("click", resetArticleForm);
+
+      function startEditArticle(id) {
+        const a = articlesCache.find((x) => x.id === id);
+        if (!a) return;
+        editingArticle = a;
+        slugTouched = true;
+        artEls.title.value = a.title;
+        artEls.slug.value = a.slug;
+        artEls.category.value = a.category || "";
+        artEls.excerpt.value = a.excerpt || "";
+        artEls.content.value = a.content || "";
+        artEls.published.checked = !!a.published;
+        artEls.file.value = "";
+        artEls.note.textContent = a.cover_url ? "فيه صورة غلاف حالية — اختار صورة جديدة لو عايز تستبدلها." : "";
+        artEls.heading.textContent = "تعديل المقال";
+        artEls.btn.innerHTML = '<i class="fas fa-floppy-disk"></i> حفظ التعديلات';
+        artEls.cancel.classList.remove("hidden");
+        document.getElementById("article-form-card").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      artEls.btn.addEventListener("click", async () => {
+        const btn = artEls.btn;
+        const isEdit = !!editingArticle;
+        const title = artEls.title.value.trim();
+        const content = artEls.content.value.trim();
+        const slug = makeSlug(artEls.slug.value || title);
+        const excerpt = artEls.excerpt.value.trim() || content.replace(/[#*>`\-\[\]()]/g, "").slice(0, 160);
+        const category = artEls.category.value.trim() || "عام";
+        const file = artEls.file.files[0] || null;
+
+        if (!title || !content || !slug) {
+          toast("من فضلك اكتب العنوان والمحتوى", false);
+          return;
+        }
+
+        const original = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> جاري الحفظ...';
+        try {
+          let cover_url = isEdit ? editingArticle.cover_url : null;
+          const oldCover = cover_url;
+          if (file) {
+            const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+            const path = `article-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { error: upErr } = await supabaseClient.storage
+              .from("project-images")
+              .upload(path, file, { contentType: file.type });
+            if (upErr) throw upErr;
+            cover_url = supabaseClient.storage.from("project-images").getPublicUrl(path).data.publicUrl;
+          }
+
+          const words = content.split(/\s+/).filter(Boolean).length;
+          const payload = {
+            title, slug, excerpt, content, category, cover_url,
+            read_minutes: Math.max(1, Math.round(words / 200)),
+            published: artEls.published.checked,
+            updated_at: new Date().toISOString(),
+          };
+
+          if (isEdit) {
+            const { error } = await supabaseClient.from("articles").update(payload).eq("id", editingArticle.id);
+            if (error) throw error;
+            if (oldCover && oldCover !== cover_url) removeStoredImage(oldCover);
+            toast("تم حفظ التعديلات ✅", true);
+          } else {
+            const { error } = await supabaseClient.from("articles").insert(payload);
+            if (error) throw error;
+            toast("تم إضافة المقال ✅", true);
+          }
+          resetArticleForm();
+          loadArticles();
+        } catch (err) {
+          const msg = String(err && err.message ? err.message : err);
+          if (/duplicate|unique/i.test(msg)) toast("الرابط المختصر (slug) مستخدم قبل كده، غيّره", false);
+          else if (/articles/.test(msg) && /relation|schema|exist/i.test(msg))
+            toast("شغّل أمر SQL الخاص بجدول المقالات في Supabase أولًا (آخر قسم في supabase-setup.sql)", false);
+          else toast("حصل خطأ: " + msg, false);
+          btn.innerHTML = original;
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      async function loadArticles() {
+        articlesList.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
+        const { data, error } = await supabaseClient
+          .from("articles")
+          .select("id, slug, title, excerpt, content, category, cover_url, published, created_at")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          articlesList.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل القائمة (تأكد من تشغيل SQL جدول المقالات)</p>';
+          return;
+        }
+        articlesCache = data || [];
+        articlesCount.textContent = articlesCache.length;
+        if (!articlesCache.length) {
+          articlesList.innerHTML = '<p class="text-muted text-sm">لا توجد مقالات بعد.</p>';
+          return;
+        }
+        articlesList.innerHTML = articlesCache
+          .map(
+            (a) => `
+          <div class="item-row${editingArticle && editingArticle.id === a.id ? " is-editing" : ""}">
+            <div class="flex items-center gap-3" style="min-width: 0">
+              ${a.cover_url ? `<img src="${escapeHtml(a.cover_url)}" class="item-thumb" alt="" />` : '<div class="item-icon"><i class="fas fa-pen-nib"></i></div>'}
+              <div style="min-width: 0">
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(a.title)}</div>
+                <div class="mono text-xs text-muted">${a.published ? "منشور" : "مسودة"} · ${escapeHtml(a.category)}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <button data-id="${a.id}" class="art-edit" title="تعديل" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem"><i class="fas fa-pen"></i></button>
+              <button data-id="${a.id}" class="art-toggle" title="نشر / مسودة" style="background:none;border:none;color:#ffb454;cursor:pointer;font-size:0.95rem"><i class="fas ${a.published ? "fa-eye" : "fa-eye-slash"}"></i></button>
+              <button data-table="articles" data-id="${a.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>`,
+          )
+          .join("");
+
+        articlesList.querySelectorAll(".art-edit").forEach((b) => b.addEventListener("click", () => startEditArticle(b.dataset.id)));
+        articlesList.querySelectorAll(".art-toggle").forEach((b) =>
+          b.addEventListener("click", async () => {
+            const a = articlesCache.find((x) => x.id === b.dataset.id);
+            const { error } = await supabaseClient.from("articles").update({ published: !a.published }).eq("id", a.id);
+            if (error) return toast("حصل خطأ: " + error.message, false);
+            toast(a.published ? "اتحوّل لمسودة" : "تم النشر ✅", true);
+            loadArticles();
+          }),
+        );
+        wireRowActions("articles", loadArticles);
       }
 
       checkSession();

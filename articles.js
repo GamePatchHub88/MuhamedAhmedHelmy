@@ -1,0 +1,97 @@
+/* articles.js — صفحة قائمة المقالات */
+
+const LIST_QUERY =
+  "select=id,slug,title,excerpt,category,cover_url,read_minutes,created_at&published=eq.true&order=created_at.desc";
+
+let ALL = [];
+let activeCat = "";
+const grid = document.getElementById("art-grid");
+const catsEl = document.getElementById("art-cats");
+const searchEl = document.getElementById("art-search");
+
+function fmtDate(iso) {
+  try {
+    return new Date(iso).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" });
+  } catch (_) {
+    return "";
+  }
+}
+
+function articleCard(a) {
+  const href = "article.html?slug=" + encodeURIComponent(a.slug);
+  return `
+    <a href="${href}" class="art-card card-hover">
+      <div class="art-cover">
+        ${
+          a.cover_url
+            ? `<img src="${escapeHtml(safeUrl(a.cover_url))}" alt="" loading="lazy" decoding="async" />`
+            : `<i class="fas fa-pen-nib"></i>`
+        }
+      </div>
+      <div class="art-body">
+        <div class="art-meta">
+          <span class="art-cat">${escapeHtml(a.category || "عام")}</span>
+          <span>${fmtDate(a.created_at)}</span>
+          <span><i class="far fa-clock"></i> ${parseInt(a.read_minutes, 10) || 1} د قراءة</span>
+        </div>
+        <h2 class="art-title">${escapeHtml(a.title)}</h2>
+        <p class="art-excerpt">${escapeHtml(a.excerpt)}</p>
+        <span class="art-more">اقرأ المقال <i class="fas fa-arrow-left"></i></span>
+      </div>
+    </a>`;
+}
+
+function renderCats() {
+  const cats = [...new Set(ALL.map((a) => a.category || "عام"))];
+  if (cats.length < 2) {
+    catsEl.innerHTML = "";
+    return;
+  }
+  catsEl.innerHTML = ["", ...cats]
+    .map(
+      (c) =>
+        `<button type="button" class="cat-chip${c === activeCat ? " active" : ""}" data-cat="${escapeHtml(c)}">${c ? escapeHtml(c) : "الكل"}</button>`,
+    )
+    .join("");
+}
+
+function renderList() {
+  const q = searchEl.value.trim().toLowerCase();
+  const list = ALL.filter(
+    (a) =>
+      (!activeCat || (a.category || "عام") === activeCat) &&
+      (!q || (a.title + " " + a.excerpt).toLowerCase().includes(q)),
+  );
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="art-state">${
+      ALL.length === 0 ? "لا توجد مقالات منشورة بعد، ترقّب قريبًا ✍️" : "لا توجد نتائج مطابقة لبحثك."
+    }</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(articleCard).join("");
+}
+
+catsEl.addEventListener("click", (e) => {
+  const b = e.target.closest(".cat-chip");
+  if (!b) return;
+  activeCat = b.dataset.cat;
+  renderCats();
+  renderList();
+});
+
+let t;
+searchEl.addEventListener("input", () => {
+  clearTimeout(t);
+  t = setTimeout(renderList, 120);
+});
+
+sbLoad("articles", LIST_QUERY, (data) => {
+  ALL = Array.isArray(data) ? data : [];
+  if (activeCat && !ALL.some((a) => (a.category || "عام") === activeCat)) activeCat = "";
+  renderCats();
+  renderList();
+}).catch((err) => {
+  console.error("تعذر تحميل المقالات:", err);
+  if (ALL.length === 0)
+    grid.innerHTML = `<div class="art-state">تعذر تحميل المقالات حاليًا، حاول لاحقًا.</div>`;
+});

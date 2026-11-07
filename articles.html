@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="favicon.png" />
+    <meta name="theme-color" content="#050505" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="preconnect" href="https://wgcfajrwfmunwoqmneww.supabase.co" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" /></noscript>
+    <title>المقالات | محمد أحمد حلمي</title>
+    <meta name="description" content="مقالات في تطوير الواجهات الأمامية والأمن السيبراني والتسويق الرقمي من محمد أحمد حلمي." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://mohamedahmedhelmi.vercel.app/articles.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ar_EG" />
+    <meta property="og:title" content="المقالات | محمد أحمد حلمي" />
+    <meta property="og:description" content="مقالات في تطوير الواجهات الأمامية والأمن السيبراني والتسويق الرقمي." />
+    <meta property="og:url" content="https://mohamedahmedhelmi.vercel.app/articles.html" />
+    <meta property="og:image" content="https://mohamedahmedhelmi.vercel.app/2.jpg" />
+  </head>
+  <body class="bg-ink text-fog antialiased">
+    <nav class="sticky top-0 w-full bg-ink z-50 border-b border-line">
+      <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <a href="index.html" class="mono text-xl font-bold text-cyan">&gt;_ MH<span class="blink">_</span></a>
+        <div class="hidden md:flex items-center gap-8 text-sm text-fog/90">
+          <a href="index.html" class="nav-link hover:text-cyan transition-colors">الرئيسية</a>
+          <a href="index.html#projects" class="nav-link hover:text-cyan transition-colors">أعمالي</a>
+          <a href="index.html#services" class="nav-link hover:text-cyan transition-colors">خدماتي</a>
+          <a href="articles.html" class="nav-link text-cyan" aria-current="page">المقالات</a>
+          <a href="index.html#contact" class="nav-link hover:text-cyan transition-colors">تواصل</a>
+        </div>
+        <a href="https://wa.me/201110742678" target="_blank" rel="noopener" class="hidden md:flex items-center gap-2 px-4 py-2 rounded-md border border-cyan/40 text-cyan text-sm hover:bg-cyan hover:text-ink transition-colors mono"><i class="fab fa-whatsapp"></i> تواصل الآن</a>
+        <button id="menu-toggle" class="menu-btn" aria-label="فتح القائمة" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+      <div id="mobile-menu" class="mobile-menu">
+        <a href="index.html" class="mobile-link">الرئيسية</a>
+        <a href="index.html#projects" class="mobile-link">أعمالي</a>
+        <a href="index.html#services" class="mobile-link">خدماتي</a>
+        <a href="articles.html" class="mobile-link text-cyan">المقالات</a>
+        <a href="index.html#contact" class="mobile-link">تواصل</a>
+      </div>
+    </nav>
+
+    <header class="page-head">
+      <div class="container mx-auto px-6">
+        <div class="mono text-cyan/70 text-sm mb-2">&gt;_ articles</div>
+        <h1 class="text-3xl md:text-4xl font-black text-white leading-tight">المقالات</h1>
+        <p class="text-muted leading-relaxed mt-3 max-w-xl">
+          أكتب هنا عن البرمجة والأمن السيبراني والتسويق الرقمي، بأسلوب بسيط وعملي.
+        </p>
+        <div class="art-toolbar">
+          <input id="art-search" class="art-search" type="search" placeholder="ابحث في المقالات..." aria-label="بحث في المقالات" />
+        </div>
+        <div id="art-cats" class="art-toolbar" style="margin-top:0.75rem" role="group" aria-label="التصنيفات"></div>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-6">
+      <div id="art-grid" class="art-grid" aria-live="polite">
+        <div class="skel"></div><div class="skel"></div><div class="skel"></div>
+      </div>
+    </main>
+
+    <footer class="py-8 bg-panel border-t border-line text-center">
+      <div class="flex justify-center gap-6 text-muted mb-4 text-lg">
+        <a href="https://wa.me/201110742678" target="_blank" rel="noopener" class="hover:text-cyan transition-colors" aria-label="واتساب"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/" target="_blank" rel="noopener" class="hover:text-cyan transition-colors" aria-label="لينكدإن"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.facebook.com/mohamed.dev27" target="_blank" rel="noopener" class="hover:text-cyan transition-colors" aria-label="فيسبوك"><i class="fab fa-facebook"></i></a>
+      </div>
+      <p class="mono text-xs text-muted tracking-widest">© 2026 Mohamed Ahmed Helmy — built with care.</p>
+    </footer>
+
+    <script src="supabase-config.js" defer></script>
+    <script src="common.js" defer></script>
+    <script src="articles.js" defer></script>
+  </body>
+</html>

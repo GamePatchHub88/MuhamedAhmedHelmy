@@ -203,3 +203,56 @@ insert into reviews (client_name, client_role, review_text, rating, order_index)
 --    واعمل مستخدم واحد بس (إيميلك وباسورد قوي) — ده هو حساب الأدمن
 --    اللي هتسجل بيه دخول من صفحة admin.html
 -- ==========================================================
+
+-- ==========================================================
+-- 6) جدول المقالات (Articles) — صفحة المقالات الجديدة
+--    الزوار بيشوفوا المقالات المنشورة فقط (published = true)
+--    والمسجّل دخوله (لوحة التحكم) بيشوف ويعدّل الكل
+-- ==========================================================
+create table if not exists articles (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  title text not null,
+  excerpt text not null default '',
+  content text not null default '',
+  category text not null default 'عام',
+  cover_url text,
+  read_minutes integer not null default 1,
+  published boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists articles_published_created_idx
+  on articles (published, created_at desc);
+
+alter table articles enable row level security;
+
+create policy "public can read published articles"
+on articles for select
+to anon
+using (published = true);
+
+create policy "authenticated can read all articles"
+on articles for select
+to authenticated
+using (true);
+
+create policy "authenticated can insert articles"
+on articles for insert
+to authenticated
+with check (true);
+
+create policy "authenticated can update articles"
+on articles for update
+to authenticated
+using (true)
+with check (true);
+
+create policy "authenticated can delete articles"
+on articles for delete
+to authenticated
+using (true);
+
+grant select on public.articles to anon, authenticated;
+grant insert, update, delete on public.articles to authenticated;

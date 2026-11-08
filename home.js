@@ -79,33 +79,32 @@ function renderProjects(data) {
     return;
   }
   empty.classList.add("hidden");
+  const hues = ["#8b7bff", "#5eead4", "#f472b6", "#ffc46b", "#60a5fa", "#34d399"];
   grid.innerHTML = data
-    .map(
-      (p) => `
-      <div class="group rounded-2xl overflow-hidden bg-panel border border-line card-hover">
-        <div class="h-44 bg-panel2 flex items-center justify-center relative overflow-hidden">
+    .map((p, i) => {
+      const href = p.link_url ? escapeHtml(safeUrl(p.link_url)) : "";
+      const cover = p.image_url
+        ? `<img src="${escapeHtml(safeUrl(p.image_url))}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async" />`
+        : `<i class="${escapeHtml(p.icon || "fas fa-globe")}"></i>`;
+      return `
+      <article class="prj-card" style="--sc:${hues[i % hues.length]}">
+        <div class="prj-cover${p.image_url ? "" : " ph"}">
           ${ribbonHtml(p)}
-          ${
-            p.image_url
-              ? `<img src="${escapeHtml(safeUrl(p.image_url))}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />`
-              : `<div class="absolute inset-0 grid-texture opacity-40"></div>
-                 <i class="${escapeHtml(p.icon || "fas fa-globe")} text-5xl text-cyan/70 relative z-10"></i>`
-          }
+          ${cover}
+          <span class="prj-no mono">${String(i + 1).padStart(2, "0")}</span>
         </div>
-        <div class="p-6">
-          <span class="mono badge text-amber">${escapeHtml(p.badge || "WEB APP")}</span>
-          <h3 class="text-xl font-bold mt-2 mb-2 text-white">${escapeHtml(p.title)}</h3>
-          <p class="text-sm text-muted leading-relaxed${p.link_url ? " mb-3" : ""}">${escapeHtml(p.description)}</p>
+        <div class="prj-body">
+          <span class="prj-badge mono">${escapeHtml(p.badge || "WEB APP")}</span>
+          <h3>${escapeHtml(p.title)}</h3>
+          <p>${escapeHtml(p.description)}</p>
           ${
-            p.link_url
-              ? `<a href="${escapeHtml(safeUrl(p.link_url))}" target="_blank" rel="noopener" class="mono text-xs text-cyan hover:underline flex items-center gap-1.5">
-                   زيارة الموقع <i class="fas fa-arrow-up-left"></i>
-                 </a>`
+            href
+              ? `<a href="${href}" target="_blank" rel="noopener" class="svc-link">زيارة الموقع <i class="fas fa-arrow-up-left"></i></a>`
               : ""
           }
         </div>
-      </div>`,
-    )
+      </article>`;
+    })
     .join("");
 }
 

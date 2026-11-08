@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}})();</script>
     <link rel="stylesheet" href="style.css" />
     <title>لوحة التحكم</title>
     <meta name="robots" content="noindex, nofollow" />
@@ -21,322 +22,224 @@
     />
     <style>
       body { min-height: 100vh; }
+      #panel main { max-width: 56rem; }
 
+      /* ---------- Header ---------- */
       .admin-header {
-        position: sticky;
-        top: 0;
-        z-index: 40;
-        background: rgba(7, 10, 16, 0.9);
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid #1c2433;
+        position: sticky; top: 0; z-index: 40;
+        background: rgba(var(--panel-rgb), 0.82);
+        -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--line);
+      }
+      .admin-header::after {
+        content: ""; position: absolute; inset-inline: 0; bottom: -1px; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(var(--violet-rgb), .55), rgba(var(--cyan-rgb), .55), transparent);
+        opacity: .7; pointer-events: none;
+      }
+      .adm-brand { display: inline-flex; align-items: center; gap: .8rem; }
+      .adm-logo {
+        width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: 15px; font-size: 1.1rem;
+        color: #07101a; background: var(--grad); box-shadow: 0 10px 22px -10px rgba(var(--violet-rgb), .8);
+      }
+      .adm-brand b { display: block; color: var(--fog); font-size: 1.05rem; font-weight: 800; line-height: 1.3; }
+      .adm-brand small { display: block; color: var(--muted); font-size: .66rem; letter-spacing: .08em; }
+      .admin-theme-fixed { position: fixed; top: 1rem; inset-inline-end: 1rem; z-index: 60; }
+
+      /* ---------- Login ---------- */
+      #login-box {
+        position: relative; overflow: hidden; border-radius: 28px !important;
+        background: radial-gradient(90% 60% at 100% 0%, rgba(var(--violet-rgb), .16), transparent 70%), var(--panel) !important;
+        border-color: rgba(var(--violet-rgb), .3) !important;
+        box-shadow: 0 30px 60px -34px rgba(var(--violet-rgb), .55);
+      }
+      #login-box::before {
+        content: ""; position: absolute; top: 0; right: 1.5rem; left: 1.5rem; height: 3px;
+        border-radius: 0 0 6px 6px; background: var(--grad); opacity: .9;
       }
 
-      .admin-input,
-      .admin-select,
-      .admin-textarea {
-        width: 100%;
-        background: #0d121c;
-        border: 1px solid #1c2433;
-        border-radius: 0.6rem;
-        padding: 0.75rem 1rem;
-        color: #cfd8e6;
-        font-family: "Tajawal", sans-serif;
-        font-size: 0.95rem;
-        outline: none;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      /* ---------- Cards ---------- */
+      #panel main .tab-panel .bg-panel.border {
+        position: relative; overflow: hidden; border-radius: 28px; padding: 1.9rem 1.7rem !important;
+        background: radial-gradient(90% 40% at 100% 0%, rgba(var(--violet-rgb), .10), transparent 70%), var(--panel);
+        border-color: var(--line);
       }
-      .admin-textarea { resize: vertical; min-height: 90px; }
-      .admin-input:focus,
-      .admin-select:focus,
-      .admin-textarea:focus {
-        border-color: #00e5c7;
-        box-shadow: 0 0 0 3px rgba(0, 229, 199, 0.12);
+      #panel main .tab-panel .bg-panel.border::before {
+        content: ""; position: absolute; top: 0; right: 1.5rem; left: 1.5rem; height: 3px;
+        border-radius: 0 0 6px 6px; background: var(--grad); opacity: .75;
       }
-      .admin-input::placeholder,
-      .admin-textarea::placeholder { color: #5a6579; }
-      .admin-label {
-        display: block;
-        font-size: 0.85rem;
-        color: #7c8aa3;
-        margin-bottom: 0.5rem;
+      [data-theme="light"] #panel main .tab-panel .bg-panel.border { background: #fff; box-shadow: 0 10px 28px -22px rgba(40,50,120,.4); }
+      @media (max-width: 640px) { #panel main .tab-panel .bg-panel.border { padding: 1.4rem 1.1rem !important; } }
+
+      /* ---------- Form controls ---------- */
+      .admin-input, .admin-select, .admin-textarea {
+        width: 100%; background: var(--panel2); border: 1px solid var(--line); border-radius: 14px;
+        padding: 0.78rem 1rem; color: var(--fog); font-family: "Tajawal", sans-serif; font-size: 0.95rem; outline: none;
+        transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
       }
+      .admin-textarea { resize: vertical; min-height: 90px; line-height: 1.8; }
+      .admin-input:hover, .admin-select:hover, .admin-textarea:hover { border-color: rgba(var(--violet-rgb), .4); }
+      .admin-input:focus, .admin-select:focus, .admin-textarea:focus {
+        border-color: var(--violet); box-shadow: 0 0 0 4px rgba(var(--violet-rgb), 0.16);
+      }
+      .admin-input::placeholder, .admin-textarea::placeholder { color: var(--muted); opacity: .7; }
+      .admin-label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--muted); margin-bottom: 0.5rem; }
 
       .admin-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        background: #00e5c7;
-        color: #070a10;
-        font-weight: 700;
-        font-size: 0.9rem;
-        border: none;
-        border-radius: 0.6rem;
-        padding: 0.8rem 1.6rem;
-        cursor: pointer;
-        transition: filter 0.2s ease, transform 0.15s ease;
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+        background: var(--grad); color: #07101a; font-family: inherit; font-weight: 800; font-size: 0.9rem;
+        border: 1px solid transparent; border-radius: 14px; padding: 0.8rem 1.6rem; cursor: pointer;
+        box-shadow: 0 12px 24px -14px rgba(var(--violet-rgb), .9);
+        transition: filter .2s ease, transform .15s ease, box-shadow .2s ease;
       }
-      .admin-btn:hover:not(:disabled) { filter: brightness(1.1); }
+      .admin-btn:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 16px 28px -14px rgba(var(--violet-rgb), 1); }
       .admin-btn:active:not(:disabled) { transform: scale(0.98); }
       .admin-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+      [data-theme="light"] .admin-btn:not(.admin-btn-ghost) { color: #fff; }
+      [data-theme="light"] .admin-btn:not(.admin-btn-ghost) .spinner { border-color: rgba(255,255,255,.35); border-top-color: #fff; }
 
-      .admin-btn-ghost {
-        background: transparent;
-        border: 1px solid #1c2433;
-        color: #cfd8e6;
-      }
+      .admin-btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--fog); box-shadow: none; }
       .admin-btn-ghost:hover:not(:disabled) {
-        border-color: #00e5c7;
-        color: #00e5c7;
-        filter: none;
+        border-color: rgba(var(--cyan-rgb), .6); color: var(--cyan); background: rgba(var(--cyan-rgb), .07);
+        filter: none; box-shadow: none;
       }
 
-      /* Toasts */
+      /* ---------- Toasts ---------- */
       #toast-wrap {
-        position: fixed;
-        bottom: 1.25rem;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 100;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        width: min(92vw, 380px);
+        position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); z-index: 100;
+        display: flex; flex-direction: column; gap: 0.5rem; width: min(92vw, 380px);
       }
       .toast {
-        font-size: 0.85rem;
-        padding: 0.8rem 1.1rem;
-        border-radius: 0.6rem;
-        border: 1px solid #1c2433;
-        background: #0d121c;
-        color: #cfd8e6;
-        box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.6);
-        animation: toast-in 0.25s ease;
+        font-size: 0.86rem; font-weight: 700; padding: 0.85rem 1.15rem; border-radius: 16px;
+        border: 1px solid var(--line); background: var(--panel); color: var(--fog);
+        box-shadow: 0 18px 38px -16px rgba(0, 0, 0, 0.55); animation: toast-in 0.25s ease;
       }
-      .toast.ok { border-color: rgba(0, 229, 199, 0.4); color: #00e5c7; }
-      .toast.err { border-color: rgba(248, 113, 113, 0.4); color: #f87171; }
+      .toast.ok { border-color: rgba(var(--cyan-rgb), 0.5); color: var(--cyan); }
+      .toast.err { border-color: rgba(248, 113, 113, 0.5); color: #f87171; }
       @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-      /* Drop zone (project image upload) */
+      /* ---------- Drop zone / files ---------- */
       .drop-zone {
-        border: 1.5px dashed #2a3345;
-        border-radius: 0.75rem;
-        background: #0d121c;
-        padding: 1.5rem 1.25rem;
-        text-align: center;
-        cursor: pointer;
-        transition: border-color 0.2s ease, background-color 0.2s ease;
+        border: 1.5px dashed rgba(var(--violet-rgb), .4); border-radius: 20px; background: var(--panel2);
+        padding: 1.6rem 1.25rem; text-align: center; cursor: pointer;
+        transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
       }
-      .drop-zone:hover, .drop-zone.drag-over {
-        border-color: #00e5c7;
-        background: rgba(0, 229, 199, 0.04);
-      }
-      .drop-zone i { font-size: 1.5rem; color: #00e5c7; margin-bottom: 0.5rem; }
-      .drop-zone .dz-hint { color: #5a6579; font-size: 0.75rem; margin-top: 0.3rem; }
+      .drop-zone:hover, .drop-zone.drag-over { border-color: var(--cyan); background: rgba(var(--cyan-rgb), 0.06); transform: translateY(-2px); }
+      .drop-zone i { font-size: 1.6rem; color: var(--cyan); margin-bottom: 0.5rem; }
+      .drop-zone .dz-hint { color: var(--muted); font-size: 0.75rem; margin-top: 0.3rem; }
       .file-chip {
-        display: none;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-        background: #0d121c;
-        border: 1px solid #1c2433;
-        border-radius: 0.6rem;
-        padding: 0.7rem 1rem;
-        margin-top: 0.75rem;
+        display: none; align-items: center; justify-content: space-between; gap: 0.75rem;
+        background: var(--panel2); border: 1px solid var(--line); border-radius: 14px; padding: 0.7rem 1rem; margin-top: 0.75rem;
       }
       .file-chip.show { display: flex; }
-      .file-chip-remove {
-        color: #f87171;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-      .file-chip img {
-        width: 32px;
-        height: 32px;
-        object-fit: cover;
-        border-radius: 0.4rem;
-      }
+      .file-chip-remove { color: #f87171; background: none; border: none; cursor: pointer; font-size: 0.9rem; }
+      .file-chip img { width: 32px; height: 32px; object-fit: cover; border-radius: 0.5rem; }
 
-      .color-input-wrap {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
+      .color-input-wrap { display: flex; align-items: center; gap: 0.75rem; }
       .color-input-wrap input[type="color"] {
-        width: 46px;
-        height: 42px;
-        padding: 2px;
-        background: #0d121c;
-        border: 1px solid #1c2433;
-        border-radius: 0.5rem;
-        cursor: pointer;
+        width: 46px; height: 42px; padding: 3px; background: var(--panel2); border: 1px solid var(--line);
+        border-radius: 12px; cursor: pointer;
       }
-      .color-input-wrap span {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 0.8rem;
-        color: #7c8aa3;
-      }
+      .color-input-wrap span { font-family: "JetBrains Mono", monospace; font-size: 0.8rem; color: var(--muted); }
 
+      /* ---------- List rows (skills / projects / reviews / articles / news) ---------- */
       .item-thumb {
-        width: 38px;
-        height: 38px;
-        flex-shrink: 0;
-        border-radius: 0.5rem;
-        object-fit: cover;
-        border: 1px solid #1c2433;
+        width: 44px; height: 44px; flex-shrink: 0; border-radius: 14px; object-fit: cover; border: 1px solid var(--line);
       }
-
-      /* Generic row (skills / projects / reviews) */
       .item-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        padding: 0.9rem 1rem;
-        border: 1px solid #1c2433;
-        border-radius: 0.7rem;
-        margin-bottom: 0.65rem;
-        background: #0d121c;
-        transition: border-color 0.2s ease;
+        display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+        padding: 0.85rem 1rem; border: 1px solid var(--line); border-radius: 20px; margin-bottom: 0.7rem;
+        background: var(--panel2);
+        transition: border-color .2s ease, transform .25s var(--ease), box-shadow .25s ease;
       }
-      .item-row:hover { border-color: rgba(0, 229, 199, 0.3); }
+      .item-row:hover { border-color: rgba(var(--violet-rgb), .5); transform: translateY(-2px); box-shadow: 0 14px 26px -20px rgba(var(--violet-rgb), .7); }
+      .item-row button { transition: transform .15s ease; }
+      .item-row button:hover { transform: scale(1.18); }
       .item-icon {
-        width: 38px;
-        height: 38px;
-        flex-shrink: 0;
-        border-radius: 0.5rem;
-        background: rgba(0, 229, 199, 0.1);
-        border: 1px solid rgba(0, 229, 199, 0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #00e5c7;
-        font-size: 0.9rem;
+        width: 44px; height: 44px; flex-shrink: 0; border-radius: 14px;
+        background: rgba(var(--cyan-rgb), 0.12); border: 1px solid rgba(var(--cyan-rgb), 0.32);
+        display: flex; align-items: center; justify-content: center; color: var(--cyan); font-size: 1rem;
       }
-      .order-input {
-        width: 56px;
-        text-align: center;
-        padding: 0.45rem 0.3rem;
-      }
+      .order-input { width: 56px; text-align: center; padding: 0.45rem 0.3rem; border-radius: 12px; }
       .stat-chip {
-        background: #0d121c;
-        border: 1px solid #1c2433;
-        border-radius: 0.6rem;
-        padding: 0.6rem 1rem;
-        font-size: 0.8rem;
-        color: #7c8aa3;
+        display: inline-flex; align-items: center; gap: .5rem; padding: 0.55rem 1.1rem; border-radius: 999px;
+        font-size: 0.82rem; font-weight: 700; color: var(--muted);
+        background: var(--grad-soft); border: 1px solid rgba(var(--violet-rgb), .3);
       }
-      .stat-chip b { color: #fff; font-size: 1.1rem; }
+      .stat-chip b { color: var(--fog); font-size: 1.1rem; font-family: "JetBrains Mono", monospace; }
 
       .spinner {
-        width: 14px;
-        height: 14px;
-        border: 2px solid rgba(7, 10, 16, 0.3);
-        border-top-color: #070a10;
-        border-radius: 50%;
-        animation: spin 0.7s linear infinite;
+        width: 14px; height: 14px; border: 2px solid rgba(7, 16, 26, 0.3); border-top-color: #07101a;
+        border-radius: 50%; animation: spin 0.7s linear infinite;
       }
       @keyframes spin { to { transform: rotate(360deg); } }
 
-      /* Tabs */
+      /* ---------- Tabs ---------- */
       .tab-bar {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
+        display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; padding: .45rem; width: fit-content; max-width: 100%;
+        border-radius: 22px; background: var(--panel); border: 1px solid var(--line);
       }
       .tab-btn {
-        background: #0d121c;
-        border: 1px solid #1c2433;
-        color: #7c8aa3;
-        font-weight: 700;
-        font-size: 0.85rem;
-        border-radius: 0.6rem;
-        padding: 0.65rem 1.1rem;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.2s ease;
+        background: transparent; border: 1px solid transparent; color: var(--muted); font-family: inherit; font-weight: 700;
+        font-size: 0.85rem; border-radius: 16px; padding: 0.65rem 1.1rem; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;
       }
-      .tab-btn:hover { color: #cfd8e6; border-color: #2a3345; }
+      .tab-btn i { transition: color .2s; }
+      .tab-btn:hover { color: var(--fog); background: rgba(var(--violet-rgb), .08); }
       .tab-btn.active {
-        background: rgba(0, 229, 199, 0.1);
-        border-color: #00e5c7;
-        color: #00e5c7;
+        background: var(--grad-soft); border-color: rgba(var(--violet-rgb), .45); color: var(--fog);
+        box-shadow: 0 10px 22px -16px rgba(var(--violet-rgb), .9);
       }
+      .tab-btn.active i { color: var(--cyan); }
       .tab-panel { display: none; }
-      .tab-panel.active { display: block; }
+      .tab-panel.active { display: block; animation: tab-in .3s var(--ease); }
+      @keyframes tab-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+      @media (max-width: 640px) { .tab-bar { width: 100%; } .tab-btn { flex: 1 1 auto; justify-content: center; padding: .6rem .8rem; } }
 
-      /* Ribbon badge + edit mode */
+      /* ---------- Ribbon badge + edit mode ---------- */
       .swatches { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
-      .swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); cursor: pointer; padding: 0; transition: transform 0.15s ease, border-color 0.15s ease; }
-      .swatch:hover { transform: scale(1.15); border-color: #fff; }
-      .skill-card { --sc: #00e5c7; display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; border-radius: 18px; background: linear-gradient(135deg, color-mix(in srgb, var(--sc) 16%, transparent), transparent 70%), #0d121c; border: 1px solid color-mix(in srgb, var(--sc) 35%, transparent); }
-      .skill-ico { width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: 14px; background: color-mix(in srgb, var(--sc) 20%, transparent); }
-      .skill-ico i { font-size: 1.2rem; color: var(--sc); }
-      .skill-name { font-weight: 700; font-size: 0.9rem; color: #fff; }
+      .swatch {
+        width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; padding: 0;
+        transition: transform 0.15s ease, border-color 0.15s ease;
+      }
+      .swatch:hover { transform: scale(1.15); border-color: var(--fog); }
+      [data-theme="light"] .swatch { border-color: rgba(40,50,120,.25); }
       .skill-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-inline-start: 0.4rem; vertical-align: middle; }
       .force-hide { display: none !important; }
       .preset-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.65rem; }
       .preset-chip {
-        background: #0d121c;
-        border: 1px solid #1c2433;
-        color: #cfd8e6;
-        font-family: "Tajawal", sans-serif;
-        font-size: 0.78rem;
-        border-radius: 999px;
-        padding: 0.3rem 0.85rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
+        background: var(--panel2); border: 1px solid var(--line); color: var(--fog); font-family: "Tajawal", sans-serif;
+        font-size: 0.78rem; font-weight: 700; border-radius: 999px; padding: 0.35rem 0.9rem; cursor: pointer; transition: all 0.2s ease;
       }
-      .preset-chip:hover { border-color: #00e5c7; color: #00e5c7; }
+      .preset-chip:hover { border-color: rgba(var(--cyan-rgb), .6); color: var(--cyan); background: rgba(var(--cyan-rgb), .07); }
       .ribbon-preview {
-        display: inline-block;
-        padding: 0.3rem 0.85rem;
-        border-radius: 999px;
-        font-size: 0.75rem;
-        font-weight: 800;
-        margin-inline-start: auto;
+        display: inline-block; padding: 0.3rem 0.85rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800;
+        margin-inline-start: auto; box-shadow: 0 8px 18px -8px rgba(0,0,0,.5);
       }
       .ribbon-tag {
-        display: inline-block;
-        padding: 0.1rem 0.55rem;
-        border-radius: 999px;
-        font-size: 0.65rem;
-        font-weight: 800;
-        margin-inline-start: 0.4rem;
-        vertical-align: middle;
+        display: inline-block; padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.65rem; font-weight: 800;
+        margin-inline-start: 0.4rem; vertical-align: middle;
       }
-      .edit-mode-card { border-color: #ffb454 !important; box-shadow: 0 0 0 3px rgba(255, 180, 84, 0.12); }
+      #panel main .tab-panel .bg-panel.border.edit-mode-card, .edit-mode-card { border-color: var(--amber) !important; box-shadow: 0 0 0 4px rgba(255, 196, 107, 0.14) !important; }
       .edit-mode-note {
-        display: none;
-        background: rgba(255, 180, 84, 0.08);
-        border: 1px solid rgba(255, 180, 84, 0.35);
-        color: #ffb454;
-        border-radius: 0.6rem;
-        padding: 0.6rem 0.9rem;
-        font-size: 0.8rem;
-        margin-bottom: 1.25rem;
+        display: none; background: rgba(255, 196, 107, 0.09); border: 1px solid rgba(255, 196, 107, 0.4); color: var(--amber);
+        border-radius: 14px; padding: 0.65rem 1rem; font-size: 0.82rem; font-weight: 700; margin-bottom: 1.25rem;
       }
       .edit-mode-card .edit-mode-note { display: block; }
-      .item-row.is-editing { border-color: #ffb454; }
+      .item-row.is-editing { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(255, 196, 107, 0.12); }
 
-      @media (max-width: 640px) {
-        .item-row { flex-wrap: wrap; }
-      }
+      @media (max-width: 640px) { .item-row { flex-wrap: wrap; } }
     </style>
   </head>
   <body class="bg-ink text-fog antialiased">
     <!-- Login screen -->
+    
     <div
       id="login-screen"
       class="flex items-center justify-center"
       style="min-height: 100vh"
     >
-      <div class="w-full" style="max-width: 380px" class="px-6">
+      <button class="theme-btn admin-theme-fixed" data-theme-toggle type="button" aria-label="تبديل الثيم (فاتح / داكن)" title="تبديل الثيم"><i class="fas fa-moon i-moon"></i><i class="fas fa-sun i-sun"></i></button>
+      <div class="w-full px-6" style="max-width: 420px">
         <div class="mono text-xl font-bold text-cyan mb-8 text-center">
           &gt;_ لوحة التحكم<span class="blink">_</span>
         </div>
@@ -371,14 +274,14 @@
     <!-- Admin panel -->
     <div id="panel" class="hidden">
       <header class="admin-header">
-        <div
-          class="container mx-auto px-6 py-4 flex items-center justify-between"
-        >
-          <span class="mono text-lg font-bold text-cyan"
-            >&gt;_ لوحة التحكم</span
-          >
+        <div class="container mx-auto px-6 py-3 flex items-center justify-between" style="max-width:72rem">
+          <span class="adm-brand">
+            <span class="adm-logo"><i class="fas fa-gauge-high"></i></span>
+            <span><b>لوحة التحكم</b><small class="mono">ADMIN // PORTFOLIO</small></span>
+          </span>
           <div class="flex items-center gap-4">
             <span id="user-email" class="mono text-xs text-muted hidden md:flex"></span>
+            <button class="theme-btn" data-theme-toggle type="button" aria-label="تبديل الثيم (فاتح / داكن)" title="تبديل الثيم"><i class="fas fa-moon i-moon"></i><i class="fas fa-sun i-sun"></i></button>
             <button id="logout-btn" class="admin-btn-ghost admin-btn">
               <i class="fas fa-right-from-bracket"></i> خروج
             </button>
@@ -430,14 +333,14 @@
             <div class="mb-2">
               <label class="admin-label">لون الأيقونة</label>
               <div class="color-input-wrap">
-                <input id="skill-icon-color" type="color" value="#00e5c7" />
-                <span id="skill-icon-color-hex">#00e5c7</span>
+                <input id="skill-icon-color" type="color" value="#5eead4" />
+                <span id="skill-icon-color-hex">#5eead4</span>
               </div>
               <div id="skill-swatches" class="swatches" aria-label="ألوان جاهزة"></div>
             </div>
             <div class="mb-2">
               <label class="admin-label">معاينة مباشرة</label>
-              <div id="skill-preview" class="skill-card" style="--sc:#00e5c7;max-width:260px">
+              <div id="skill-preview" class="skill-card" style="--sc:#5eead4;max-width:260px">
                 <span class="skill-ico"><i id="skill-preview-i" class="fas fa-code"></i></span>
                 <span class="skill-name" id="skill-preview-n">اسم المهارة</span>
               </div>
@@ -496,7 +399,7 @@
               <label class="admin-label">شارة مميزة على صورة المشروع — اختياري</label>
               <input id="project-ribbon-text" type="text" maxlength="24" class="admin-input" placeholder="مثال: جديد / مميز / الأكثر طلبًا" />
               <div class="preset-row" id="ribbon-presets">
-                <button type="button" class="preset-chip" data-text="جديد" data-color="#00e5c7">جديد</button>
+                <button type="button" class="preset-chip" data-text="جديد" data-color="#5eead4">جديد</button>
                 <button type="button" class="preset-chip" data-text="مميز" data-color="#ffb454">مميز</button>
                 <button type="button" class="preset-chip" data-text="الأكثر طلبًا" data-color="#ff6b6b">الأكثر طلبًا</button>
                 <button type="button" class="preset-chip" data-text="قيد التطوير" data-color="#7c8aa3">قيد التطوير</button>
@@ -640,7 +543,7 @@
 
             <div class="flex gap-3 mt-5">
               <button id="save-article-btn" class="admin-btn"><i class="fas fa-plus"></i> إضافة المقال</button>
-              <button id="cancel-article-btn" class="admin-btn hidden" style="background:#121826;color:#cfd8e6;border:1px solid #1c2433">إلغاء التعديل</button>
+              <button id="cancel-article-btn" class="admin-btn admin-btn-ghost hidden">إلغاء التعديل</button>
             </div>
           </div>
 
@@ -974,7 +877,7 @@
       const skillsList = document.getElementById("skills-list");
       const skillsCount = document.getElementById("skills-count");
 
-      const SKILL_COLORS = ["#e34f26","#2965f1","#f7df1e","#61dafb","#22c55e","#8b7bff","#f472b6","#ffb454","#00e5c7","#ef4444","#f97316","#ffffff"];
+      const SKILL_COLORS = ["#e34f26","#2965f1","#f7df1e","#61dafb","#22c55e","#8b7bff","#f472b6","#ffb454","#5eead4","#ef4444","#f97316","#ffffff"];
       const skillFormCard = document.getElementById("skill-form-card");
       const skillSubmitBtn = document.getElementById("add-skill-btn");
       const cancelSkillBtn = document.getElementById("cancel-skill-edit-btn");
@@ -989,7 +892,7 @@
       );
 
       function updateSkillPreview() {
-        const c = skillColorInput.value || "#00e5c7";
+        const c = skillColorInput.value || "#5eead4";
         skillColorHex.textContent = c;
         document.getElementById("skill-preview").style.setProperty("--sc", c);
         document.getElementById("skill-preview-i").className = document.getElementById("skill-icon").value.trim() || "fas fa-code";
@@ -1003,7 +906,7 @@
         document.getElementById("skill-name").value = "";
         document.getElementById("skill-category").value = "";
         document.getElementById("skill-icon").value = "";
-        skillColorInput.value = "#00e5c7";
+        skillColorInput.value = "#5eead4";
         updateSkillPreview();
         skillFormCard.classList.remove("edit-mode-card");
         document.getElementById("skill-form-title").textContent = "إضافة مهارة جديدة";
@@ -1021,7 +924,7 @@
         document.getElementById("skill-name").value = s.name || "";
         document.getElementById("skill-category").value = s.category || "";
         document.getElementById("skill-icon").value = s.icon || "";
-        skillColorInput.value = safeHex(s.icon_color, "#00e5c7");
+        skillColorInput.value = safeHex(s.icon_color, "#5eead4");
         updateSkillPreview();
         skillFormCard.classList.add("edit-mode-card");
         document.getElementById("skill-form-title").textContent = "تعديل المهارة";
@@ -1039,7 +942,7 @@
         const name = document.getElementById("skill-name").value.trim();
         const category = document.getElementById("skill-category").value.trim() || "عام";
         const icon = document.getElementById("skill-icon").value.trim() || "fas fa-code";
-        const icon_color = document.getElementById("skill-icon-color").value || "#00e5c7";
+        const icon_color = document.getElementById("skill-icon-color").value || "#5eead4";
 
         if (!name) {
           toast("من فضلك اكتب اسم المهارة", false);
@@ -1097,18 +1000,18 @@
             (s) => `
           <div class="item-row${editingSkill && editingSkill.id === s.id ? " is-editing" : ""}" data-skill-id="${s.id}">
             <div class="flex items-center gap-3" style="min-width: 0">
-              <div class="item-icon" style="color:${safeHex(s.icon_color, "#00e5c7")}"><i class="${escapeHtml(s.icon)}"></i></div>
+              <div class="item-icon" style="color:${safeHex(s.icon_color, "#5eead4")}"><i class="${escapeHtml(s.icon)}"></i></div>
               <input type="number" data-table="skills" data-id="${s.id}" class="order-input admin-input" value="${s.order_index}" />
               <div style="min-width: 0">
                 <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(s.name)}</div>
-                <div class="mono text-xs text-muted">${escapeHtml(s.category)}<span class="skill-dot" style="background:${safeHex(s.icon_color, "#00e5c7")}"></span></div>
+                <div class="mono text-xs text-muted">${escapeHtml(s.category)}<span class="skill-dot" style="background:${safeHex(s.icon_color, "#5eead4")}"></span></div>
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <button data-id="${s.id}" class="edit-skill-btn" title="تعديل" style="background:none;border:none;color:#ffb454;cursor:pointer;font-size:0.95rem">
+              <button data-id="${s.id}" class="edit-skill-btn" title="تعديل" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:0.95rem">
                 <i class="fas fa-pen"></i>
               </button>
-              <button data-table="skills" data-id="${s.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem">
+              <button data-table="skills" data-id="${s.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:0.95rem">
                 <i class="fas fa-floppy-disk"></i>
               </button>
               <button data-table="skills" data-id="${s.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
@@ -1322,10 +1225,10 @@
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <button data-id="${p.id}" class="edit-project-btn" title="تعديل" style="background:none;border:none;color:#ffb454;cursor:pointer;font-size:0.95rem">
+              <button data-id="${p.id}" class="edit-project-btn" title="تعديل" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:0.95rem">
                 <i class="fas fa-pen"></i>
               </button>
-              <button data-table="projects" data-id="${p.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem">
+              <button data-table="projects" data-id="${p.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:0.95rem">
                 <i class="fas fa-floppy-disk"></i>
               </button>
               <button data-table="projects" data-id="${p.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
@@ -1414,7 +1317,7 @@
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <button data-table="reviews" data-id="${r.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem">
+              <button data-table="reviews" data-id="${r.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:0.95rem">
                 <i class="fas fa-floppy-disk"></i>
               </button>
               <button data-table="reviews" data-id="${r.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
@@ -1587,8 +1490,8 @@
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <button data-id="${a.id}" class="art-edit" title="تعديل" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem"><i class="fas fa-pen"></i></button>
-              <button data-id="${a.id}" class="art-toggle" title="نشر / مسودة" style="background:none;border:none;color:#ffb454;cursor:pointer;font-size:0.95rem"><i class="fas ${a.published ? "fa-eye" : "fa-eye-slash"}"></i></button>
+              <button data-id="${a.id}" class="art-edit" title="تعديل" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:0.95rem"><i class="fas fa-pen"></i></button>
+              <button data-id="${a.id}" class="art-toggle" title="نشر / مسودة" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:0.95rem"><i class="fas ${a.published ? "fa-eye" : "fa-eye-slash"}"></i></button>
               <button data-table="articles" data-id="${a.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem"><i class="fas fa-trash"></i></button>
             </div>
           </div>`,
@@ -1829,8 +1732,8 @@
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <button data-id="${n.id}" class="news-edit" title="تعديل" style="background:none;border:none;color:#ffb454;cursor:pointer;font-size:0.95rem"><i class="fas fa-pen"></i></button>
-              <button data-id="${n.id}" class="news-toggle" title="إظهار / إخفاء" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem"><i class="fas ${n.active ? "fa-eye" : "fa-eye-slash"}"></i></button>
+              <button data-id="${n.id}" class="news-edit" title="تعديل" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:0.95rem"><i class="fas fa-pen"></i></button>
+              <button data-id="${n.id}" class="news-toggle" title="إظهار / إخفاء" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:0.95rem"><i class="fas ${n.active ? "fa-eye" : "fa-eye-slash"}"></i></button>
               <button data-table="news" data-id="${n.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem"><i class="fas fa-trash"></i></button>
             </div>
           </div>`;
@@ -1851,6 +1754,24 @@
       }
 
       checkSession();
+    </script>
+  <script>
+      (function () {
+        var root = document.documentElement;
+        function sync() {
+          var light = root.getAttribute("data-theme") === "light";
+          document.querySelectorAll("[data-theme-toggle]").forEach(function (b) { b.setAttribute("aria-pressed", light ? "true" : "false"); });
+        }
+        sync();
+        document.querySelectorAll("[data-theme-toggle]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var light = root.getAttribute("data-theme") !== "light";
+            if (light) root.setAttribute("data-theme", "light"); else root.removeAttribute("data-theme");
+            try { localStorage.setItem("theme", light ? "light" : "dark"); } catch (_) {}
+            sync();
+          });
+        });
+      })();
     </script>
   </body>
 </html>

@@ -1344,3 +1344,48 @@ body, .header-bar, .bg-panel, .art-card, .svc-card, .road-card { transition: bac
   .news-title { font-size: 1.6rem; }
   .news-nav { padding: 0 1rem 1rem; }
 }
+
+/* =========================================================
+   Projects — colorful cards (matches services / reviews)
+========================================================= */
+.prj-card {
+  --sc: #8b7bff; position: relative; display: flex; flex-direction: column; border-radius: 28px; overflow: hidden;
+  background: radial-gradient(90% 55% at 100% 0%, color-mix(in srgb, var(--sc) 14%, transparent), transparent 70%), var(--panel);
+  border: 1px solid color-mix(in srgb, var(--sc) 28%, transparent);
+  transition: transform .35s var(--ease), box-shadow .35s ease, border-color .35s;
+}
+.prj-cover {
+  position: relative; aspect-ratio: 16 / 10; overflow: hidden; display: grid; place-items: center;
+  background: var(--panel2); border-bottom: 1px solid color-mix(in srgb, var(--sc) 22%, transparent);
+}
+.prj-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
+.prj-cover.ph {
+  background: radial-gradient(80% 80% at 85% 10%, color-mix(in srgb, var(--sc) 38%, transparent), transparent 70%),
+              radial-gradient(70% 70% at 10% 95%, rgba(var(--cyan-rgb), .22), transparent 70%), var(--panel2);
+}
+.prj-cover.ph i { font-size: 2.8rem; color: var(--sc); opacity: .9; position: relative; z-index: 1; }
+.prj-cover::after { /* colored top bar like service cards */
+  content: ""; position: absolute; top: 0; right: 1.5rem; left: 1.5rem; height: 3px; z-index: 3;
+  border-radius: 0 0 6px 6px; background: var(--sc); opacity: .85;
+}
+.prj-no {
+  position: absolute; z-index: 2; bottom: .55rem; inset-inline-end: 1rem; font-weight: 700; font-size: 2.4rem; line-height: 1;
+  color: #fff; opacity: .55; text-shadow: 0 4px 16px rgba(0,0,0,.5); pointer-events: none;
+}
+.prj-cover.ph .prj-no { color: var(--sc); opacity: .18; text-shadow: none; }
+.prj-body { display: flex; flex-direction: column; flex: 1; padding: 1.4rem 1.5rem 1.5rem; }
+.prj-badge {
+  align-self: flex-start; padding: .22rem .75rem; border-radius: 999px; font-size: .68rem; font-weight: 700; letter-spacing: .04em;
+  color: var(--sc); background: color-mix(in srgb, var(--sc) 14%, transparent); border: 1px solid color-mix(in srgb, var(--sc) 35%, transparent);
+}
+.prj-body h3 { margin: .85rem 0 .5rem; color: #fff; font-size: 1.15rem; font-weight: 800; line-height: 1.5; }
+.prj-body p { margin: 0 0 1.2rem; color: var(--muted); font-size: .88rem; line-height: 1.9; flex: 1; }
+.prj-card .project-ribbon { top: .8rem; inset-inline-start: .8rem; z-index: 4; }
+@media (hover: hover) and (pointer: fine) {
+  .prj-card:hover { transform: translateY(-6px); border-color: color-mix(in srgb, var(--sc) 60%, transparent); box-shadow: 0 24px 44px -22px var(--sc); }
+  .prj-card:hover .prj-cover img { transform: scale(1.05); }
+}
+[data-theme="light"] .prj-card { box-shadow: 0 10px 26px -22px rgba(40,50,120,.5); }
+[data-theme="light"] .prj-body h3 { color: #121735; }
+[data-theme="light"] .prj-badge, [data-theme="light"] .prj-cover.ph i { color: color-mix(in srgb, var(--sc) 62%, #14183a); }
+[data-theme="light"] .prj-cover.ph .prj-no { opacity: .22; }

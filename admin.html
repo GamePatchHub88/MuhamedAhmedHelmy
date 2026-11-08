@@ -306,6 +306,9 @@
           <button class="tab-btn" data-tab="news">
             <i class="fas fa-bullhorn"></i> الأخبار والإعلانات
           </button>
+          <button class="tab-btn" data-tab="students">
+            <i class="fas fa-user-graduate"></i> طلاب موقع الحلول
+          </button>
         </div>
 
         <!-- ===================== SKILLS TAB ===================== -->
@@ -629,6 +632,30 @@
             <div id="news-list"></div>
           </div>
         </div>
+      
+        <!-- ===================== STUDENTS TAB (موقع حلول كيريو) ===================== -->
+        <div class="tab-panel" id="tab-students">
+          <div class="flex items-center gap-3 mb-8" style="flex-wrap: wrap">
+            <span class="stat-chip">إجمالي الأسماء: <b id="students-count">0</b></span>
+            <span class="stat-chip">مرفوض: <b id="students-rejected-count">0</b></span>
+            <button id="students-refresh-btn" class="admin-btn" type="button" style="width: auto; padding: .55rem 1rem; margin-inline-start: auto">
+              <i class="fas fa-rotate"></i> تحديث
+            </button>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7">
+            <h2 class="text-lg font-bold text-white mb-1">الأسماء المسجّلة من موقع الحلول</h2>
+            <p class="text-xs text-muted mb-5">
+              أي طالب يدخل موقع الحلول يكتب اسمه فيظهر هنا. زر
+              <i class="fas fa-ban" style="color:#f87171"></i>
+              يرفض الاسم فيُمنع جهازه من الموقع حتى يكتب اسمًا آخر، وزر
+              <i class="fas fa-trash" style="color:#f87171"></i>
+              يحذف الاسم فيُطلب من الجهاز كتابة اسمه من جديد.
+            </p>
+            <input id="students-search" type="text" class="admin-input" placeholder="بحث بالاسم..." style="margin-bottom: 1rem" />
+            <div id="students-list"></div>
+          </div>
+        </div>
       </main>
     </div>
 
@@ -795,6 +822,7 @@
           loadReviews();
           loadArticles();
           loadNews();
+          loadStudents();
         } else {
           loginScreen.classList.remove("hidden");
           panel.classList.add("hidden");
@@ -1330,6 +1358,100 @@
 
         wireRowActions("reviews", loadReviews);
       }
+
+      /* ---------- Students (أسماء طلاب موقع الحلول) ---------- */
+      let studentsCache = [];
+
+      function studentWhen(iso) {
+        try {
+          return new Date(iso).toLocaleString("ar-EG", { dateStyle: "medium", timeStyle: "short" });
+        } catch (_) {
+          return "";
+        }
+      }
+
+      function renderStudents() {
+        const list = document.getElementById("students-list");
+        const q = (document.getElementById("students-search").value || "").trim().toLowerCase();
+        const rows = studentsCache.filter((st) => !q || st.name.toLowerCase().includes(q));
+
+        if (!studentsCache.length) {
+          list.innerHTML = '<p class="text-muted text-sm">لا توجد أسماء بعد.</p>';
+          return;
+        }
+        if (!rows.length) {
+          list.innerHTML = '<p class="text-muted text-sm">لا توجد نتائج مطابقة.</p>';
+          return;
+        }
+
+        list.innerHTML = rows
+          .map((st) => {
+            const rej = st.status === "rejected";
+            const badge = rej
+              ? '<span style="color:#f87171;font-weight:700">مرفوض</span>'
+              : '<span style="color:#4ade9b;font-weight:700">مقبول</span>';
+            const actionIcon = rej ? "fa-rotate-left" : "fa-ban";
+            const actionColor = rej ? "#4ade9b" : "#f87171";
+            const actionTitle = rej ? "إلغاء الرفض" : "رفض الاسم";
+            return `
+          <div class="item-row" style="${rej ? "opacity:.75" : ""}">
+            <div class="flex items-center gap-3" style="min-width: 0">
+              <div class="item-icon"><i class="fas ${rej ? "fa-user-slash" : "fa-user-graduate"}"></i></div>
+              <div style="min-width: 0">
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(st.name)}</div>
+                <div class="mono text-xs text-muted">${badge} · ${escapeHtml(studentWhen(st.created_at))}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <button data-id="${st.id}" data-status="${rej ? "approved" : "rejected"}" class="student-status-btn" title="${actionTitle}" style="background:none;border:none;color:${actionColor};cursor:pointer;font-size:0.95rem">
+                <i class="fas ${actionIcon}"></i>
+              </button>
+              <button data-table="students" data-id="${st.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>`;
+          })
+          .join("");
+
+        list.querySelectorAll(".student-status-btn").forEach((b) => {
+          b.addEventListener("click", async () => {
+            b.disabled = true;
+            const { error } = await supabaseClient.from("students").update({ status: b.dataset.status }).eq("id", b.dataset.id);
+            if (error) {
+              b.disabled = false;
+              toast("تعذر التحديث: " + error.message, false);
+              return;
+            }
+            toast(b.dataset.status === "rejected" ? "تم رفض الاسم" : "تم إلغاء الرفض", true);
+            loadStudents();
+          });
+        });
+
+        wireRowActions("students", loadStudents);
+      }
+
+      async function loadStudents() {
+        const list = document.getElementById("students-list");
+        list.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
+        const { data, error } = await supabaseClient
+          .from("students")
+          .select("id, name, status, created_at")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          list.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل القائمة (هل شغّلت students-setup.sql؟)</p>';
+          return;
+        }
+        studentsCache = data || [];
+        document.getElementById("students-count").textContent = studentsCache.length;
+        document.getElementById("students-rejected-count").textContent = studentsCache.filter((x) => x.status === "rejected").length;
+        renderStudents();
+      }
+
+      document.getElementById("students-refresh-btn").addEventListener("click", loadStudents);
+      document.getElementById("students-search").addEventListener("input", renderStudents);
+      document.querySelector('.tab-btn[data-tab="students"]').addEventListener("click", loadStudents);
 
       /* ---------- Articles ---------- */
       const articlesList = document.getElementById("articles-list");

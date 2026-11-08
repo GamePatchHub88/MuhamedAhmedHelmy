@@ -120,10 +120,10 @@ catsEl.addEventListener("click", (e) => {
   renderList();
 });
 
-let t;
+let searchTimer;
 searchEl.addEventListener("input", () => {
-  clearTimeout(t);
-  t = setTimeout(renderList, 120);
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(renderList, 120);
 });
 
 sbLoad("articles", LIST_QUERY, (data) => {

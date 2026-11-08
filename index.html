@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script>try{var t=localStorage.getItem("theme");if(t==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+        <script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}})();</script>
     <link rel="stylesheet" href="style.css" />
 
     <title>محمد أحمد حلمي | مبرمج فرونت اند | أبونجاح</title>
@@ -552,28 +552,52 @@
 
     <section id="contact" class="py-24 relative overflow-hidden">
       <div class="absolute inset-0 pointer-events-none contact-bg" aria-hidden="true"></div>
-      <div class="container mx-auto px-6 max-w-4xl relative z-10">
-        <div class="contact-card">
-          <span class="contact-plane" aria-hidden="true"><i class="fas fa-paper-plane"></i></span>
-          <div class="inline-flex items-center gap-2 mono badge text-cyan border border-cyan/30 rounded-full px-3 py-1 mb-5">
-            <span class="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse"></span>
-            الأماكن محدودة هذا الشهر
+      <div class="container mx-auto px-6 max-w-6xl relative z-10">
+        <div class="ct-grid">
+          <div class="ct-info">
+            <div class="inline-flex items-center gap-2 mono badge text-cyan border border-cyan/30 rounded-full px-3 py-1 mb-5">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse"></span>
+              الأماكن محدودة هذا الشهر
+            </div>
+            <span class="mono badge text-cyan block">// CONTACT</span>
+            <h2 class="ct-title">لنبدأ <span class="glow-text">مشروعك القادم</span></h2>
+            <p class="ct-lead">محتاج موقع احترافي وآمن لمشروعك أو شركتك؟ اكتب فكرتك هنا وهتوصلني على واتساب جاهزة، واستشارة أول مرة مجانًا قبل ما تقرر.</p>
+            <ul class="ct-list">
+              <li><a href="https://wa.me/201110742678" target="_blank" rel="noopener" style="--c:#25d366"><span class="ct-ico"><i class="fab fa-whatsapp"></i></span><span><small>واتساب</small><b dir="ltr">+20 111 074 2678</b></span><i class="fas fa-arrow-left ct-go"></i></a></li>
+              <li><a href="mailto:mh3976698@gmail.com" style="--c:#ea4335"><span class="ct-ico"><i class="fas fa-envelope"></i></span><span><small>البريد</small><b dir="ltr">mh3976698@gmail.com</b></span><i class="fas fa-arrow-left ct-go"></i></a></li>
+              <li><a href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/" target="_blank" rel="noopener" style="--c:#0a8ee9"><span class="ct-ico"><i class="fab fa-linkedin-in"></i></span><span><small>لينكدإن</small><b>Mohammad Ahmed Helmy</b></span><i class="fas fa-arrow-left ct-go"></i></a></li>
+              <li><a href="https://www.facebook.com/mohamed.dev27" target="_blank" rel="noopener" style="--c:#1877f2"><span class="ct-ico"><i class="fab fa-facebook-f"></i></span><span><small>فيسبوك</small><b>mohamed.dev27</b></span><i class="fas fa-arrow-left ct-go"></i></a></li>
+            </ul>
+            <div class="contact-perks">
+              <span><i class="fas fa-check"></i> استشارة مجانية</span>
+              <span><i class="fas fa-check"></i> رد خلال ساعة</span>
+              <span><i class="fas fa-check"></i> دعم بعد التسليم</span>
+            </div>
           </div>
-          <span class="mono badge text-cyan block">// CONTACT</span>
-          <h2 class="text-3xl md:text-5xl font-black text-white mt-2 mb-5">لنبدأ مشروعك القادم</h2>
-          <p class="text-muted mb-8 leading-relaxed contact-lead">محتاج موقع احترافي وآمن لمشروعك أو شركتك؟ تواصل معايا دلوقتي، واستشارة أول مرة مجانًا قبل ما تقرر.</p>
-          <p class="contact-label">اختار اللي محتاجه وابعتلي مباشرة على واتساب:</p>
-          <div class="topic-row"><a class="topic-chip" href="https://wa.me/201110742678?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%20%D9%85%D8%AD%D9%85%D8%AF%D8%8C%20%D9%85%D9%87%D8%AA%D9%85%20%D8%A8%D9%80%3A%20%D9%85%D9%88%D9%82%D8%B9%20%D8%AA%D8%B9%D8%B1%D9%8A%D9%81%D9%8A" target="_blank" rel="noopener"><i class="fas fa-globe"></i>موقع تعريفي</a><a class="topic-chip" href="https://wa.me/201110742678?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%20%D9%85%D8%AD%D9%85%D8%AF%D8%8C%20%D9%85%D9%87%D8%AA%D9%85%20%D8%A8%D9%80%3A%20%D9%85%D8%AA%D8%AC%D8%B1%20%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A" target="_blank" rel="noopener"><i class="fas fa-cart-shopping"></i>متجر إلكتروني</a><a class="topic-chip" href="https://wa.me/201110742678?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%20%D9%85%D8%AD%D9%85%D8%AF%D8%8C%20%D9%85%D9%87%D8%AA%D9%85%20%D8%A8%D9%80%3A%20%D9%81%D9%8A%D8%AF%D9%8A%D9%88%D9%87%D8%A7%D8%AA%20%D8%A8%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%A7%D8%B5%D8%B7%D9%86%D8%A7%D8%B9%D9%8A" target="_blank" rel="noopener"><i class="fas fa-clapperboard"></i>فيديوهات بالذكاء الاصطناعي</a><a class="topic-chip" href="https://wa.me/201110742678?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%20%D9%85%D8%AD%D9%85%D8%AF%D8%8C%20%D9%85%D9%87%D8%AA%D9%85%20%D8%A8%D9%80%3A%20%D8%A5%D8%AF%D8%A7%D8%B1%D8%A9%20%D8%A7%D9%84%D8%B3%D9%88%D8%B4%D9%8A%D8%A7%D9%84%20%D9%85%D9%8A%D8%AF%D9%8A%D8%A7" target="_blank" rel="noopener"><i class="fas fa-hashtag"></i>إدارة سوشيال ميديا</a><a class="topic-chip" href="https://wa.me/201110742678?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%20%D9%85%D8%AD%D9%85%D8%AF%D8%8C%20%D9%85%D9%87%D8%AA%D9%85%20%D8%A8%D9%80%3A%20%D9%81%D8%AD%D8%B5%20%D8%A3%D9%85%D9%86%D9%8A%20%D9%84%D9%85%D9%88%D9%82%D8%B9%D9%8A" target="_blank" rel="noopener"><i class="fas fa-shield-halved"></i>فحص أمني لموقعي</a></div>
-          <div class="flex flex-wrap items-center justify-center gap-4 mb-8">
-            <a href="https://wa.me/201110742678" target="_blank" rel="noopener" class="px-7 py-3.5 rounded-md bg-cyan text-ink font-bold hover:brightness-110 transition-all flex items-center gap-2"><i class="fab fa-whatsapp text-lg"></i> ابدأ على واتساب</a>
-            <a href="mailto:mh3976698@gmail.com" class="px-7 py-3.5 rounded-md border border-line text-fog font-bold hover:border-cyan hover:text-cyan transition-all flex items-center gap-2 mono text-sm"><i class="fas fa-envelope text-cyan"></i> mh3976698@gmail.com</a>
-            <a href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/" target="_blank" rel="noopener" class="px-5 py-3.5 rounded-md border border-line text-fog font-bold hover:border-cyan hover:text-cyan transition-all flex items-center gap-2 text-sm"><i class="fab fa-linkedin-in text-cyan"></i> لينكدإن</a>
-          </div>
-          <div class="contact-perks">
-            <span><i class="fas fa-check"></i> استشارة مجانية</span>
-            <span><i class="fas fa-check"></i> رد خلال ساعة</span>
-            <span><i class="fas fa-check"></i> دعم بعد التسليم</span>
-            <span><i class="fas fa-check"></i> عرض سعر واضح</span>
+
+          <div class="ct-compose">
+            <div class="ct-bar"><span class="ct-av">MH</span><div><b>محمد حلمي</b><small><i></i> متاح الآن</small></div><i class="fab fa-whatsapp ct-wa"></i></div>
+            <form id="ct-form" class="ct-form" autocomplete="off">
+              <label class="ct-lbl">اسمك
+                <input id="ct-name" class="ct-input" type="text" maxlength="60" placeholder="اكتب اسمك" />
+              </label>
+              <div class="ct-lbl">محتاج إيه؟
+                <div class="ct-topics" id="ct-topics" role="radiogroup" aria-label="نوع الخدمة">
+                  <button type="button" class="on" data-t="موقع تعريفي"><i class="fas fa-globe"></i>موقع تعريفي</button>
+                  <button type="button" data-t="متجر إلكتروني"><i class="fas fa-cart-shopping"></i>متجر إلكتروني</button>
+                  <button type="button" data-t="فيديوهات بالذكاء الاصطناعي"><i class="fas fa-clapperboard"></i>فيديوهات AI</button>
+                  <button type="button" data-t="إدارة سوشيال ميديا"><i class="fas fa-hashtag"></i>سوشيال ميديا</button>
+                  <button type="button" data-t="فحص أمني"><i class="fas fa-shield-halved"></i>فحص أمني</button>
+                  <button type="button" data-t="شيء آخر"><i class="fas fa-ellipsis"></i>شيء آخر</button>
+                </div>
+              </div>
+              <label class="ct-lbl">فكرتك باختصار
+                <textarea id="ct-msg" class="ct-input" rows="3" maxlength="500" placeholder="مثال: عايز موقع لعيادتي فيه حجز مواعيد..."></textarea>
+              </label>
+              <div class="ct-preview" aria-live="polite"><span class="ct-bubble" id="ct-preview"></span></div>
+              <button type="submit" class="ct-send"><i class="fab fa-whatsapp"></i> أرسل على واتساب</button>
+              <p class="ct-note"><i class="fas fa-lock"></i> بيفتح واتساب برسالة جاهزة، ومفيش بيانات بتتخزن على الموقع.</p>
+            </form>
           </div>
         </div>
       </div>

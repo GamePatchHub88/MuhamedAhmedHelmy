@@ -168,3 +168,41 @@ const ORDER = "order=order_index.asc,created_at.desc";
     else if (el && !sessionStorage.getItem("sb:" + table + "?" + q)) showEmpty(el, `تعذر تحميل ${label} حاليًا، حاول لاحقًا.`);
   });
 });
+
+/* ---------- نموذج التواصل → رسالة واتساب جاهزة ---------- */
+(function () {
+  const form = document.getElementById("ct-form");
+  if (!form) return;
+  const nameEl = document.getElementById("ct-name");
+  const msgEl = document.getElementById("ct-msg");
+  const topics = document.getElementById("ct-topics");
+  const prev = document.getElementById("ct-preview");
+  let topic = "موقع تعريفي";
+
+  const build = () => {
+    const n = nameEl.value.trim();
+    const m = msgEl.value.trim();
+    return (
+      "مرحبا محمد" + (n ? "، أنا " + n : "") + ".\n" +
+      "مهتم بـ: " + topic + "." +
+      (m ? "\nفكرتي: " + m : "")
+    );
+  };
+  const paint = () => { prev.textContent = build(); };
+
+  topics.addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-t]");
+    if (!b) return;
+    topics.querySelectorAll("button").forEach((x) => x.classList.remove("on"));
+    b.classList.add("on");
+    topic = b.dataset.t;
+    paint();
+  });
+  nameEl.addEventListener("input", paint);
+  msgEl.addEventListener("input", paint);
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    window.open("https://wa.me/201110742678?text=" + encodeURIComponent(build()), "_blank", "noopener");
+  });
+  paint();
+})();

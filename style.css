@@ -1193,3 +1193,75 @@ body, .header-bar, .bg-panel, .art-card, .svc-card, .road-card { transition: bac
 .contact-perks { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem 1.6rem; font-size: .8rem; color: var(--muted); }
 .contact-perks i { color: var(--cyan); margin-inline-end: .35rem; }
 [data-theme="light"] .contact-card { background: linear-gradient(160deg, rgba(101,82,240,.1), rgba(15,181,166,.06) 60%, transparent), #fff; }
+
+/* =========================================================
+   v4 — Process: richer mobile map
+========================================================= */
+@media (max-width: 899px) {
+  .map { position: relative; padding: 4.2rem .9rem 4.2rem; border-radius: 30px; overflow: hidden; background: linear-gradient(var(--m-grid) 1px, transparent 1px) 0 0 / 100% 36px, linear-gradient(90deg, var(--m-grid) 1px, transparent 1px) 0 0 / 36px 100%, var(--m-paper); border: 1px solid var(--line); }
+  .map::before { content: "ابدأ هنا"; position: absolute; top: 1rem; right: .9rem; padding: .4rem 1rem; border-radius: 999px; font-weight: 800; font-size: .8rem; color: #07101a; background: #5eead4; box-shadow: 0 8px 18px -8px #5eead4; }
+  .map::after { content: "🏁  تسليم موقعك"; position: absolute; bottom: 1rem; right: .9rem; padding: .4rem 1rem; border-radius: 999px; font-weight: 800; font-size: .8rem; color: #1a1405; background: #ffc46b; box-shadow: 0 8px 18px -8px #ffc46b; }
+  .map-steps { padding-top: .6rem; }
+  /* road strip */
+  .map-steps::before { top: 0; bottom: 0; right: calc(1.7rem - 14px); width: 28px; border-radius: 14px; background: var(--m-road); border: 3px solid var(--m-edge); opacity: 1; }
+  .map-steps::after { content: ""; position: absolute; top: 12px; bottom: 12px; right: calc(1.7rem - 2px); width: 4px; border-radius: 4px; background: repeating-linear-gradient(180deg, #5eead4 0 10px, #8b7bff 10px 20px, #f472b6 20px 30px, #ffc46b 30px 40px); transform-origin: top; transform: scaleY(0); transition: transform 2.4s var(--ease) .3s; }
+  #process.in .map-steps::after { transform: scaleY(1); }
+  .map-step { padding-bottom: 1.5rem; }
+  .map-step:last-child { padding-bottom: 0; }
+  .map-card { padding-top: 1.35rem; }
+  .map-card .road-num { top: .55rem; left: .9rem; font-size: 2.3rem; opacity: .16; }
+  .map-card::after { content: ""; position: absolute; top: 1.35rem; right: -7px; width: 12px; height: 12px; background: var(--panel); border: 1px solid color-mix(in srgb, var(--sc) 30%, transparent); border-left: 0; border-bottom: 0; transform: rotate(45deg); }
+  .map-card { overflow: visible; margin-right: .2rem; }
+  .map-card h3 { font-size: 1.05rem; }
+  .map-step .road-node { margin-top: .1rem; }
+}
+@media (min-width: 900px) { .map-steps::after { content: none; } }
+@media (min-width: 900px) { .map::before, .map::after { content: none; } }
+[data-theme="light"] .map::before, [data-theme="light"] .map::after { box-shadow: none; }
+
+/* =========================================================
+   v4 — Contact: info + live WhatsApp composer
+========================================================= */
+.ct-grid { display: grid; gap: 2.2rem; grid-template-columns: 1fr; align-items: center; }
+@media (min-width: 960px) { .ct-grid { grid-template-columns: 1.05fr 1fr; gap: 4rem; } }
+.ct-title { margin: .6rem 0 1rem; font-size: 2.4rem; font-weight: 900; line-height: 1.35; color: #fff; }
+@media (min-width: 768px) { .ct-title { font-size: 3.2rem; } }
+[data-theme="light"] .ct-title { color: #121735; }
+.ct-title::after { display: none !important; }
+.ct-lead { margin: 0 0 1.8rem; color: var(--muted); line-height: 2; max-width: 32rem; }
+.ct-list { list-style: none; margin: 0 0 1.5rem; padding: 0; display: grid; gap: .7rem; }
+.ct-list a { --c: #8b7bff; display: flex; align-items: center; gap: 1rem; padding: .75rem 1rem; border-radius: 20px; background: var(--panel); border: 1px solid var(--line); transition: transform .25s var(--ease), border-color .25s, box-shadow .25s; }
+.ct-ico { flex: none; width: 2.8rem; height: 2.8rem; display: grid; place-items: center; border-radius: 15px; font-size: 1.15rem; color: var(--c); background: color-mix(in srgb, var(--c) 15%, transparent); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); }
+.ct-list small { display: block; color: var(--muted); font-size: .72rem; }
+.ct-list b { color: var(--fog); font-size: .95rem; font-weight: 700; }
+.ct-go { margin-inline-start: auto; color: var(--muted); font-size: .8rem; transition: transform .25s, color .25s; }
+@media (hover: hover) and (pointer: fine) { .ct-list a:hover { transform: translateX(-5px); border-color: color-mix(in srgb, var(--c) 60%, transparent); box-shadow: 0 14px 28px -18px var(--c); } .ct-list a:hover .ct-go { color: var(--c); transform: translateX(-4px); } }
+.contact-perks { justify-content: flex-start; }
+
+.ct-compose { position: relative; border-radius: 32px; overflow: hidden; background: var(--panel); border: 1px solid rgba(var(--violet-rgb), .35); box-shadow: 0 40px 80px -44px rgba(var(--violet-rgb), .7); }
+.ct-bar { display: flex; align-items: center; gap: .85rem; padding: .95rem 1.2rem; background: linear-gradient(135deg, #0f7d5c, #128c7e); color: #fff; }
+.ct-av { width: 2.7rem; height: 2.7rem; display: grid; place-items: center; border-radius: 50%; font: 700 .9rem "JetBrains Mono", monospace; color: #07101a; background: #fff; direction: ltr; }
+.ct-bar b { display: block; font-size: .98rem; }
+.ct-bar small { display: flex; align-items: center; gap: .4rem; font-size: .74rem; opacity: .9; }
+.ct-bar small i { width: .5rem; height: .5rem; border-radius: 50%; background: #7dffb0; box-shadow: 0 0 0 3px rgba(125,255,176,.25); animation: pulse 2s ease-in-out infinite; }
+.ct-wa { margin-inline-start: auto; font-size: 1.7rem; opacity: .85; }
+.ct-form { display: grid; gap: 1.1rem; padding: 1.4rem 1.3rem 1.5rem; }
+@media (min-width: 768px) { .ct-form { padding: 1.7rem 1.8rem 1.8rem; } }
+.ct-lbl { display: grid; gap: .5rem; font-size: .82rem; font-weight: 700; color: var(--muted); }
+.ct-input { width: 100%; font-family: inherit; font-size: .95rem; color: var(--fog); background: var(--ink); border: 1px solid var(--line); border-radius: 16px; padding: .8rem 1rem; resize: vertical; min-height: 3rem; transition: border-color .2s, box-shadow .2s; }
+.ct-input:focus { outline: none; border-color: #25d366; box-shadow: 0 0 0 4px rgba(37,211,102,.15); }
+.ct-topics { display: flex; flex-wrap: wrap; gap: .5rem; }
+.ct-topics button { display: inline-flex; align-items: center; gap: .45rem; font-family: inherit; font-size: .8rem; font-weight: 700; cursor: pointer; color: var(--fog); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: .5rem .9rem; transition: all .2s; }
+.ct-topics button i { color: var(--cyan); font-size: .8rem; }
+.ct-topics button:hover { border-color: var(--cyan); }
+.ct-topics button.on { color: #07101a; background: var(--grad); border-color: transparent; }
+.ct-topics button.on i { color: #07101a; }
+.ct-preview { display: flex; justify-content: flex-start; padding: 1rem; border-radius: 20px; background: repeating-linear-gradient(45deg, rgba(var(--violet-rgb), .05) 0 10px, transparent 10px 20px), var(--panel2); }
+.ct-bubble { position: relative; max-width: 92%; white-space: pre-wrap; padding: .7rem 1rem; border-radius: 16px 16px 16px 4px; font-size: .88rem; line-height: 1.9; color: #0b2a1f; background: #d9fdd3; box-shadow: 0 6px 14px -8px rgba(0,0,0,.5); }
+.ct-send { display: flex; align-items: center; justify-content: center; gap: .6rem; padding: .95rem 1.2rem; font-family: inherit; font-size: 1rem; font-weight: 800; cursor: pointer; border: 0; border-radius: 18px; color: #fff; background: linear-gradient(135deg, #25d366, #128c7e); box-shadow: 0 16px 30px -14px #25d366; transition: transform .25s var(--ease), filter .25s; }
+.ct-send i { font-size: 1.25rem; }
+.ct-send:hover { transform: translateY(-2px); filter: brightness(1.06); }
+.ct-note { margin: 0; text-align: center; font-size: .74rem; color: var(--muted); }
+.ct-note i { margin-inline-end: .35rem; color: var(--cyan); }
+[data-theme="light"] .ct-input { background: #f4f6fc; }
+[data-theme="light"] .ct-bubble { color: #0b2a1f; }

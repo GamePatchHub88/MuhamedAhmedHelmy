@@ -63,96 +63,41 @@
     <meta name="theme-color" content="#070815" />
   </head>
   <body class="bg-ink text-fog antialiased">
-    <nav
-      class="sticky top-0 w-full bg-ink z-50 border-b border-line"
-    >
-      <div
-        class="container mx-auto px-6 py-4 flex justify-between items-center"
-      >
-        <a href="#home" class="mono text-xl font-bold text-cyan"
-          >&gt;_ MH<span class="blink">_</span></a
-        >
-        <div class="hidden md:flex items-center gap-8 text-sm text-fog/90">
-          <a href="#home" class="nav-link hover:text-cyan transition-colors"
-            >الرئيسية</a
-          >
-          <a href="#about" class="nav-link hover:text-cyan transition-colors"
-            >نبذة عني</a
-          >
-          <a href="#skills" class="nav-link hover:text-cyan transition-colors"
-            >المهارات</a
-          >
-          <a
-            href="#identity"
-            class="nav-link hover:text-cyan transition-colors"
-            >الهوية</a
-          >
-          <a href="#design" class="nav-link hover:text-cyan transition-colors"
-            >التصميم</a
-          >
-          <a
-            href="#services"
-            class="nav-link hover:text-cyan transition-colors"
-            >خدماتي</a
-          >
-          <a href="#projects" class="nav-link hover:text-cyan transition-colors"
-            >أعمالي</a
-          >
-          <a
-            href="#testimonials"
-            class="nav-link hover:text-cyan transition-colors"
-            >آراء العملاء</a
-          >
-          <a href="#why" class="nav-link hover:text-cyan transition-colors"
-            >ليه أنا</a
-          >
-          <a href="articles.html" class="nav-link hover:text-cyan transition-colors"
-            >المقالات</a
-          >
-          <a href="#contact" class="nav-link hover:text-cyan transition-colors"
-            >تواصل</a
-          >
+    <header class="site-header" id="site-header">
+      <div class="header-bar">
+        <a href="#home" class="brand" aria-label="محمد أحمد حلمي">
+          <span class="brand-mark">MH</span>
+          <span class="brand-text"><b>محمد حلمي</b><small>Front-End Developer</small></span>
+        </a>
+        <nav class="hnav" aria-label="القائمة الرئيسية">
+          <a href="#home" class="hnav-link" data-spy="home">الرئيسية</a>
+          <a href="#about" class="hnav-link" data-spy="about">نبذة عني</a>
+          <a href="#skills" class="hnav-link" data-spy="skills">المهارات</a>
+          <a href="#services" class="hnav-link" data-spy="services">خدماتي</a>
+          <a href="#projects" class="hnav-link" data-spy="projects">أعمالي</a>
+          <a href="articles.html" class="hnav-link" data-spy="articles">المقالات</a>
+          <a href="#contact" class="hnav-link" data-spy="contact">تواصل</a>
+        </nav>
+        <div class="header-actions">
+          <a href="https://wa.me/201110742678" target="_blank" rel="noopener" class="header-cta"><i class="fab fa-whatsapp"></i><span>تواصل الآن</span></a>
+          <button id="menu-toggle" class="menu-btn" aria-label="فتح القائمة" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button>
         </div>
-        <a
-          href="https://wa.me/201110742678"
-          target="_blank"
-          class="hidden md:flex items-center gap-2 px-4 py-2 rounded-md border border-cyan/40 text-cyan text-sm hover:bg-cyan hover:text-ink transition-colors mono"
-        >
-          <i class="fab fa-whatsapp"></i> تواصل الآن
-        </a>
-        <button
-          id="menu-toggle"
-          class="menu-btn"
-          aria-label="فتح القائمة"
-          aria-expanded="false"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
       </div>
-
       <div id="mobile-menu" class="mobile-menu">
-        <a href="#home" class="mobile-link">الرئيسية</a>
-        <a href="#about" class="mobile-link">نبذة عني</a>
-        <a href="#skills" class="mobile-link">المهارات</a>
-        <a href="#identity" class="mobile-link">الهوية</a>
-        <a href="#design" class="mobile-link">التصميم</a>
-        <a href="#services" class="mobile-link">خدماتي</a>
-        <a href="#projects" class="mobile-link">أعمالي</a>
-        <a href="#testimonials" class="mobile-link">آراء العملاء</a>
-        <a href="#why" class="mobile-link">ليه أنا</a>
-        <a href="articles.html" class="mobile-link">المقالات</a>
-        <a href="#contact" class="mobile-link">تواصل</a>
-        <a
-          href="https://wa.me/201110742678"
-          target="_blank"
-          class="mobile-link mono text-cyan"
-        >
-          <i class="fab fa-whatsapp"></i> تواصل عبر واتساب
-        </a>
+        <a href="#home" class="mobile-link"><i class="fas fa-house"></i>الرئيسية</a>
+        <a href="#about" class="mobile-link"><i class="fas fa-user"></i>نبذة عني</a>
+        <a href="#skills" class="mobile-link"><i class="fas fa-code"></i>المهارات</a>
+        <a href="#identity" class="mobile-link"><i class="fas fa-fingerprint"></i>الهوية</a>
+        <a href="#design" class="mobile-link"><i class="fas fa-pen-nib"></i>التصميم</a>
+        <a href="#services" class="mobile-link"><i class="fas fa-briefcase"></i>خدماتي</a>
+        <a href="#projects" class="mobile-link"><i class="fas fa-layer-group"></i>أعمالي</a>
+        <a href="#testimonials" class="mobile-link"><i class="fas fa-comments"></i>آراء العملاء</a>
+        <a href="#why" class="mobile-link"><i class="fas fa-circle-question"></i>ليه أنا</a>
+        <a href="articles.html" class="mobile-link"><i class="fas fa-newspaper"></i>المقالات</a>
+        <a href="#contact" class="mobile-link"><i class="fas fa-envelope"></i>تواصل</a>
+        <a href="https://wa.me/201110742678" target="_blank" rel="noopener" class="mobile-cta"><i class="fab fa-whatsapp"></i> تواصل عبر واتساب</a>
       </div>
-    </nav>
+    </header>
 
 
     <section
@@ -959,30 +904,46 @@
       </div>
     </section>
 
-    <footer class="py-8 bg-panel border-t border-line text-center">
-      <div class="flex justify-center gap-6 text-muted mb-4 text-lg">
-        <a
-          href="https://wa.me/201110742678"
-          target="_blank"
-          class="hover:text-cyan transition-colors"
-          ><i class="fab fa-whatsapp"></i
-        ></a>
-        <a
-          href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/"
-          target="_blank"
-          class="hover:text-cyan transition-colors"
-          ><i class="fab fa-linkedin"></i
-        ></a>
-        <a
-          href="https://www.facebook.com/mohamed.dev27"
-          target="_blank"
-          class="hover:text-cyan transition-colors"
-          ><i class="fab fa-facebook"></i
-        ></a>
+    <footer class="site-footer">
+      <div class="footer-glow" aria-hidden="true"></div>
+      <div class="container mx-auto px-6">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <a href="#home" class="brand"><span class="brand-mark">MH</span><span class="brand-text"><b>محمد أحمد حلمي</b><small>Front-End Developer</small></span></a>
+            <p>أبني مواقع عربية سريعة وآمنة بتجربة مستخدم محترمة، وأقدّم خدمات المحتوى والتسويق الرقمي.</p>
+            <div class="footer-social">
+              <a href="https://wa.me/201110742678" target="_blank" rel="noopener" aria-label="واتساب" style="--c:#25d366"><i class="fab fa-whatsapp"></i></a>
+              <a href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/" target="_blank" rel="noopener" aria-label="لينكدإن" style="--c:#0a8ee9"><i class="fab fa-linkedin-in"></i></a>
+              <a href="https://www.facebook.com/mohamed.dev27" target="_blank" rel="noopener" aria-label="فيسبوك" style="--c:#1877f2"><i class="fab fa-facebook-f"></i></a>
+              <a href="mailto:mh3976698@gmail.com" aria-label="البريد" style="--c:#f472b6"><i class="fas fa-envelope"></i></a>
+            </div>
+          </div>
+          <div class="footer-col">
+            <h4>روابط سريعة</h4>
+            <a href="#about">نبذة عني</a>
+            <a href="#skills">المهارات</a>
+            <a href="#projects">أعمالي</a>
+            <a href="articles.html">المقالات</a>
+          </div>
+          <div class="footer-col">
+            <h4>خدماتي</h4>
+            <a href="#services">تطوير المواقع</a>
+            <a href="#services">فيديوهات بالذكاء الاصطناعي</a>
+            <a href="#services">التسويق الرقمي</a>
+            <a href="#design">التصميم</a>
+          </div>
+          <div class="footer-col">
+            <h4>تواصل معي</h4>
+            <a href="https://wa.me/201110742678" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> 201110742678+</a>
+            <a href="mailto:mh3976698@gmail.com"><i class="fas fa-envelope"></i> mh3976698@gmail.com</a>
+            <span><i class="fas fa-location-dot"></i> مصر</span>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>© 2026 محمد أحمد حلمي — صُنع بحب وعناية.</p>
+          <a href="#" class="to-top" id="to-top" aria-label="العودة للأعلى"><i class="fas fa-arrow-up"></i></a>
+        </div>
       </div>
-      <p class="mono text-xs text-muted tracking-widest">
-        © 2026 Mohamed Ahmed Helmy — built with care.
-      </p>
     </footer>
 
     <script src="supabase-config.js" defer></script>

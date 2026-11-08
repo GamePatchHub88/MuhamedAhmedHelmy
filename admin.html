@@ -271,6 +271,14 @@
       .tab-panel.active { display: block; }
 
       /* Ribbon badge + edit mode */
+      .swatches { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
+      .swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); cursor: pointer; padding: 0; transition: transform 0.15s ease, border-color 0.15s ease; }
+      .swatch:hover { transform: scale(1.15); border-color: #fff; }
+      .skill-card { --sc: #00e5c7; display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; border-radius: 18px; background: linear-gradient(135deg, color-mix(in srgb, var(--sc) 16%, transparent), transparent 70%), #0d121c; border: 1px solid color-mix(in srgb, var(--sc) 35%, transparent); }
+      .skill-ico { width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: 14px; background: color-mix(in srgb, var(--sc) 20%, transparent); }
+      .skill-ico i { font-size: 1.2rem; color: var(--sc); }
+      .skill-name { font-weight: 700; font-size: 0.9rem; color: #fff; }
+      .skill-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-inline-start: 0.4rem; vertical-align: middle; }
       .force-hide { display: none !important; }
       .preset-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.65rem; }
       .preset-chip {
@@ -400,9 +408,9 @@
             <span class="stat-chip">إجمالي المهارات: <b id="skills-count">0</b></span>
           </div>
 
-          <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
-            <h2 class="text-lg font-bold text-white mb-1">إضافة مهارة جديدة</h2>
-            <p class="text-xs text-muted mb-6">هتظهر مع باقي المهارات في قسم "المهارات التقنية" بالموقع</p>
+          <div class="bg-panel border border-line rounded-2xl p-7 mb-8" id="skill-form-card">
+            <h2 class="text-lg font-bold text-white mb-1" id="skill-form-title">إضافة مهارة جديدة</h2>
+            <p class="text-xs text-muted mb-6" id="skill-form-sub">هتظهر مع باقي المهارات في قسم "المهارات التقنية" بالموقع</p>
 
             <div class="mb-5">
               <label class="admin-label">اسم المهارة</label>
@@ -422,11 +430,24 @@
                 <input id="skill-icon-color" type="color" value="#00e5c7" />
                 <span id="skill-icon-color-hex">#00e5c7</span>
               </div>
+              <div id="skill-swatches" class="swatches" aria-label="ألوان جاهزة"></div>
+            </div>
+            <div class="mb-2">
+              <label class="admin-label">معاينة مباشرة</label>
+              <div id="skill-preview" class="skill-card" style="--sc:#00e5c7;max-width:260px">
+                <span class="skill-ico"><i id="skill-preview-i" class="fas fa-code"></i></span>
+                <span class="skill-name" id="skill-preview-n">اسم المهارة</span>
+              </div>
             </div>
 
-            <button id="add-skill-btn" class="admin-btn mt-5">
-              <i class="fas fa-plus"></i> إضافة المهارة
-            </button>
+            <div class="flex items-center gap-3 mt-5" style="flex-wrap:wrap">
+              <button id="add-skill-btn" class="admin-btn">
+                <i class="fas fa-plus"></i> إضافة المهارة
+              </button>
+              <button id="cancel-skill-edit-btn" type="button" class="admin-btn admin-btn-ghost force-hide">
+                <i class="fas fa-xmark"></i> إلغاء التعديل
+              </button>
+            </div>
           </div>
 
           <div class="bg-panel border border-line rounded-2xl p-7">
@@ -873,8 +894,68 @@
       const skillsList = document.getElementById("skills-list");
       const skillsCount = document.getElementById("skills-count");
 
-      document.getElementById("add-skill-btn").addEventListener("click", async () => {
-        const btn = document.getElementById("add-skill-btn");
+      const SKILL_COLORS = ["#e34f26","#2965f1","#f7df1e","#61dafb","#22c55e","#8b7bff","#f472b6","#ffb454","#00e5c7","#ef4444","#f97316","#ffffff"];
+      const skillFormCard = document.getElementById("skill-form-card");
+      const skillSubmitBtn = document.getElementById("add-skill-btn");
+      const cancelSkillBtn = document.getElementById("cancel-skill-edit-btn");
+      const SKILL_ADD_HTML = '<i class="fas fa-plus"></i> إضافة المهارة';
+      const SKILL_EDIT_HTML = '<i class="fas fa-floppy-disk"></i> حفظ التعديلات';
+      let skillsCache = [];
+      let editingSkill = null;
+
+      document.getElementById("skill-swatches").innerHTML = SKILL_COLORS.map((c) => `<button type="button" class="swatch" data-c="${c}" style="background:${c}" title="${c}"></button>`).join("");
+      document.querySelectorAll("#skill-swatches .swatch").forEach((b) =>
+        b.addEventListener("click", () => { skillColorInput.value = b.dataset.c; updateSkillPreview(); }),
+      );
+
+      function updateSkillPreview() {
+        const c = skillColorInput.value || "#00e5c7";
+        skillColorHex.textContent = c;
+        document.getElementById("skill-preview").style.setProperty("--sc", c);
+        document.getElementById("skill-preview-i").className = document.getElementById("skill-icon").value.trim() || "fas fa-code";
+        document.getElementById("skill-preview-n").textContent = document.getElementById("skill-name").value.trim() || "اسم المهارة";
+      }
+      ["skill-name", "skill-icon"].forEach((id) => document.getElementById(id).addEventListener("input", updateSkillPreview));
+      skillColorInput.addEventListener("input", updateSkillPreview);
+
+      function resetSkillForm() {
+        editingSkill = null;
+        document.getElementById("skill-name").value = "";
+        document.getElementById("skill-category").value = "";
+        document.getElementById("skill-icon").value = "";
+        skillColorInput.value = "#00e5c7";
+        updateSkillPreview();
+        skillFormCard.classList.remove("edit-mode-card");
+        document.getElementById("skill-form-title").textContent = "إضافة مهارة جديدة";
+        document.getElementById("skill-form-sub").textContent = 'هتظهر مع باقي المهارات في قسم "المهارات التقنية" بالموقع';
+        cancelSkillBtn.classList.add("force-hide");
+        skillSubmitBtn.innerHTML = SKILL_ADD_HTML;
+        document.querySelectorAll("#skills-list .item-row.is-editing").forEach((r) => r.classList.remove("is-editing"));
+      }
+
+      function startEditSkill(id) {
+        const s = skillsCache.find((x) => x.id === id);
+        if (!s) return;
+        resetSkillForm();
+        editingSkill = s;
+        document.getElementById("skill-name").value = s.name || "";
+        document.getElementById("skill-category").value = s.category || "";
+        document.getElementById("skill-icon").value = s.icon || "";
+        skillColorInput.value = safeHex(s.icon_color, "#00e5c7");
+        updateSkillPreview();
+        skillFormCard.classList.add("edit-mode-card");
+        document.getElementById("skill-form-title").textContent = "تعديل المهارة";
+        document.getElementById("skill-form-sub").textContent = "غيّر الاسم أو التصنيف أو الأيقونة أو اللون ثم دوس حفظ التعديلات";
+        cancelSkillBtn.classList.remove("force-hide");
+        skillSubmitBtn.innerHTML = SKILL_EDIT_HTML;
+        const row = document.querySelector(`#skills-list .item-row[data-skill-id="${id}"]`);
+        if (row) row.classList.add("is-editing");
+        skillFormCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      cancelSkillBtn.addEventListener("click", resetSkillForm);
+
+      skillSubmitBtn.addEventListener("click", async () => {
+        const btn = skillSubmitBtn;
         const name = document.getElementById("skill-name").value.trim();
         const category = document.getElementById("skill-category").value.trim() || "عام";
         const icon = document.getElementById("skill-icon").value.trim() || "fas fa-code";
@@ -885,27 +966,28 @@
           return;
         }
 
+        const editing = !!editingSkill;
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> جاري الإضافة...';
+        btn.innerHTML = '<span class="spinner"></span> ' + (editing ? "جاري الحفظ..." : "جاري الإضافة...");
         try {
-          const order_index = await nextOrderIndex("skills");
-          const { error } = await supabaseClient
-            .from("skills")
-            .insert({ name, category, icon, icon_color, order_index });
-          if (error) throw error;
-
-          toast("تم إضافة المهارة بنجاح ✅", true);
-          document.getElementById("skill-name").value = "";
-          document.getElementById("skill-category").value = "";
-          document.getElementById("skill-icon").value = "";
-          document.getElementById("skill-icon-color").value = "#00e5c7";
-          skillColorHex.textContent = "#00e5c7";
+          if (editing) {
+            const { error } = await supabaseClient.from("skills").update({ name, category, icon, icon_color }).eq("id", editingSkill.id);
+            if (error) throw error;
+            toast("تم حفظ تعديلات المهارة ✅", true);
+          } else {
+            const order_index = await nextOrderIndex("skills");
+            const { error } = await supabaseClient.from("skills").insert({ name, category, icon, icon_color, order_index });
+            if (error) throw error;
+            toast("تم إضافة المهارة بنجاح ✅", true);
+          }
+          try { Object.keys(sessionStorage).filter((k) => k.startsWith("sb:skills")).forEach((k) => sessionStorage.removeItem(k)); } catch (_) {}
+          resetSkillForm();
           loadSkills();
         } catch (err) {
           toast("حصل خطأ: " + err.message, false);
         } finally {
           btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-plus"></i> إضافة المهارة';
+          btn.innerHTML = editingSkill ? SKILL_EDIT_HTML : SKILL_ADD_HTML;
         }
       });
 
@@ -929,19 +1011,23 @@
           return;
         }
 
+        skillsCache = data;
         skillsList.innerHTML = data
           .map(
             (s) => `
-          <div class="item-row">
+          <div class="item-row${editingSkill && editingSkill.id === s.id ? " is-editing" : ""}" data-skill-id="${s.id}">
             <div class="flex items-center gap-3" style="min-width: 0">
               <div class="item-icon" style="color:${safeHex(s.icon_color, "#00e5c7")}"><i class="${escapeHtml(s.icon)}"></i></div>
               <input type="number" data-table="skills" data-id="${s.id}" class="order-input admin-input" value="${s.order_index}" />
               <div style="min-width: 0">
                 <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(s.name)}</div>
-                <div class="mono text-xs text-muted">${s.category}</div>
+                <div class="mono text-xs text-muted">${escapeHtml(s.category)}<span class="skill-dot" style="background:${safeHex(s.icon_color, "#00e5c7")}"></span></div>
               </div>
             </div>
             <div class="flex items-center gap-3">
+              <button data-id="${s.id}" class="edit-skill-btn" title="تعديل" style="background:none;border:none;color:#ffb454;cursor:pointer;font-size:0.95rem">
+                <i class="fas fa-pen"></i>
+              </button>
               <button data-table="skills" data-id="${s.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem">
                 <i class="fas fa-floppy-disk"></i>
               </button>
@@ -953,6 +1039,7 @@
           )
           .join("");
 
+        skillsList.querySelectorAll(".edit-skill-btn").forEach((b) => b.addEventListener("click", () => startEditSkill(b.dataset.id)));
         wireRowActions("skills", loadSkills);
       }
 

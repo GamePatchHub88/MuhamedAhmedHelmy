@@ -88,3 +88,30 @@ function initReveal(selector) {
     io.observe(s);
   });
 }
+
+/* ---------- الهيدر: ظل عند التمرير + تمييز القسم الحالي + زر الأعلى ---------- */
+(function () {
+  const header = document.getElementById("site-header");
+  if (header) {
+    const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 12);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+  const top = document.getElementById("to-top");
+  if (top) top.addEventListener("click", (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); });
+
+  const links = document.querySelectorAll(".hnav-link[data-spy]");
+  const isHome = !!document.getElementById("home");
+  if (!isHome || !("IntersectionObserver" in window) || !links.length) return;
+  const map = {};
+  links.forEach((a) => { map[a.dataset.spy] = a; });
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => {
+      if (!e.isIntersecting || !map[e.target.id]) return;
+      links.forEach((a) => a.classList.remove("active"));
+      map[e.target.id].classList.add("active");
+    }),
+    { rootMargin: "-45% 0px -50% 0px" },
+  );
+  Object.keys(map).forEach((id) => { const s = document.getElementById(id); if (s) io.observe(s); });
+})();

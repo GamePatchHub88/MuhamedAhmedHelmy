@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script>try{var t=localStorage.getItem("theme");if(t==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
     <link rel="stylesheet" href="style.css" />
 
     <title>محمد أحمد حلمي | مبرمج فرونت اند | أبونجاح</title>
@@ -60,7 +61,7 @@
       media="print"
       onload="this.media='all'"
     />
-    <meta name="theme-color" content="#070815" />
+    <meta name="theme-color" content="#070815" id="meta-theme" />
   </head>
   <body class="bg-ink text-fog antialiased">
     <header class="site-header" id="site-header">
@@ -80,6 +81,7 @@
         </nav>
         <div class="header-actions">
           <a href="https://wa.me/201110742678" target="_blank" rel="noopener" class="header-cta"><i class="fab fa-whatsapp"></i><span>تواصل الآن</span></a>
+          <button id="theme-toggle" class="theme-btn" type="button" aria-label="تبديل الثيم (فاتح / داكن)" title="تبديل الثيم"><i class="fas fa-moon i-moon"></i><i class="fas fa-sun i-sun"></i></button>
           <button id="menu-toggle" class="menu-btn" aria-label="فتح القائمة" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button>
         </div>
       </div>
@@ -257,64 +259,25 @@
       </div>
     </div>
 
-    <section id="about" class="py-24 border-b border-line relative">
+    <section id="about" class="has-road py-24 border-b border-line">
       <div class="container mx-auto px-6 max-w-6xl">
         <div class="mb-16">
           <span class="mono badge text-cyan">// ABOUT</span>
-          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
-            نبذة عني
-          </h2>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">نبذة عني</h2>
+          
         </div>
-
-        <div class="grid md:grid-cols-5 gap-12 items-start">
-          <div class="md:col-span-2">
-            <p class="text-fog/90 leading-loose text-base">
-              أنا محمد أحمد حلمي، مطوّر واجهات أمامية من مصر، بدأت رحلتي في
-              البرمجة من شغفي ببناء أشياء يستخدمها الناس فعلاً. أعمل بشكل أساسي
-              على مواقع عربية كاملة الاتجاه (RTL) باستخدام HTML وCSS
-              وJavaScript، من المتاجر الإلكترونية إلى المواقع التعريفية
-              والتطبيقات التفاعلية.
-            </p>
-            <p class="text-fog/90 leading-loose text-base mt-4">
-              إلى جانب التطوير، أبني مساري في الأمن السيبراني خطوة بخطوة: من
-              أساسيات الشبكات ولينكس، إلى أدوات مثل Wireshark وNmap وBurp Suite،
-              استعدادًا لشهادة Security+ والعمل كمحلل أمني. هذه الخلفية تخلي
-              تركيزي مختلف شوية كمطوّر: مش بس "هل الموقع شغال؟" لكن كمان "هل
-              الموقع آمن؟".
-            </p>
-          </div>
-
-          <div class="md:col-span-3 grid sm:grid-cols-2 gap-5">
-            <div class="bg-panel border border-line rounded-2xl p-6 card-hover">
-              <div class="mono text-cyan text-2xl mb-3">01</div>
-              <h3 class="font-bold text-white mb-2">تطوير دقيق</h3>
-              <p class="text-sm text-muted leading-relaxed">
-                كود نظيف، واجهات متجاوبة، واهتمام بأدق التفاصيل في كل شاشة.
-              </p>
-            </div>
-            <div class="bg-panel border border-line rounded-2xl p-6 card-hover">
-              <div class="mono text-cyan text-2xl mb-3">02</div>
-              <h3 class="font-bold text-white mb-2">عقلية أمنية</h3>
-              <p class="text-sm text-muted leading-relaxed">
-                أبني مع وضع الثغرات الشائعة في الاعتبار، مش كفكرة لاحقة.
-              </p>
-            </div>
-            <div class="bg-panel border border-line rounded-2xl p-6 card-hover">
-              <div class="mono text-cyan text-2xl mb-3">03</div>
-              <h3 class="font-bold text-white mb-2">محتوى عربي</h3>
-              <p class="text-sm text-muted leading-relaxed">
-                خبرة فعلية في بناء واجهات RTL ومحتوى عربي معقّد بسلاسة.
-              </p>
-            </div>
-            <div class="bg-panel border border-line rounded-2xl p-6 card-hover">
-              <div class="mono text-cyan text-2xl mb-3">04</div>
-              <h3 class="font-bold text-white mb-2">جاهز للعمل</h3>
-              <p class="text-sm text-muted leading-relaxed">
-                متاح للمشاريع الحرة، وأتواصل بوضوح من أول بريف للتسليم.
-              </p>
-            </div>
-          </div>
+        <div class="about-intro">
+          <p>أنا محمد أحمد حلمي، مطوّر واجهات أمامية من مصر، بدأت رحلتي في البرمجة من شغفي ببناء أشياء يستخدمها الناس فعلاً. أعمل بشكل أساسي على مواقع عربية كاملة الاتجاه (RTL) باستخدام HTML وCSS وJavaScript، من المتاجر الإلكترونية إلى المواقع التعريفية والتطبيقات التفاعلية.</p>
+          <p>إلى جانب التطوير، أبني مساري في الأمن السيبراني خطوة بخطوة: من أساسيات الشبكات ولينكس، إلى أدوات مثل Wireshark وNmap وBurp Suite، استعدادًا لشهادة Security+ والعمل كمحلل أمني. هذه الخلفية تخلي تركيزي مختلف شوية كمطوّر: مش بس "هل الموقع شغال؟" لكن كمان "هل الموقع آمن؟".</p>
         </div>
+<div class="roadmap rm-4">
+<svg class="road-svg" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g-about" x1="1" x2="0"><stop offset="0" stop-color="#5eead4"/><stop offset=".35" stop-color="#8b7bff"/><stop offset=".7" stop-color="#f472b6"/><stop offset="1" stop-color="#ffc46b"/></linearGradient></defs><path id="p-about" class="road-bg" d="M875 28C750 28 750 84 625 84S500 28 375 28S250 84 125 84"/><path class="road-fg" style="stroke:url(#g-about)" d="M875 28C750 28 750 84 625 84S500 28 375 28S250 84 125 84"/><circle class="road-dot" r="7"><animateMotion dur="7s" repeatCount="indefinite" rotate="0"><mpath href="#p-about"/></animateMotion></circle></svg>
+<ol class="road-steps">
+<li class="road-step" style="--sc:#5eead4;--d:0.00s"><span class="road-node"><i class="fas fa-code"></i></span><div class="road-card"><span class="road-num">01</span><h3>تطوير دقيق</h3><p>كود نظيف، واجهات متجاوبة، واهتمام بأدق التفاصيل في كل شاشة.</p></div></li>
+<li class="road-step" style="--sc:#8b7bff;--d:0.25s"><span class="road-node"><i class="fas fa-shield-halved"></i></span><div class="road-card"><span class="road-num">02</span><h3>عقلية أمنية</h3><p>أبني مع وضع الثغرات الشائعة في الاعتبار، مش كفكرة لاحقة.</p></div></li>
+<li class="road-step" style="--sc:#f472b6;--d:0.50s"><span class="road-node"><i class="fas fa-language"></i></span><div class="road-card"><span class="road-num">03</span><h3>محتوى عربي</h3><p>خبرة فعلية في بناء واجهات RTL ومحتوى عربي معقّد بسلاسة.</p></div></li>
+<li class="road-step" style="--sc:#ffc46b;--d:0.75s"><span class="road-node"><i class="fas fa-rocket"></i></span><div class="road-card"><span class="road-num">04</span><h3>جاهز للعمل</h3><p>متاح للمشاريع الحرة، وأتواصل بوضوح من أول بريف للتسليم.</p></div></li>
+</ol></div>
       </div>
     </section>
 
@@ -336,176 +299,54 @@
       </div>
     </section>
 
-    <section id="identity" class="py-24 border-b border-line bg-panel/40">
+    <section id="identity" class="has-road py-24 border-b border-line bg-panel/40">
       <div class="container mx-auto px-6 max-w-6xl">
         <div class="mb-16">
           <span class="mono badge text-cyan">// IDENTITY</span>
-          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
-            الهوية الشخصية
-          </h2>
-          <p class="text-muted mt-3 max-w-xl">
-            مش بس بكتب كود، ببني هوية واضحة قدام كل عميل بيشتغل معايا.
-          </p>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">الهوية الشخصية</h2>
+          <p class="text-muted mt-3 max-w-xl">مش بس بكتب كود، ببني هوية واضحة قدام كل عميل بيشتغل معايا.</p>
         </div>
-
-        <div class="grid md:grid-cols-2 gap-7 mb-7">
-          <div class="id-card id-vision">
-            <div class="id-ico">
-              <i class="fas fa-compass"></i>
-            </div>
-            <div>
-              <h3 class="font-bold text-white mb-1.5">الرؤية</h3>
-              <p class="text-sm text-muted leading-relaxed">
-                أن أصبح مرجعًا موثوقًا في تطوير المواقع الإلكترونية
-                والبرامج، وأن أساعد الأفراد والشركات على تحقيق التحول الرقمي
-                من خلال حلول برمجية مبتكرة وعالية الجودة.
-              </p>
-            </div>
-          </div>
-
-          <div class="id-card id-mission">
-            <div class="id-ico">
-              <i class="fas fa-rocket"></i>
-            </div>
-            <div>
-              <h3 class="font-bold text-white mb-1.5">الرسالة</h3>
-              <p class="text-sm text-muted leading-relaxed">
-                أقدّم خدمات تطوير مواقع إلكترونية وبرامج كمبيوتر تجمع بين
-                الأداء القوي، والتصميم المتميز، والأمان، وسهولة الاستخدام،
-                مع الالتزام بالجودة، والشفافية، وتسليم المشاريع في موعدها،
-                وبناء علاقات طويلة الأمد مع العملاء.
-              </p>
-            </div>
-          </div>
-        </div>
-
+<div class="roadmap rm-4">
+<svg class="road-svg" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g-identity" x1="1" x2="0"><stop offset="0" stop-color="#5eead4"/><stop offset=".35" stop-color="#8b7bff"/><stop offset=".7" stop-color="#f472b6"/><stop offset="1" stop-color="#ffc46b"/></linearGradient></defs><path id="p-identity" class="road-bg" d="M875 28C750 28 750 84 625 84S500 28 375 28S250 84 125 84"/><path class="road-fg" style="stroke:url(#g-identity)" d="M875 28C750 28 750 84 625 84S500 28 375 28S250 84 125 84"/><circle class="road-dot" r="7"><animateMotion dur="7s" repeatCount="indefinite" rotate="0"><mpath href="#p-identity"/></animateMotion></circle></svg>
+<ol class="road-steps">
+<li class="road-step" style="--sc:#5eead4;--d:0.00s"><span class="road-node"><i class="fas fa-compass"></i></span><div class="road-card"><span class="road-num">01</span><h3>الرؤية</h3><p>أن أصبح مرجعًا موثوقًا في تطوير المواقع الإلكترونية والبرامج، وأن أساعد الأفراد والشركات على تحقيق التحول الرقمي من خلال حلول برمجية مبتكرة وعالية الجودة.</p></div></li>
+<li class="road-step" style="--sc:#8b7bff;--d:0.25s"><span class="road-node"><i class="fas fa-bullseye"></i></span><div class="road-card"><span class="road-num">02</span><h3>الرسالة</h3><p>أقدّم خدمات تطوير مواقع إلكترونية وبرامج كمبيوتر تجمع بين الأداء القوي، والتصميم المتميز، والأمان، وسهولة الاستخدام، مع الالتزام بالجودة والشفافية وتسليم المشاريع في موعدها.</p></div></li>
+<li class="road-step" style="--sc:#f472b6;--d:0.50s"><span class="road-node"><i class="fas fa-gem"></i></span><div class="road-card"><span class="road-num">03</span><h3>القيم</h3><div class="chip-wrap"><span class="pill pill-sm" style="--sc:#f5b83d">الجودة أولًا</span><span class="pill pill-sm" style="--sc:#34d399">الصدق والشفافية</span><span class="pill pill-sm" style="--sc:#fb923c">الالتزام بالمواعيد</span><span class="pill pill-sm" style="--sc:#fde047">الابتكار المستمر</span><span class="pill pill-sm" style="--sc:#f472b6">التركيز على العميل</span><span class="pill pill-sm" style="--sc:#60a5fa">الأمان والموثوقية</span><span class="pill pill-sm" style="--sc:#a78bfa">دعم فني مستمر</span></div></div></li>
+<li class="road-step" style="--sc:#ffc46b;--d:0.75s"><span class="road-node"><i class="fas fa-star"></i></span><div class="road-card"><span class="road-num">04</span><h3>القيمة الفريدة</h3><p>لا أكتفي بكتابة الكود، بل أبني حلولًا برمجية تركز على الأداء، وسهولة الاستخدام، وقابلية التطوير، مع اهتمام كبير بتجربة المستخدم وجودة التنفيذ.</p></div></li>
+</ol></div>
         <div class="id-promise">
           <span class="mono badge text-amber">BRAND PROMISE</span>
-          <p class="text-xl md:text-2xl font-bold text-white mt-3">
-            أحوّل فكرتك إلى برنامج أو موقع احترافي يصنع الفرق.
-          </p>
+          <p class="text-xl md:text-2xl font-bold text-white mt-3">أحوّل فكرتك إلى برنامج أو موقع احترافي يصنع الفرق.</p>
         </div>
-
-        <div class="mb-10">
-          <span class="mono badge text-cyan">// VALUES</span>
-          <h3 class="text-2xl font-black text-white mt-2">القيم</h3>
-        </div>
-
-        <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-5 mb-16">
-          <div class="val-card" style="--sc:#f5b83d"><span class="val-ico"><i class="fas fa-medal"></i></span>
-            <h4>الجودة أولًا</h4>
-          </div>
-          <div class="val-card" style="--sc:#34d399"><span class="val-ico"><i class="fas fa-handshake"></i></span>
-            <h4>الصدق والشفافية
-            </h4>
-          </div>
-          <div class="val-card" style="--sc:#fb923c"><span class="val-ico"><i class="fas fa-bolt"></i></span>
-            <h4>الالتزام بالمواعيد
-            </h4>
-          </div>
-          <div class="val-card" style="--sc:#fde047"><span class="val-ico"><i class="fas fa-lightbulb"></i></span>
-            <h4>الابتكار المستمر
-            </h4>
-          </div>
-          <div class="val-card" style="--sc:#f472b6"><span class="val-ico"><i class="fas fa-bullseye"></i></span>
-            <h4>التركيز على العميل
-            </h4>
-          </div>
-          <div class="val-card" style="--sc:#60a5fa"><span class="val-ico"><i class="fas fa-shield-halved"></i></span>
-            <h4>الأمان والموثوقية
-            </h4>
-          </div>
-          <div class="val-card" style="--sc:#a78bfa"><span class="val-ico"><i class="fas fa-headset"></i></span>
-            <h4>دعم فني مستمر</h4>
-          </div>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-7">
-          <div>
-            <span class="mono badge text-amber">// UVP</span>
-            <h3 class="text-2xl font-black text-white mt-2 mb-4">
-              القيمة الفريدة
-            </h3>
-            <div class="id-uvp">
-              <p class="text-fog/90 leading-relaxed text-base">
-                لا أكتفي بكتابة الكود، بل أبني حلولًا برمجية تركز على
-                الأداء، وسهولة الاستخدام، وقابلية التطوير، مع اهتمام كبير
-                بتجربة المستخدم وجودة التنفيذ.
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <span class="mono badge text-amber">// BRAND PERSONALITY</span>
-            <h3 class="text-2xl font-black text-white mt-2 mb-4">
-              شخصية العلامة
-            </h3>
-            <div class="flex flex-wrap gap-3">
-              <span class="pill" style="--sc:#5eead4">احترافية</span>
-              <span class="pill" style="--sc:#8b7bff">ودودة وسهلة التواصل</span>
-              <span class="pill" style="--sc:#f472b6">موثوقة</span>
-              <span class="pill" style="--sc:#ffc46b">تهتم بالتفاصيل</span>
-              <span class="pill" style="--sc:#60a5fa">مبتكرة</span>
-              <span class="pill" style="--sc:#34d399">تركز على النتائج</span>
-            </div>
+        <div class="id-persona">
+          <span class="mono badge text-amber">// BRAND PERSONALITY</span>
+          <h3 class="text-2xl font-black text-white mt-2 mb-4">شخصية العلامة</h3>
+          <div class="flex flex-wrap gap-3">
+            <span class="pill" style="--sc:#5eead4">احترافية</span>
+            <span class="pill" style="--sc:#8b7bff">ودودة وسهلة التواصل</span>
+            <span class="pill" style="--sc:#f472b6">موثوقة</span>
+            <span class="pill" style="--sc:#ffc46b">تهتم بالتفاصيل</span>
+            <span class="pill" style="--sc:#60a5fa">مبتكرة</span>
+            <span class="pill" style="--sc:#34d399">تركز على النتائج</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="design" class="py-24 border-b border-line">
+    <section id="design" class="has-road py-24 border-b border-line">
       <div class="container mx-auto px-6 max-w-6xl">
         <div class="mb-16">
           <span class="mono badge text-cyan">// DESIGN</span>
-          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
-            التصميم
-          </h2>
-          <p class="text-muted mt-3 max-w-xl">
-            مش بس بطوّر، كمان بصمم الهوية البصرية اللي حوالين المنتج: من اللوجو
-            لحد التفاصيل المتحركة.
-          </p>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">التصميم</h2>
+          <p class="text-muted mt-3 max-w-xl">مش بس بطوّر، كمان بصمم الهوية البصرية اللي حوالين المنتج: من اللوجو لحد التفاصيل المتحركة.</p>
         </div>
-
-        <div class="grid md:grid-cols-3 gap-7">
-          <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
-            <div
-              class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
-            >
-              <i class="fas fa-pen-nib"></i>
-            </div>
-            <h3 class="text-xl font-bold text-white mb-2">تصميم لوجو</h3>
-            <p class="text-sm text-muted leading-relaxed">
-              بناء هوية بصرية مميزة لعلامتك التجارية، بشكل بسيط وقابل للتذكر
-              ويشتغل على كل المقاسات.
-            </p>
-          </div>
-
-          <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
-            <div
-              class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
-            >
-              <i class="fas fa-film"></i>
-            </div>
-            <h3 class="text-xl font-bold text-white mb-2">تصميم انترو</h3>
-            <p class="text-sm text-muted leading-relaxed">
-              مقدمات بصرية متحركة لموقعك أو تطبيقك، تدي أول انطباع احترافي من
-              اللحظة الأولى.
-            </p>
-          </div>
-
-          <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
-            <div
-              class="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan text-xl mb-5"
-            >
-              <i class="fas fa-shapes"></i>
-            </div>
-            <h3 class="text-xl font-bold text-white mb-2">تصميم Canvas</h3>
-            <p class="text-sm text-muted leading-relaxed">
-              رسومات وتفاعلات مبنية بـ Canvas، من مشاركة صور مخصصة لحد عناصر
-              رسومية حية داخل الموقع.
-            </p>
-          </div>
-        </div>
+<div class="roadmap rm-3">
+<svg class="road-svg" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g-design" x1="1" x2="0"><stop offset="0" stop-color="#5eead4"/><stop offset=".35" stop-color="#8b7bff"/><stop offset=".7" stop-color="#f472b6"/><stop offset="1" stop-color="#ffc46b"/></linearGradient></defs><path id="p-design" class="road-bg" d="M833 28C667 28 667 84 500 84S333 28 167 28"/><path class="road-fg" style="stroke:url(#g-design)" d="M833 28C667 28 667 84 500 84S333 28 167 28"/><circle class="road-dot" r="7"><animateMotion dur="7s" repeatCount="indefinite" rotate="0"><mpath href="#p-design"/></animateMotion></circle></svg>
+<ol class="road-steps">
+<li class="road-step" style="--sc:#5eead4;--d:0.00s"><span class="road-node"><i class="fas fa-pen-nib"></i></span><div class="road-card"><span class="road-num">01</span><h3>تصميم لوجو</h3><p>بناء هوية بصرية مميزة لعلامتك التجارية، بشكل بسيط وقابل للتذكر ويشتغل على كل المقاسات.</p></div></li>
+<li class="road-step" style="--sc:#f472b6;--d:0.25s"><span class="road-node"><i class="fas fa-film"></i></span><div class="road-card"><span class="road-num">02</span><h3>تصميم انترو</h3><p>مقدمات بصرية متحركة لموقعك أو تطبيقك، تدي أول انطباع احترافي من اللحظة الأولى.</p></div></li>
+<li class="road-step" style="--sc:#ffc46b;--d:0.50s"><span class="road-node"><i class="fas fa-shapes"></i></span><div class="road-card"><span class="road-num">03</span><h3>تصميم Canvas</h3><p>رسومات وتفاعلات مبنية بـ Canvas، من مشاركة صور مخصصة لحد عناصر رسومية حية داخل الموقع.</p></div></li>
+</ol></div>
       </div>
     </section>
 
@@ -584,103 +425,32 @@
       </div>
     </section>
 
-    <section id="why" class="py-24 border-b border-line bg-panel/40">
+    <section id="why" class="has-road py-24 border-b border-line bg-panel/40">
       <div class="container mx-auto px-6 max-w-6xl">
         <div class="mb-16">
           <span class="mono badge text-cyan">// WHY ME</span>
-          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">
-            ليه تشتغل معايا؟
-          </h2>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">ليه تشتغل معايا؟</h2>
+          
         </div>
-
-        <div class="grid md:grid-cols-2 gap-7">
-          <div
-            class="bg-panel border border-line rounded-2xl p-7 card-hover flex gap-5"
-          >
-            <div
-              class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
-            >
-              <i class="fas fa-handshake"></i>
-            </div>
-            <div>
-              <h3 class="font-bold text-white mb-1.5">أمانة في التعامل</h3>
-              <p class="text-sm text-muted leading-relaxed">
-                مواعيد واضحة، أسعار صريحة، ومفيش مفاجآت في الآخر. كلمتي عندي
-                مسؤولية.
-              </p>
-            </div>
-          </div>
-
-          <div
-            class="bg-panel border border-line rounded-2xl p-7 card-hover flex gap-5"
-          >
-            <div
-              class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
-            >
-              <i class="fas fa-shield-halved"></i>
-            </div>
-            <div>
-              <h3 class="font-bold text-white mb-1.5">موقع آمن من الأساس</h3>
-              <p class="text-sm text-muted leading-relaxed">
-                خلفيتي في الأمن السيبراني بتخليني أبني وأنا واخد بالي من الثغرات
-                الشائعة من البداية.
-              </p>
-            </div>
-          </div>
-
-          <div
-            class="bg-panel border border-line rounded-2xl p-7 card-hover flex gap-5"
-          >
-            <div
-              class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
-            >
-              <i class="fas fa-bullseye"></i>
-            </div>
-            <div>
-              <h3 class="font-bold text-white mb-1.5">تركيز على هدف المشروع</h3>
-              <p class="text-sm text-muted leading-relaxed">
-                مش بصمم عشان "يبان شكله حلو" بس، لكن عشان يخدم هدفك ويشد عملاءك
-                فعلاً.
-              </p>
-            </div>
-          </div>
-
-          <div
-            class="bg-panel border border-line rounded-2xl p-7 card-hover flex gap-5"
-          >
-            <div
-              class="w-11 h-11 shrink-0 rounded-xl bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan"
-            >
-              <i class="fas fa-comments"></i>
-            </div>
-            <div>
-              <h3 class="font-bold text-white mb-1.5">تواصل مستمر</h3>
-              <p class="text-sm text-muted leading-relaxed">
-                بتعرف ايه اللي بيحصل في مشروعك أول بأول، من البداية لحد التسليم.
-              </p>
-            </div>
-          </div>
-        </div>
-
+<div class="roadmap rm-4">
+<svg class="road-svg" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g-why" x1="1" x2="0"><stop offset="0" stop-color="#5eead4"/><stop offset=".35" stop-color="#8b7bff"/><stop offset=".7" stop-color="#f472b6"/><stop offset="1" stop-color="#ffc46b"/></linearGradient></defs><path id="p-why" class="road-bg" d="M875 28C750 28 750 84 625 84S500 28 375 28S250 84 125 84"/><path class="road-fg" style="stroke:url(#g-why)" d="M875 28C750 28 750 84 625 84S500 28 375 28S250 84 125 84"/><circle class="road-dot" r="7"><animateMotion dur="7s" repeatCount="indefinite" rotate="0"><mpath href="#p-why"/></animateMotion></circle></svg>
+<ol class="road-steps">
+<li class="road-step" style="--sc:#5eead4;--d:0.00s"><span class="road-node"><i class="fas fa-handshake"></i></span><div class="road-card"><span class="road-num">01</span><h3>أمانة في التعامل</h3><p>مواعيد واضحة، أسعار صريحة، ومفيش مفاجآت في الآخر. كلمتي عندي مسؤولية.</p></div></li>
+<li class="road-step" style="--sc:#8b7bff;--d:0.25s"><span class="road-node"><i class="fas fa-shield-halved"></i></span><div class="road-card"><span class="road-num">02</span><h3>موقع آمن من الأساس</h3><p>خلفيتي في الأمن السيبراني بتخليني أبني وأنا واخد بالي من الثغرات الشائعة من البداية.</p></div></li>
+<li class="road-step" style="--sc:#f472b6;--d:0.50s"><span class="road-node"><i class="fas fa-bullseye"></i></span><div class="road-card"><span class="road-num">03</span><h3>تركيز على هدف المشروع</h3><p>مش بصمم عشان "يبان شكله حلو" بس، لكن عشان يخدم هدفك ويشد عملاءك فعلاً.</p></div></li>
+<li class="road-step" style="--sc:#ffc46b;--d:0.75s"><span class="road-node"><i class="fas fa-comments"></i></span><div class="road-card"><span class="road-num">04</span><h3>تواصل مستمر</h3><p>بتعرف ايه اللي بيحصل في مشروعك أول بأول، من البداية لحد التسليم.</p></div></li>
+</ol></div>
         <div class="ayah-grid mt-16">
           <div class="ayah-card ayah-emerald"><span class="ayah-orn" aria-hidden="true"></span>
-            <p class="ayah-text">
-              ﴿إِنَّ اللَّهَ يَأْمُرُكُمْ أَن تُؤَدُّوا الْأَمَانَاتِ إِلَىٰ
-              أَهْلِهَا﴾
-            </p>
+            <p class="ayah-text">﴿إِنَّ اللَّهَ يَأْمُرُكُمْ أَن تُؤَدُّوا الْأَمَانَاتِ إِلَىٰ أَهْلِهَا﴾</p>
             <span class="ayah-ref">سورة النساء - ٥٨</span>
           </div>
           <div class="ayah-card ayah-sapphire"><span class="ayah-orn" aria-hidden="true"></span>
-            <p class="ayah-text">
-              ﴿وَفِي السَّمَاءِ رِزْقُكُمْ وَمَا تُوعَدُونَ﴾
-            </p>
+            <p class="ayah-text">﴿وَفِي السَّمَاءِ رِزْقُكُمْ وَمَا تُوعَدُونَ﴾</p>
             <span class="ayah-ref">سورة الذاريات - ٢٢</span>
           </div>
           <div class="ayah-card ayah-rose"><span class="ayah-orn" aria-hidden="true"></span>
-            <p class="ayah-text">
-              ﴿وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا ۝ وَيَرْزُقْهُ مِنْ
-              حَيْثُ لَا يَحْتَسِبُ﴾
-            </p>
+            <p class="ayah-text">﴿وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا ۝ وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ﴾</p>
             <span class="ayah-ref">سورة الطلاق - ٢-٣</span>
           </div>
         </div>
@@ -705,7 +475,7 @@
       </div>
     </section>
 
-    <section id="process" class="py-24 border-b border-line bg-panel/40">
+    <section id="process" class="has-road py-24 border-b border-line bg-panel/40">
       <div class="container mx-auto px-6 max-w-6xl">
         <div class="mb-16">
           <span class="mono badge text-cyan">// PROCESS</span>
@@ -714,7 +484,7 @@
           </h2>
         </div>
 
-        <div class="roadmap">
+        <div class="roadmap rm-4">
           <svg class="road-svg" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true">
             <defs><linearGradient id="roadg" x1="1" x2="0"><stop offset="0" stop-color="#5eead4"/><stop offset=".35" stop-color="#8b7bff"/><stop offset=".7" stop-color="#f472b6"/><stop offset="1" stop-color="#ffc46b"/></linearGradient></defs>
             <path id="road-p" class="road-bg" d="M875 28C750 28 750 84 625 84S500 28 375 28S250 84 125 84" />

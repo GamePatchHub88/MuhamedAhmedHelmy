@@ -3,10 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script>try{var t=localStorage.getItem("theme");if(t==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="apple-touch-icon" href="favicon.png" />
-    <meta name="theme-color" content="#070815" />
+    <meta name="theme-color" content="#070815" id="meta-theme" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
@@ -43,6 +44,7 @@
         </nav>
         <div class="header-actions">
           <a href="https://wa.me/201110742678" target="_blank" rel="noopener" class="header-cta"><i class="fab fa-whatsapp"></i><span>تواصل الآن</span></a>
+          <button id="theme-toggle" class="theme-btn" type="button" aria-label="تبديل الثيم (فاتح / داكن)" title="تبديل الثيم"><i class="fas fa-moon i-moon"></i><i class="fas fa-sun i-sun"></i></button>
           <button id="menu-toggle" class="menu-btn" aria-label="فتح القائمة" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button>
         </div>
       </div>
@@ -62,15 +64,22 @@
       </div>
     </header>
 
-    <main class="article-wrap">
-      <a href="articles.html" class="mono text-xs text-cyan flex items-center gap-2 mb-6"><i class="fas fa-arrow-right"></i> كل المقالات</a>
+    <div id="read-progress" aria-hidden="true"></div>
+    <main class="art-page">
+      <nav class="crumbs" aria-label="مسار التنقل">
+        <a href="index.html">الرئيسية</a><i class="fas fa-chevron-left"></i>
+        <a href="articles.html">المقالات</a><i class="fas fa-chevron-left"></i>
+        <span class="cur" id="crumb-title">مقال</span>
+      </nav>
       <div id="article-root" aria-live="polite">
         <div class="skel" style="height:320px"></div>
       </div>
 
-      <section id="more-wrap" class="hidden" style="margin-top:4rem">
-        <h2 class="text-xl font-bold text-white mb-5">مقالات أخرى</h2>
-        <div id="more-grid" class="art-grid" style="padding:0"></div>
+      <div id="pn-wrap" class="post-end hidden"><div class="pn-grid" id="pn-grid"></div></div>
+
+      <section id="more-wrap" class="related hidden">
+        <h2>مقالات قد تعجبك</h2>
+        <div id="more-grid" class="art-grid"></div>
       </section>
     </main>
 

@@ -3,10 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script>try{var t=localStorage.getItem("theme");if(t==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="apple-touch-icon" href="favicon.png" />
-    <meta name="theme-color" content="#070815" />
+    <meta name="theme-color" content="#070815" id="meta-theme" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
@@ -43,6 +44,7 @@
         </nav>
         <div class="header-actions">
           <a href="https://wa.me/201110742678" target="_blank" rel="noopener" class="header-cta"><i class="fab fa-whatsapp"></i><span>تواصل الآن</span></a>
+          <button id="theme-toggle" class="theme-btn" type="button" aria-label="تبديل الثيم (فاتح / داكن)" title="تبديل الثيم"><i class="fas fa-moon i-moon"></i><i class="fas fa-sun i-sun"></i></button>
           <button id="menu-toggle" class="menu-btn" aria-label="فتح القائمة" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button>
         </div>
       </div>
@@ -66,17 +68,17 @@
       <div class="container mx-auto px-6">
         <div class="mono text-cyan/70 text-sm mb-2">&gt;_ articles</div>
         <h1 class="text-3xl md:text-4xl font-black text-white leading-tight">المقالات</h1>
-        <p class="text-muted leading-relaxed mt-3 max-w-xl">
-          أكتب هنا عن البرمجة والأمن السيبراني والتسويق الرقمي، بأسلوب بسيط وعملي.
-        </p>
+        <p class="lead">أكتب هنا عن البرمجة والأمن السيبراني والتسويق الرقمي، بأسلوب بسيط وعملي.</p>
+        <span class="art-count" id="art-count" hidden><i class="far fa-newspaper"></i><span id="art-count-n"></span></span>
         <div class="art-toolbar">
-          <input id="art-search" class="art-search" type="search" placeholder="ابحث في المقالات..." aria-label="بحث في المقالات" />
+          <label class="search-wrap"><i class="fas fa-magnifying-glass"></i><input id="art-search" class="art-search" type="search" placeholder="ابحث في المقالات..." aria-label="بحث في المقالات" /></label>
         </div>
         <div id="art-cats" class="art-toolbar" style="margin-top:0.75rem" role="group" aria-label="التصنيفات"></div>
       </div>
     </header>
 
     <main class="container mx-auto px-6">
+      <div id="art-feature" aria-live="polite"></div>
       <div id="art-grid" class="art-grid" aria-live="polite">
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
       </div>

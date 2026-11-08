@@ -113,31 +113,44 @@ function renderProjects(data) {
 function renderReviews(data) {
   const grid = document.getElementById("reviews-grid");
   const empty = document.getElementById("reviews-empty");
+  const sum = document.getElementById("reviews-summary");
   if (!data || data.length === 0) {
     grid.innerHTML = "";
+    sum.classList.add("hidden");
     empty.classList.remove("hidden");
     return;
   }
   empty.classList.add("hidden");
+  const avg = data.reduce((a, r) => a + (parseInt(r.rating, 10) || 0), 0) / data.length;
+  sum.innerHTML = `<span class="rev-avg">${avg.toFixed(1)}</span><div><div class="rev-stars">${starsHtml(Math.round(avg))}</div><small>من ${data.length} تقييم</small></div>`;
+  sum.classList.remove("hidden");
+  const hues = ["#5eead4", "#8b7bff", "#f472b6", "#ffc46b", "#60a5fa", "#34d399"];
   grid.innerHTML = data
     .map(
-      (r) => `
-      <div class="bg-panel border border-line rounded-2xl p-7 card-hover">
-        <div class="flex gap-1 text-amber mb-4 text-sm">${starsHtml(r.rating)}</div>
-        <p class="text-sm text-fog/90 leading-relaxed mb-5">"${escapeHtml(r.review_text)}"</p>
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full bg-cyan/15 border border-cyan/30 flex items-center justify-center text-cyan text-xs font-bold">
-            ${escapeHtml(initials(r.client_name))}
-          </div>
+      (r, i) => `
+      <article class="rev-card" style="--sc:${hues[i % hues.length]}">
+        <i class="fas fa-quote-right rev-q"></i>
+        <div class="rev-stars">${starsHtml(r.rating)}</div>
+        <p class="rev-text">${escapeHtml(r.review_text)}</p>
+        <div class="rev-who">
+          <span class="rev-av">${escapeHtml(initials(r.client_name))}</span>
           <div>
-            <div class="text-sm font-bold text-white">${escapeHtml(r.client_name)}</div>
-            <div class="text-xs text-muted">${escapeHtml(r.client_role || "عميل")}</div>
+            <div class="rev-name">${escapeHtml(r.client_name)}</div>
+            <div class="rev-role">${escapeHtml(r.client_role || "عميل")}</div>
           </div>
         </div>
-      </div>`,
+      </article>`,
     )
     .join("");
 }
+
+(function () {
+  const track = document.getElementById("reviews-grid");
+  const go = (dir) => track.scrollBy({ left: dir * track.clientWidth * 0.8, behavior: "smooth" });
+  /* الصفحة RTL: "التالي" = تحرك لليسار (قيمة سالبة) */
+  document.getElementById("rev-next").addEventListener("click", () => go(-1));
+  document.getElementById("rev-prev").addEventListener("click", () => go(1));
+})();
 
 const ORDER = "order=order_index.asc,created_at.desc";
 

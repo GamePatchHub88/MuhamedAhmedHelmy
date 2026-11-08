@@ -733,3 +733,26 @@ footer.bg-panel { background: rgba(var(--panel-rgb), .6); border-top: 1px solid 
 }
 .to-top:hover { transform: translateY(-3px); background: var(--grad); color: #07101a; }
 @media (max-width: 767px) { .site-footer { padding-top: 3rem; border-radius: 28px 28px 0 0; } .footer-glow { display: none; } }
+
+/* =========================================================
+   Social icons — real brand colors, different color on hover
+========================================================= */
+.social-row { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 3rem; }
+.social-link, .footer-social a {
+  --c: #8b7bff; --h: #5b4bd6;
+  width: 3rem; height: 3rem; display: grid; place-items: center; border-radius: 16px; font-size: 1.2rem;
+  color: var(--c);
+  background: color-mix(in srgb, var(--c) 13%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+  transition: transform .25s var(--ease), background-color .25s, color .25s, border-color .25s, box-shadow .25s;
+}
+.footer-social a { width: 2.7rem; height: 2.7rem; font-size: 1.05rem; }
+.social-link i, .footer-social a i { color: inherit; }
+@media (hover: hover) and (pointer: fine) {
+  .social-link:hover, .footer-social a:hover {
+    transform: translateY(-4px) scale(1.06);
+    background: var(--h); border-color: var(--h); color: #fff;
+    box-shadow: 0 14px 24px -10px var(--c);
+  }
+}
+.social-link:active, .footer-social a:active { background: var(--h); color: #fff; }

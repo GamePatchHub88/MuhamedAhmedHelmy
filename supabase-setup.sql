@@ -256,3 +256,53 @@ using (true);
 
 grant select on public.articles to anon, authenticated;
 grant insert, update, delete on public.articles to authenticated;
+
+
+-- ==========================================================
+-- 5) الأخبار والإعلانات (News) — تظهر أعلى الصفحة الرئيسية فوق صورتك
+--    شغّل هذا الجزء فقط في Supabase → SQL Editor (مرة واحدة)
+--    الصور بتتخزن في نفس مساحة project-images الموجودة بالفعل
+-- ==========================================================
+create table if not exists news (
+  id uuid primary key default gen_random_uuid(),
+  kind text not null default 'إعلان',   -- خبر / إعلان / عرض / تنبيه
+  title text not null,
+  body text,                            -- نص قصير (اختياري)
+  image_url text,                       -- صورة (اختياري)
+  link_url text,                        -- رابط الزر (اختياري)
+  link_text text,                       -- نص الزر (اختياري)
+  active boolean not null default true, -- ظاهر / مخفي
+  expires_at timestamptz,               -- يختفي تلقائيًا بعد التاريخ ده (اختياري)
+  created_at timestamptz not null default now()
+);
+
+alter table news enable row level security;
+
+create policy "public can read active news"
+on news for select
+to anon, authenticated
+using (active = true and (expires_at is null or expires_at > now()));
+
+create policy "authenticated can read all news"
+on news for select
+to authenticated
+using (true);
+
+create policy "authenticated can insert news"
+on news for insert
+to authenticated
+with check (true);
+
+create policy "authenticated can update news"
+on news for update
+to authenticated
+using (true)
+with check (true);
+
+create policy "authenticated can delete news"
+on news for delete
+to authenticated
+using (true);
+
+grant select on public.news to anon, authenticated;
+grant insert, update, delete on public.news to authenticated;

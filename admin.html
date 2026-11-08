@@ -400,6 +400,9 @@
           <button class="tab-btn" data-tab="articles">
             <i class="fas fa-pen-nib"></i> المقالات
           </button>
+          <button class="tab-btn" data-tab="news">
+            <i class="fas fa-bullhorn"></i> الأخبار والإعلانات
+          </button>
         </div>
 
         <!-- ===================== SKILLS TAB ===================== -->
@@ -647,6 +650,82 @@
             <div id="articles-list"></div>
           </div>
         </div>
+
+        <!-- ===================== NEWS TAB ===================== -->
+        <div class="tab-panel" id="tab-news">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="stat-chip">إجمالي الأخبار: <b id="news-count">0</b></span>
+          </div>
+
+          <div id="news-form-card" class="bg-panel border border-line rounded-2xl p-7 mb-8">
+            <h2 id="news-form-title" class="text-lg font-bold text-white mb-1">إضافة خبر / إعلان جديد</h2>
+            <p id="news-form-sub" class="text-xs text-muted mb-6">هيظهر أعلى الصفحة الرئيسية، فوق صورتك مباشرة</p>
+
+            <div class="mb-5">
+              <label class="admin-label">النوع</label>
+              <select id="news-kind" class="admin-select">
+                <option value="إعلان" selected>إعلان</option>
+                <option value="خبر">خبر</option>
+                <option value="عرض">عرض</option>
+                <option value="تنبيه">تنبيه</option>
+              </select>
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">العنوان</label>
+              <input id="news-title" type="text" maxlength="90" class="admin-input" placeholder="مثال: متاح لمشاريع جديدة هذا الشهر" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">النص — اختياري (جملتين بالكتير)</label>
+              <textarea id="news-body" maxlength="280" class="admin-textarea" placeholder="اكتب تفاصيل قصيرة..."></textarea>
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">صورة — اختياري</label>
+              <div id="news-drop-zone" class="drop-zone">
+                <i class="fas fa-cloud-arrow-up"></i>
+                <div class="text-sm text-fog/90">اسحب صورة هنا أو دوس للاختيار</div>
+                <div class="dz-hint">JPG / PNG / WebP — حتى 5MB (الأفضل صورة أفقية)</div>
+                <input id="news-image" type="file" accept="image/*" hidden />
+              </div>
+              <div id="news-file-chip" class="file-chip">
+                <div class="flex items-center gap-2 mono text-xs text-fog/90" style="overflow: hidden">
+                  <img id="news-file-preview" alt="" />
+                  <span id="news-file-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"></span>
+                </div>
+                <button id="news-file-remove" class="file-chip-remove" type="button">
+                  <i class="fas fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">رابط الزر — اختياري</label>
+              <input id="news-link" type="url" class="admin-input" placeholder="https://example.com" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">نص الزر — اختياري</label>
+              <input id="news-link-text" type="text" maxlength="30" class="admin-input" placeholder="مثال: تواصل معي" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">يختفي تلقائيًا بعد تاريخ — اختياري</label>
+              <input id="news-expires" type="date" class="admin-input" />
+            </div>
+            <label class="flex items-center gap-2 text-sm text-fog/90 mb-2" style="cursor:pointer">
+              <input id="news-active" type="checkbox" checked /> ظاهر في الموقع
+            </label>
+
+            <div class="flex items-center gap-3 mt-5" style="flex-wrap:wrap">
+              <button id="add-news-btn" class="admin-btn"><i class="fas fa-plus"></i> نشر الخبر</button>
+              <button id="cancel-news-btn" type="button" class="admin-btn admin-btn-ghost force-hide">
+                <i class="fas fa-xmark"></i> إلغاء التعديل
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7">
+            <h2 class="text-lg font-bold text-white mb-1">الأخبار الحالية</h2>
+            <p class="text-xs text-muted mb-5">الأحدث يظهر أول. دوس القلم للتعديل، أو العين للإظهار/الإخفاء.</p>
+            <div id="news-list"></div>
+          </div>
+        </div>
       </main>
     </div>
 
@@ -812,6 +891,7 @@
           loadProjects();
           loadReviews();
           loadArticles();
+          loadNews();
         } else {
           loginScreen.classList.remove("hidden");
           panel.classList.add("hidden");
@@ -1526,6 +1606,248 @@
           }),
         );
         wireRowActions("articles", loadArticles);
+      }
+
+
+      /* ---------- News / Announcements ---------- */
+      const newsListEl = document.getElementById("news-list");
+      const newsCountEl = document.getElementById("news-count");
+      const newsFormCard = document.getElementById("news-form-card");
+      const newsSubmitBtn = document.getElementById("add-news-btn");
+      const cancelNewsBtn = document.getElementById("cancel-news-btn");
+      const newsDrop = document.getElementById("news-drop-zone");
+      const newsImageInput = document.getElementById("news-image");
+      const newsChip = document.getElementById("news-file-chip");
+      const newsChipName = document.getElementById("news-file-name");
+      const newsChipPreview = document.getElementById("news-file-preview");
+      const NEWS_ADD_HTML = '<i class="fas fa-plus"></i> نشر الخبر';
+      const NEWS_EDIT_HTML = '<i class="fas fa-floppy-disk"></i> حفظ التعديلات';
+      let newsCache = [];
+      let editingNews = null;
+      let newsImageRemoved = false;
+
+      function newsShowExistingImage() {
+        if (!editingNews || !editingNews.image_url) return;
+        newsChipName.textContent = "الصورة الحالية";
+        newsChipPreview.src = editingNews.image_url;
+        newsChip.classList.add("show");
+      }
+
+      function setNewsImage(file) {
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+          toast("الملف لازم يكون صورة", false);
+          newsImageInput.value = "";
+          return;
+        }
+        if (file.size > MAX_IMG_SIZE) {
+          toast("حجم الصورة أكبر من 5MB", false);
+          newsImageInput.value = "";
+          return;
+        }
+        newsChipName.textContent = file.name;
+        newsChipPreview.src = URL.createObjectURL(file);
+        newsChip.classList.add("show");
+      }
+
+      newsDrop.addEventListener("click", () => newsImageInput.click());
+      newsDrop.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        newsDrop.classList.add("drag-over");
+      });
+      newsDrop.addEventListener("dragleave", () => newsDrop.classList.remove("drag-over"));
+      newsDrop.addEventListener("drop", (e) => {
+        e.preventDefault();
+        newsDrop.classList.remove("drag-over");
+        const file = e.dataTransfer.files[0];
+        if (file) {
+          newsImageInput.files = e.dataTransfer.files;
+          setNewsImage(file);
+        }
+      });
+      newsImageInput.addEventListener("change", () => setNewsImage(newsImageInput.files[0]));
+      document.getElementById("news-file-remove").addEventListener("click", (e) => {
+        e.stopPropagation();
+        const hadNewFile = !!newsImageInput.files[0];
+        newsImageInput.value = "";
+        if (editingNews) {
+          if (hadNewFile && editingNews.image_url && !newsImageRemoved) {
+            newsShowExistingImage();
+            return;
+          }
+          if (!hadNewFile) newsImageRemoved = true;
+        }
+        newsChip.classList.remove("show");
+      });
+
+      function toDateInput(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        const p = (n) => String(n).padStart(2, "0");
+        return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+      }
+
+      function newsStatus(n) {
+        if (!n.active) return { t: "مخفي", c: "#8d97b8" };
+        if (n.expires_at && new Date(n.expires_at) < new Date()) return { t: "منتهي", c: "#f87171" };
+        return { t: "ظاهر في الموقع", c: "#22c55e" };
+      }
+
+      function resetNewsForm() {
+        editingNews = null;
+        newsImageRemoved = false;
+        document.getElementById("news-kind").value = "إعلان";
+        document.getElementById("news-title").value = "";
+        document.getElementById("news-body").value = "";
+        document.getElementById("news-link").value = "";
+        document.getElementById("news-link-text").value = "";
+        document.getElementById("news-expires").value = "";
+        document.getElementById("news-active").checked = true;
+        newsImageInput.value = "";
+        newsChip.classList.remove("show");
+        newsFormCard.classList.remove("edit-mode-card");
+        document.getElementById("news-form-title").textContent = "إضافة خبر / إعلان جديد";
+        document.getElementById("news-form-sub").textContent = "هيظهر أعلى الصفحة الرئيسية، فوق صورتك مباشرة";
+        cancelNewsBtn.classList.add("force-hide");
+        newsSubmitBtn.innerHTML = NEWS_ADD_HTML;
+        document.querySelectorAll("#news-list .item-row.is-editing").forEach((r) => r.classList.remove("is-editing"));
+      }
+
+      function startEditNews(id) {
+        const n = newsCache.find((x) => x.id === id);
+        if (!n) return;
+        resetNewsForm();
+        editingNews = n;
+        document.getElementById("news-kind").value = n.kind || "إعلان";
+        document.getElementById("news-title").value = n.title || "";
+        document.getElementById("news-body").value = n.body || "";
+        document.getElementById("news-link").value = n.link_url || "";
+        document.getElementById("news-link-text").value = n.link_text || "";
+        document.getElementById("news-expires").value = toDateInput(n.expires_at);
+        document.getElementById("news-active").checked = !!n.active;
+        newsShowExistingImage();
+        newsFormCard.classList.add("edit-mode-card");
+        document.getElementById("news-form-title").textContent = "تعديل الخبر";
+        document.getElementById("news-form-sub").textContent = "غيّر اللي تحتاجه ثم دوس حفظ التعديلات";
+        cancelNewsBtn.classList.remove("force-hide");
+        newsSubmitBtn.innerHTML = NEWS_EDIT_HTML;
+        const row = document.querySelector(`#news-list .item-row[data-news-id="${n.id}"]`);
+        if (row) row.classList.add("is-editing");
+        newsFormCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      cancelNewsBtn.addEventListener("click", resetNewsForm);
+
+      newsSubmitBtn.addEventListener("click", async () => {
+        const btn = newsSubmitBtn;
+        const isEdit = !!editingNews;
+        const title = document.getElementById("news-title").value.trim();
+        if (!title) {
+          toast("من فضلك اكتب عنوان الخبر", false);
+          return;
+        }
+        const expiresVal = document.getElementById("news-expires").value;
+        const payloadBase = {
+          kind: document.getElementById("news-kind").value,
+          title,
+          body: document.getElementById("news-body").value.trim() || null,
+          link_url: document.getElementById("news-link").value.trim() || null,
+          link_text: document.getElementById("news-link-text").value.trim() || null,
+          active: document.getElementById("news-active").checked,
+          expires_at: expiresVal ? new Date(expiresVal + "T23:59:59").toISOString() : null,
+        };
+        const imageFile = newsImageInput.files[0] || null;
+
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner"></span> ${isEdit ? "جاري الحفظ..." : "جاري النشر..."}`;
+        try {
+          const oldImageUrl = isEdit ? editingNews.image_url : null;
+          let image_url = oldImageUrl;
+          if (imageFile) {
+            const ext = imageFile.name.split(".").pop().toLowerCase();
+            const filePath = `news-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { error: uploadError } = await supabaseClient.storage
+              .from("project-images")
+              .upload(filePath, imageFile, { contentType: imageFile.type });
+            if (uploadError) throw uploadError;
+            const { data: pub } = supabaseClient.storage.from("project-images").getPublicUrl(filePath);
+            image_url = pub.publicUrl;
+          } else if (isEdit && newsImageRemoved) {
+            image_url = null;
+          }
+          const payload = { ...payloadBase, image_url };
+
+          if (isEdit) {
+            const { error } = await supabaseClient.from("news").update(payload).eq("id", editingNews.id);
+            if (error) throw error;
+            if (oldImageUrl && oldImageUrl !== image_url) removeStoredImage(oldImageUrl);
+            toast("تم حفظ التعديلات ✅", true);
+          } else {
+            const { error } = await supabaseClient.from("news").insert(payload);
+            if (error) throw error;
+            toast("تم نشر الخبر ✅", true);
+          }
+          resetNewsForm();
+          loadNews();
+        } catch (err) {
+          const msg = String(err && err.message ? err.message : err);
+          if (/news/.test(msg) && /(relation|schema cache|does not exist)/i.test(msg)) {
+            toast("لازم تشغّل أمر SQL الخاص بالأخبار في Supabase أولًا (آخر الملف supabase-setup.sql)", false);
+          } else {
+            toast("حصل خطأ: " + msg, false);
+          }
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = editingNews ? NEWS_EDIT_HTML : NEWS_ADD_HTML;
+        }
+      });
+
+      async function loadNews() {
+        newsListEl.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
+        const { data, error } = await supabaseClient.from("news").select("*").order("created_at", { ascending: false });
+        if (error) {
+          newsListEl.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل القائمة — تأكد إنك شغّلت أمر SQL الخاص بالأخبار (آخر ملف supabase-setup.sql)</p>';
+          return;
+        }
+        newsCache = data || [];
+        newsCountEl.textContent = newsCache.length;
+        if (editingNews && !newsCache.some((x) => x.id === editingNews.id)) resetNewsForm();
+        if (newsCache.length === 0) {
+          newsListEl.innerHTML = '<p class="text-muted text-sm">لا توجد أخبار بعد.</p>';
+          return;
+        }
+        newsListEl.innerHTML = newsCache
+          .map((n) => {
+            const st = newsStatus(n);
+            return `
+          <div class="item-row${editingNews && editingNews.id === n.id ? " is-editing" : ""}" data-news-id="${n.id}">
+            <div class="flex items-center gap-3" style="min-width: 0">
+              ${n.image_url ? `<img src="${escapeHtml(n.image_url)}" class="item-thumb" alt="" />` : '<div class="item-icon"><i class="fas fa-bullhorn"></i></div>'}
+              <div style="min-width: 0">
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(n.title)}</div>
+                <div class="mono text-xs text-muted">${escapeHtml(n.kind)} · <span style="color:${st.c}">${st.t}</span></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <button data-id="${n.id}" class="news-edit" title="تعديل" style="background:none;border:none;color:#ffb454;cursor:pointer;font-size:0.95rem"><i class="fas fa-pen"></i></button>
+              <button data-id="${n.id}" class="news-toggle" title="إظهار / إخفاء" style="background:none;border:none;color:#00e5c7;cursor:pointer;font-size:0.95rem"><i class="fas ${n.active ? "fa-eye" : "fa-eye-slash"}"></i></button>
+              <button data-table="news" data-id="${n.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>`;
+          })
+          .join("");
+
+        newsListEl.querySelectorAll(".news-edit").forEach((b) => b.addEventListener("click", () => startEditNews(b.dataset.id)));
+        newsListEl.querySelectorAll(".news-toggle").forEach((b) =>
+          b.addEventListener("click", async () => {
+            const n = newsCache.find((x) => x.id === b.dataset.id);
+            const { error } = await supabaseClient.from("news").update({ active: !n.active }).eq("id", n.id);
+            if (error) return toast("حصل خطأ: " + error.message, false);
+            toast(n.active ? "تم إخفاء الخبر" : "الخبر ظاهر الآن ✅", true);
+            loadNews();
+          }),
+        );
+        wireRowActions("news", loadNews);
       }
 
       checkSession();

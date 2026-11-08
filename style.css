@@ -1306,3 +1306,41 @@ body, .header-bar, .bg-panel, .art-card, .svc-card, .road-card { transition: bac
   [dir="rtl"] .ps-num { transform: translateX(50%); }
   .ps-step:not(:last-child)::after { top: 1.6rem; bottom: auto; height: 2px; width: calc(100% - 1.7rem); inset-inline-start: auto; inset-inline-end: calc(-50% + .1rem); background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 12px); }
 }
+
+
+/* =========================================================
+   v7 — News / Announcements (أعلى الهيرو، فوق الصورة)
+========================================================= */
+.news-wrap { grid-column: 1 / -1; margin-bottom: .25rem; }
+.news-wrap[hidden] { display: none; }
+.news-card { position: relative; padding: 1.5px; border-radius: var(--r-xl); background: linear-gradient(135deg, rgba(var(--violet-rgb), .75), rgba(var(--cyan-rgb), .6)); box-shadow: 0 26px 52px -32px rgba(var(--violet-rgb), .65); animation: newsIn .6s var(--ease) both; }
+.news-inner { position: relative; overflow: hidden; border-radius: calc(var(--r-xl) - 1.5px); background: var(--panel); }
+.news-inner::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: var(--grad-soft); }
+.news-slide { position: relative; display: none; }
+.news-slide.is-on { display: flex; flex-direction: column; animation: newsFade .45s ease both; }
+.news-img { position: relative; flex: none; aspect-ratio: 16 / 9; background: var(--panel2); }
+.news-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.news-body { position: relative; display: flex; flex-direction: column; gap: .55rem; justify-content: center; min-width: 0; padding: 1.2rem 1.35rem 1.4rem; }
+.news-tag { align-self: flex-start; display: inline-flex; align-items: center; gap: .45rem; padding: .22rem .8rem; border-radius: 999px; font-size: .78rem; font-weight: 800; color: var(--cyan); background: rgba(var(--cyan-rgb), .12); border: 1px solid rgba(var(--cyan-rgb), .32); }
+.news-title { margin: 0; font-size: 1.3rem; line-height: 1.5; font-weight: 900; color: var(--fog); overflow-wrap: anywhere; }
+.news-text { margin: 0; font-size: .95rem; line-height: 1.9; color: var(--muted); white-space: pre-line; overflow-wrap: anywhere; }
+.news-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: .5rem; margin-top: .35rem; padding: .6rem 1.2rem; border-radius: 999px; font-size: .88rem; font-weight: 800; color: #07101a; text-decoration: none; background: var(--grad); transition: transform .2s var(--ease), box-shadow .2s ease; }
+.news-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -14px rgba(var(--violet-rgb), .8); }
+[data-theme="light"] .news-btn { color: #fff; }
+.news-close { position: absolute; top: .65rem; inset-inline-end: .65rem; z-index: 3; width: 2.1rem; height: 2.1rem; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); background: rgba(var(--ink-rgb), .72); color: var(--fog); cursor: pointer; font-size: .85rem; transition: background-color .2s ease, transform .2s var(--ease); }
+.news-close:hover { background: rgba(var(--ink-rgb), .95); transform: rotate(90deg); }
+.news-nav { position: relative; display: flex; align-items: center; justify-content: center; gap: .9rem; padding: 0 1rem 1rem; }
+.news-arrow { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font-size: .75rem; transition: color .2s ease, border-color .2s ease; }
+.news-arrow:hover { color: var(--cyan); border-color: rgba(var(--cyan-rgb), .5); }
+.news-dots { display: flex; align-items: center; gap: .45rem; }
+.news-dots button { width: .5rem; height: .5rem; padding: 0; border: 0; border-radius: 999px; background: var(--line); cursor: pointer; transition: width .3s var(--ease), background-color .3s ease; }
+.news-dots button.on { width: 1.5rem; background: var(--cyan); }
+@keyframes newsIn { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+@keyframes newsFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (min-width: 768px) {
+  .news-slide.is-on { flex-direction: row; align-items: stretch; }
+  .news-img { width: 300px; aspect-ratio: auto; min-height: 200px; }
+  .news-body { flex: 1; padding: 1.7rem 2.2rem 1.9rem; }
+  .news-title { font-size: 1.6rem; }
+  .news-nav { padding: 0 1rem 1rem; }
+}

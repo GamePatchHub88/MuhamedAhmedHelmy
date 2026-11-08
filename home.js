@@ -152,6 +152,94 @@ function renderReviews(data) {
   document.getElementById("rev-prev").addEventListener("click", () => go(1));
 })();
 
+/* ---------- الأخبار والإعلانات (أعلى الصفحة، فوق صورتي) ---------- */
+let newsTimer = null;
+const NEWS_ICONS = { "خبر": "fa-newspaper", "إعلان": "fa-bullhorn", "عرض": "fa-tag", "تنبيه": "fa-bell" };
+
+function renderNews(data) {
+  const box = document.getElementById("news");
+  if (!box) return;
+  clearInterval(newsTimer);
+
+  let closed = [];
+  try { closed = JSON.parse(localStorage.getItem("news-closed") || "[]"); } catch (_) {}
+  const items = (data || []).filter((n) => n && !closed.includes(n.id));
+  if (!items.length) {
+    box.hidden = true;
+    box.innerHTML = "";
+    return;
+  }
+
+  const multi = items.length > 1;
+  const slides = items
+    .map((n, i) => {
+      const icon = NEWS_ICONS[n.kind] || "fa-bullhorn";
+      const external = /^https?:/i.test(n.link_url || "");
+      const btn = n.link_url
+        ? `<a class="news-btn" href="${escapeHtml(safeUrl(n.link_url))}"${external ? ' target="_blank" rel="noopener"' : ""}>${escapeHtml(n.link_text || "اعرف أكثر")} <i class="fas fa-arrow-up-left"></i></a>`
+        : "";
+      const img = n.image_url
+        ? `<div class="news-img"><img src="${escapeHtml(safeUrl(n.image_url))}" alt="${escapeHtml(n.title)}" decoding="async" /></div>`
+        : "";
+      return `
+        <article class="news-slide${i === 0 ? " is-on" : ""}${n.image_url ? " has-img" : ""}">
+          ${img}
+          <div class="news-body">
+            <span class="news-tag"><i class="fas ${icon}"></i> ${escapeHtml(n.kind || "إعلان")}</span>
+            <h2 class="news-title">${escapeHtml(n.title)}</h2>
+            ${n.body ? `<p class="news-text">${escapeHtml(n.body)}</p>` : ""}
+            ${btn}
+          </div>
+        </article>`;
+    })
+    .join("");
+
+  const nav = multi
+    ? `<div class="news-nav">
+         <button type="button" class="news-arrow" data-d="-1" aria-label="السابق"><i class="fas fa-chevron-right"></i></button>
+         <div class="news-dots">${items.map((_, i) => `<button type="button" data-i="${i}" aria-label="الخبر ${i + 1}"${i === 0 ? ' class="on"' : ""}></button>`).join("")}</div>
+         <button type="button" class="news-arrow" data-d="1" aria-label="التالي"><i class="fas fa-chevron-left"></i></button>
+       </div>`
+    : "";
+
+  box.innerHTML = `
+    <div class="news-card" role="region" aria-label="آخر الأخبار والإعلانات">
+      <div class="news-inner">
+        <button type="button" class="news-close" aria-label="إغلاق"><i class="fas fa-xmark"></i></button>
+        ${slides}
+        ${nav}
+      </div>
+    </div>`;
+  box.hidden = false;
+
+  let idx = 0;
+  const slideEls = box.querySelectorAll(".news-slide");
+  const dotEls = box.querySelectorAll(".news-dots button");
+  const go = (i) => {
+    idx = (i + items.length) % items.length;
+    slideEls.forEach((s, k) => s.classList.toggle("is-on", k === idx));
+    dotEls.forEach((d, k) => d.classList.toggle("on", k === idx));
+  };
+  box.querySelectorAll(".news-arrow").forEach((b) => b.addEventListener("click", () => { go(idx + parseInt(b.dataset.d, 10)); }));
+  dotEls.forEach((d) => d.addEventListener("click", () => go(parseInt(d.dataset.i, 10))));
+
+  const start = () => {
+    clearInterval(newsTimer);
+    if (multi && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) newsTimer = setInterval(() => go(idx + 1), 7000);
+  };
+  box.onpointerenter = () => clearInterval(newsTimer);
+  box.onpointerleave = start;
+  start();
+
+  box.querySelector(".news-close").addEventListener("click", () => {
+    try { localStorage.setItem("news-closed", JSON.stringify(closed.concat(items.map((n) => n.id)).slice(-50))); } catch (_) {}
+    clearInterval(newsTimer);
+    box.hidden = true;
+  });
+}
+
+sbLoad("news", "select=id,kind,title,body,image_url,link_url,link_text&order=created_at.desc&limit=5", renderNews).catch((err) => console.warn("الأخبار:", err));
+
 const ORDER = "order=order_index.asc,created_at.desc";
 
 // الطلبات الثلاثة بتشتغل بالتوازي

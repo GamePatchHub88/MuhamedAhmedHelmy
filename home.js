@@ -40,16 +40,16 @@ function renderSkills(data) {
     .map(
       (cat) => `
       <div>
-        <h3 class="mono text-sm text-cyan mb-6 flex items-center gap-2">
+        <h3 class="skill-cat mono text-sm mb-6 flex items-center gap-2">
           <i class="fas fa-layer-group"></i> ${escapeHtml(cat)}
         </h3>
         <div class="grid grid-cols-2 gap-4">
           ${groups[cat]
             .map(
               (s) => `
-            <div class="p-4 rounded-xl bg-panel border border-line flex items-center gap-3 card-hover">
-              <i class="${escapeHtml(s.icon || "fas fa-code")} text-2xl" style="color:${/^#[0-9a-fA-F]{3,8}$/.test(s.icon_color || "") ? s.icon_color : "#00e5c7"}"></i>
-              <span class="font-medium text-sm">${escapeHtml(s.name)}</span>
+            <div class="skill-card" style="--sc:${/^#[0-9a-fA-F]{3,8}$/.test(s.icon_color || "") ? s.icon_color : "#5eead4"}">
+              <span class="skill-ico"><i class="${escapeHtml(s.icon || "fas fa-code")}"></i></span>
+              <span class="skill-name">${escapeHtml(s.name)}</span>
             </div>`,
             )
             .join("")}

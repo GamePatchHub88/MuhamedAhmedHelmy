@@ -552,3 +552,84 @@ footer.bg-panel { background: rgba(var(--panel-rgb), .6); border-top: 1px solid 
   .reveal { transition: none; opacity: 1; transform: none; }
   .type-line, .blink, .animate-pulse { animation: none; width: auto; }
 }
+
+/* =========================================================
+   Skills — colorful cards (color comes from each skill's icon_color)
+========================================================= */
+.skill-cat {
+  width: fit-content; padding: .45rem 1rem; border-radius: 999px; color: var(--fog);
+  background: var(--grad-soft); border: 1px solid rgba(var(--violet-rgb), .3);
+}
+.skill-cat i { color: var(--cyan); }
+.skill-card {
+  --sc: #5eead4;
+  position: relative; display: flex; align-items: center; gap: .85rem;
+  padding: .8rem 1rem; border-radius: 20px; overflow: hidden;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--sc) 16%, transparent), transparent 70%),
+    var(--panel);
+  border: 1px solid color-mix(in srgb, var(--sc) 30%, transparent);
+  transition: transform .3s var(--ease), box-shadow .3s ease, border-color .3s ease;
+}
+.skill-card::after { /* colored bottom bar */
+  content: ""; position: absolute; inset-inline: 18% ; bottom: 0; height: 3px; border-radius: 99px;
+  background: var(--sc); opacity: .75;
+}
+.skill-ico {
+  flex: none; width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: 15px;
+  background: color-mix(in srgb, var(--sc) 20%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sc) 35%, transparent);
+}
+.skill-ico i { font-size: 1.35rem; color: var(--sc); }
+.skill-name { font-weight: 700; font-size: .9rem; color: #fff; }
+@media (hover: hover) and (pointer: fine) {
+  .skill-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--sc) 65%, transparent);
+    box-shadow: 0 16px 32px -16px color-mix(in srgb, var(--sc) 60%, transparent);
+  }
+}
+
+/* =========================================================
+   Quran verses — Islamic ornamental cards (inside the box only)
+========================================================= */
+.ayah-card {
+  --g1: #10b981; --g2: #064e3b; --gold: #e6c068; --tint: rgba(16,185,129,.16);
+  position: relative; isolation: isolate; text-align: center;
+  padding: 2.6rem 1.6rem 1.8rem; border-radius: 26px; overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 50% 0%, var(--tint), transparent 70%),
+    linear-gradient(160deg, var(--g2), #0a0d1f 85%);
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  box-shadow: 0 16px 36px -20px var(--g1);
+}
+.ayah-sapphire { --g1: #38bdf8; --g2: #0c2a55; --tint: rgba(56,189,248,.18); }
+.ayah-rose { --g1: #e879a9; --g2: #3d1236; --tint: rgba(232,121,169,.18); }
+
+/* inner double frame */
+.ayah-card::before {
+  content: ""; position: absolute; inset: 9px; z-index: -1; border-radius: 19px; pointer-events: none;
+  border: 1px dashed color-mix(in srgb, var(--gold) 45%, transparent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cg fill='none' stroke='%23e6c068' stroke-opacity='.13' stroke-width='1'%3E%3Cpath d='M22 3l5.5 13.5L41 22l-13.5 5.5L22 41l-5.5-13.5L3 22l13.5-5.5z'/%3E%3Ccircle cx='22' cy='22' r='5'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 44px 44px;
+}
+/* top ornament: eight-point star medallion */
+.ayah-card::after {
+  content: ""; position: absolute; top: .55rem; left: 50%; width: 40px; height: 40px; transform: translateX(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%23e6c068' stroke-width='1.6'%3E%3Cpath d='M20 2l5 11.5L38 20l-13 6.5L20 38l-5-11.5L2 20l13-6.5z' fill='%23e6c068' fill-opacity='.18'/%3E%3Cpath d='M20 9l3.2 7.8L31 20l-7.8 3.2L20 31l-3.2-7.8L9 20l7.8-3.2z'/%3E%3Ccircle cx='20' cy='20' r='2.2' fill='%23e6c068'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  filter: drop-shadow(0 0 6px rgba(230,192,104,.45));
+}
+.ayah-text {
+  position: relative; margin: 0 0 1rem; font-family: "Amiri", "Tajawal", serif; font-size: 1.35rem; line-height: 2.15; color: #fff8e4;
+  text-shadow: 0 1px 12px color-mix(in srgb, var(--g1) 45%, transparent);
+}
+.ayah-ref {
+  display: inline-block; padding: .3rem 1.1rem; border-radius: 999px; font-size: .78rem; font-weight: 700; color: var(--gold);
+  background: rgba(230,192,104,.1); border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+}
+/* small gold diamonds on both sides of the reference */
+.ayah-ref::before, .ayah-ref::after { content: "\2756"; font-size: .7rem; margin-inline: .45rem; opacity: .8; }
+@media (hover: hover) and (pointer: fine) {
+  .ayah-card { transition: transform .35s var(--ease), box-shadow .35s ease; }
+  .ayah-card:hover { transform: translateY(-4px); box-shadow: 0 22px 44px -18px var(--g1); }
+}

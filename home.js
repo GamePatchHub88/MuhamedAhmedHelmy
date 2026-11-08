@@ -70,42 +70,84 @@ function ribbonHtml(p) {
   return `<span class="project-ribbon" style="background:${bg};color:${fg}">${escapeHtml(text)}</span>`;
 }
 
+let ALL_PROJECTS = [];
+let PROJECT_FILTER = "all";
+
+function projectCardHtml(p, i, featured) {
+  const hues = ["#8b7bff", "#5eead4", "#f472b6", "#ffc46b", "#60a5fa", "#34d399"];
+  const href = p.link_url ? escapeHtml(safeUrl(p.link_url)) : "";
+  const media = p.image_url
+    ? `<img src="${escapeHtml(safeUrl(p.image_url))}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async" />`
+    : `<i class="${escapeHtml(p.icon || "fas fa-globe")}"></i>`;
+  const cover = `<div class="prj-cover${p.image_url ? "" : " ph"}">
+      ${ribbonHtml(p)}
+      ${media}
+      <span class="prj-no mono">${String(i + 1).padStart(2, "0")}</span>
+      ${href ? `<span class="prj-open" aria-hidden="true"><i class="fas fa-arrow-up-left"></i></span>` : ""}
+    </div>`;
+  return `
+    <article class="prj-card${featured ? " is-featured" : ""}" style="--sc:${hues[i % hues.length]};--d:${Math.min(i, 8) * 70}ms">
+      ${href ? `<a class="prj-cover-link" href="${href}" target="_blank" rel="noopener" aria-label="${escapeHtml(p.title)}" tabindex="-1">${cover}</a>` : cover}
+      <div class="prj-body">
+        <div class="prj-top">
+          <span class="prj-badge mono">${escapeHtml(p.badge || "WEB APP")}</span>
+          ${featured ? `<span class="prj-star"><i class="fas fa-star"></i> مشروع مميز</span>` : ""}
+        </div>
+        <h3>${escapeHtml(p.title)}</h3>
+        <p>${escapeHtml(p.description)}</p>
+        ${href ? `<a href="${href}" target="_blank" rel="noopener" class="svc-link">زيارة الموقع <i class="fas fa-arrow-up-left"></i></a>` : `<span class="prj-soon mono">قريبًا</span>`}
+      </div>
+    </article>`;
+}
+
+function drawProjects() {
+  const grid = document.getElementById("projects-grid");
+  const filters = document.getElementById("projects-filters");
+  const cats = [];
+  ALL_PROJECTS.forEach((p) => {
+    const c = (p.badge || "WEB APP").trim();
+    if (!cats.includes(c)) cats.push(c);
+  });
+  if (PROJECT_FILTER !== "all" && !cats.includes(PROJECT_FILTER)) PROJECT_FILTER = "all";
+  if (filters) {
+    filters.innerHTML =
+      cats.length > 1
+        ? [["all", "الكل", ALL_PROJECTS.length]]
+            .concat(cats.map((c) => [c, c, ALL_PROJECTS.filter((p) => (p.badge || "WEB APP").trim() === c).length]))
+            .map(
+              ([k, label, n]) =>
+                `<button type="button" class="cat-chip${k === PROJECT_FILTER ? " active" : ""}" data-cat="${escapeHtml(k)}">${escapeHtml(label)}<span class="n">${n}</span></button>`,
+            )
+            .join("")
+        : "";
+  }
+  const list = PROJECT_FILTER === "all" ? ALL_PROJECTS : ALL_PROJECTS.filter((p) => (p.badge || "WEB APP").trim() === PROJECT_FILTER);
+  const featuredOn = list.length >= 3;
+  grid.innerHTML = list.map((p, i) => projectCardHtml(p, i, featuredOn && i === 0)).join("");
+}
+
 function renderProjects(data) {
   const grid = document.getElementById("projects-grid");
   const empty = document.getElementById("projects-empty");
+  const filters = document.getElementById("projects-filters");
   if (!data || data.length === 0) {
     grid.innerHTML = "";
+    if (filters) filters.innerHTML = "";
     empty.classList.remove("hidden");
     return;
   }
   empty.classList.add("hidden");
-  const hues = ["#8b7bff", "#5eead4", "#f472b6", "#ffc46b", "#60a5fa", "#34d399"];
-  grid.innerHTML = data
-    .map((p, i) => {
-      const href = p.link_url ? escapeHtml(safeUrl(p.link_url)) : "";
-      const cover = p.image_url
-        ? `<img src="${escapeHtml(safeUrl(p.image_url))}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async" />`
-        : `<i class="${escapeHtml(p.icon || "fas fa-globe")}"></i>`;
-      return `
-      <article class="prj-card" style="--sc:${hues[i % hues.length]}">
-        <div class="prj-cover${p.image_url ? "" : " ph"}">
-          ${ribbonHtml(p)}
-          ${cover}
-          <span class="prj-no mono">${String(i + 1).padStart(2, "0")}</span>
-        </div>
-        <div class="prj-body">
-          <span class="prj-badge mono">${escapeHtml(p.badge || "WEB APP")}</span>
-          <h3>${escapeHtml(p.title)}</h3>
-          <p>${escapeHtml(p.description)}</p>
-          ${
-            href
-              ? `<a href="${href}" target="_blank" rel="noopener" class="svc-link">زيارة الموقع <i class="fas fa-arrow-up-left"></i></a>`
-              : ""
-          }
-        </div>
-      </article>`;
-    })
-    .join("");
+  ALL_PROJECTS = data;
+  if (filters && !filters.dataset.bound) {
+    filters.dataset.bound = "1";
+    filters.addEventListener("click", (e) => {
+      const b = e.target.closest(".cat-chip");
+      if (!b) return;
+      PROJECT_FILTER = b.dataset.cat;
+      drawProjects();
+    });
+  }
+  drawProjects();
 }
 
 /* ---------- Reviews ---------- */

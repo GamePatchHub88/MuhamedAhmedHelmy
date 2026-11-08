@@ -1389,3 +1389,32 @@ body, .header-bar, .bg-panel, .art-card, .svc-card, .road-card { transition: bac
 [data-theme="light"] .prj-body h3 { color: #121735; }
 [data-theme="light"] .prj-badge, [data-theme="light"] .prj-cover.ph i { color: color-mix(in srgb, var(--sc) 62%, #14183a); }
 [data-theme="light"] .prj-cover.ph .prj-no { opacity: .22; }
+
+/* Projects v2 — filters, featured card, reveal, hover affordances */
+.prj-filters { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 2rem; }
+.prj-filters:empty { display: none; }
+.prj-card { animation: prj-in .55s var(--ease) both; animation-delay: var(--d, 0ms); }
+@keyframes prj-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.prj-cover-link { display: block; color: inherit; }
+.prj-open {
+  position: absolute; z-index: 4; top: .8rem; inset-inline-end: .8rem; width: 2.4rem; height: 2.4rem; display: grid; place-items: center;
+  border-radius: 50%; color: #07101a; background: var(--sc); font-size: .9rem; opacity: 0; transform: scale(.7) rotate(-20deg);
+  transition: opacity .3s, transform .35s var(--ease); box-shadow: 0 10px 22px -8px var(--sc);
+}
+@media (hover: none) { .prj-open { opacity: 1; transform: none; } }
+.prj-card:hover .prj-open { opacity: 1; transform: none; }
+.prj-top { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; }
+.prj-star { font-size: .72rem; font-weight: 800; color: var(--amber); display: inline-flex; align-items: center; gap: .35rem; }
+.prj-soon { align-self: flex-start; font-size: .75rem; color: var(--muted); padding: .45rem .9rem; border-radius: 999px; border: 1px dashed var(--line); }
+.prj-body h3 { margin-top: .9rem; }
+@media (min-width: 1024px) {
+  .prj-card.is-featured { grid-column: 1 / -1; flex-direction: row; min-height: 21rem; }
+  .prj-card.is-featured .prj-cover-link, .prj-card.is-featured > .prj-cover { flex: 1.2; }
+  .prj-card.is-featured .prj-cover { height: 100%; aspect-ratio: auto; border-bottom: 0; border-inline-end: 1px solid color-mix(in srgb, var(--sc) 22%, transparent); }
+  .prj-card.is-featured .prj-body { flex: 1; justify-content: center; padding: 2.4rem 2.6rem; }
+  .prj-card.is-featured .prj-body h3 { font-size: 1.7rem; }
+  .prj-card.is-featured .prj-body p { flex: 0 0 auto; font-size: .98rem; margin-bottom: 1.6rem; }
+  .prj-card.is-featured .prj-no { font-size: 3.4rem; }
+}
+[data-theme="light"] .prj-star { color: var(--amber); }
+[data-theme="light"] .prj-open { color: #fff; }

@@ -1286,3 +1286,23 @@ body, .header-bar, .bg-panel, .art-card, .svc-card, .road-card { transition: bac
 #contact .ct-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(var(--cyan-rgb), .15); }
 #contact .ct-topics button { padding: .45rem .85rem; font-size: .82rem; font-weight: 500; }
 #contact .ct-send { border-radius: 14px; box-shadow: none; padding: .85rem 1.2rem; }
+
+/* =========================================================
+   v6 — Process: simple steps
+========================================================= */
+.ps-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.6rem; grid-template-columns: 1fr; position: relative; }
+.ps-step { position: relative; padding-inline-start: 4.4rem; opacity: 0; transform: translateY(12px); transition: opacity .5s ease var(--d), transform .5s var(--ease) var(--d); }
+#process.in .ps-step { opacity: 1; transform: none; }
+.ps-num { position: absolute; top: 0; inset-inline-start: 0; width: 3.2rem; height: 3.2rem; display: grid; place-items: center; border-radius: 50%; font-size: 1.1rem; color: var(--sc); background: color-mix(in srgb, var(--sc) 14%, var(--ink)); border: 2px solid var(--sc); z-index: 1; }
+.ps-step:not(:last-child)::after { content: ""; position: absolute; top: 3.2rem; bottom: -1.6rem; inset-inline-start: calc(1.6rem - 1px); width: 2px; background: repeating-linear-gradient(180deg, var(--line) 0 6px, transparent 6px 12px); }
+.ps-step h3 { margin: .15rem 0 .35rem; font-size: 1.1rem; font-weight: 800; color: #fff; }
+.ps-step p { margin: 0; font-size: .9rem; line-height: 1.85; color: var(--muted); }
+[data-theme="light"] .ps-step h3 { color: #121735; }
+[data-theme="light"] .ps-num { color: color-mix(in srgb, var(--sc) 62%, #14183a); background: #fff; }
+@media (min-width: 900px) {
+  .ps-steps { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+  .ps-step { padding: 4.4rem 0 0; text-align: center; }
+  .ps-num { top: 0; inset-inline-start: 50%; transform: translateX(50%); }
+  [dir="rtl"] .ps-num { transform: translateX(50%); }
+  .ps-step:not(:last-child)::after { top: 1.6rem; bottom: auto; height: 2px; width: calc(100% - 1.7rem); inset-inline-start: auto; inset-inline-end: calc(-50% + .1rem); background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 12px); }
+}

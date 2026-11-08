@@ -188,7 +188,7 @@ const ORDER = "order=order_index.asc,created_at.desc";
       (m ? "\nفكرتي: " + m : "")
     );
   };
-  const paint = () => { prev.textContent = build(); };
+  const paint = () => { if (prev) prev.textContent = build(); };
 
   topics.addEventListener("click", (e) => {
     const b = e.target.closest("button[data-t]");

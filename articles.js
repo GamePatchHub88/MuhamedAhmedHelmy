@@ -107,7 +107,7 @@ function renderList() {
     return;
   }
   /* أحدث مقال يظهر كبطاقة مميزة لما مفيش بحث/فلتر */
-  const showFeature = !q && !activeCat && list.length > 2;
+  const showFeature = false; /* كل المقالات بجوار بعضها */
   featEl.innerHTML = showFeature ? featureCard(list[0]) : "";
   grid.innerHTML = (showFeature ? list.slice(1) : list).map(articleCard).join("");
 }

@@ -550,55 +550,39 @@
       </div>
     </section>
 
-    <section id="contact" class="py-24 relative overflow-hidden">
-      <div class="absolute inset-0 pointer-events-none contact-bg" aria-hidden="true"></div>
-      <div class="container mx-auto px-6 max-w-6xl relative z-10">
+    <section id="contact" class="py-24 relative">
+      <div class="container mx-auto px-6 max-w-5xl">
         <div class="ct-grid">
           <div class="ct-info">
-            <div class="inline-flex items-center gap-2 mono badge text-cyan border border-cyan/30 rounded-full px-3 py-1 mb-5">
-              <span class="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse"></span>
-              الأماكن محدودة هذا الشهر
-            </div>
             <span class="mono badge text-cyan block">// CONTACT</span>
-            <h2 class="ct-title">لنبدأ <span class="glow-text">مشروعك القادم</span></h2>
-            <p class="ct-lead">محتاج موقع احترافي وآمن لمشروعك أو شركتك؟ اكتب فكرتك هنا وهتوصلني على واتساب جاهزة، واستشارة أول مرة مجانًا قبل ما تقرر.</p>
+            <h2 class="ct-title">لنبدأ مشروعك القادم</h2>
+            <p class="ct-lead">محتاج موقع احترافي وآمن؟ اكتب فكرتك وابعتها على واتساب، والاستشارة الأولى مجانًا.</p>
             <ul class="ct-list">
-              <li><a href="https://wa.me/201110742678" target="_blank" rel="noopener" style="--c:#25d366"><span class="ct-ico"><i class="fab fa-whatsapp"></i></span><span><small>واتساب</small><b dir="ltr">+20 111 074 2678</b></span><i class="fas fa-arrow-left ct-go"></i></a></li>
-              <li><a href="mailto:mh3976698@gmail.com" style="--c:#ea4335"><span class="ct-ico"><i class="fas fa-envelope"></i></span><span><small>البريد</small><b dir="ltr">mh3976698@gmail.com</b></span><i class="fas fa-arrow-left ct-go"></i></a></li>
-              <li><a href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/" target="_blank" rel="noopener" style="--c:#0a8ee9"><span class="ct-ico"><i class="fab fa-linkedin-in"></i></span><span><small>لينكدإن</small><b>Mohammad Ahmed Helmy</b></span><i class="fas fa-arrow-left ct-go"></i></a></li>
-              <li><a href="https://www.facebook.com/mohamed.dev27" target="_blank" rel="noopener" style="--c:#1877f2"><span class="ct-ico"><i class="fab fa-facebook-f"></i></span><span><small>فيسبوك</small><b>mohamed.dev27</b></span><i class="fas fa-arrow-left ct-go"></i></a></li>
+              <li><a href="https://wa.me/201110742678" target="_blank" rel="noopener" style="--c:#25d366"><i class="fab fa-whatsapp"></i><span dir="ltr">+20 111 074 2678</span></a></li>
+              <li><a href="mailto:mh3976698@gmail.com" style="--c:#ea4335"><i class="fas fa-envelope"></i><span dir="ltr">mh3976698@gmail.com</span></a></li>
+              <li><a href="https://www.linkedin.com/in/mohammad-ahmed-helmy-aboura-6ab350370/" target="_blank" rel="noopener" style="--c:#0a8ee9"><i class="fab fa-linkedin-in"></i><span>لينكدإن</span></a></li>
             </ul>
-            <div class="contact-perks">
-              <span><i class="fas fa-check"></i> استشارة مجانية</span>
-              <span><i class="fas fa-check"></i> رد خلال ساعة</span>
-              <span><i class="fas fa-check"></i> دعم بعد التسليم</span>
-            </div>
+            <p class="ct-perk"><i class="fas fa-circle-check"></i> رد خلال ساعة · استشارة مجانية · دعم بعد التسليم</p>
           </div>
 
-          <div class="ct-compose">
-            <div class="ct-bar"><span class="ct-av">MH</span><div><b>محمد حلمي</b><small><i></i> متاح الآن</small></div><i class="fab fa-whatsapp ct-wa"></i></div>
-            <form id="ct-form" class="ct-form" autocomplete="off">
-              <label class="ct-lbl">اسمك
-                <input id="ct-name" class="ct-input" type="text" maxlength="60" placeholder="اكتب اسمك" />
-              </label>
-              <div class="ct-lbl">محتاج إيه؟
-                <div class="ct-topics" id="ct-topics" role="radiogroup" aria-label="نوع الخدمة">
-                  <button type="button" class="on" data-t="موقع تعريفي"><i class="fas fa-globe"></i>موقع تعريفي</button>
-                  <button type="button" data-t="متجر إلكتروني"><i class="fas fa-cart-shopping"></i>متجر إلكتروني</button>
-                  <button type="button" data-t="فيديوهات بالذكاء الاصطناعي"><i class="fas fa-clapperboard"></i>فيديوهات AI</button>
-                  <button type="button" data-t="إدارة سوشيال ميديا"><i class="fas fa-hashtag"></i>سوشيال ميديا</button>
-                  <button type="button" data-t="فحص أمني"><i class="fas fa-shield-halved"></i>فحص أمني</button>
-                  <button type="button" data-t="شيء آخر"><i class="fas fa-ellipsis"></i>شيء آخر</button>
-                </div>
+          <form id="ct-form" class="ct-form" autocomplete="off">
+            <label class="ct-lbl">الاسم
+              <input id="ct-name" class="ct-input" type="text" maxlength="60" placeholder="اسمك" />
+            </label>
+            <div class="ct-lbl">محتاج إيه؟
+              <div class="ct-topics" id="ct-topics" role="radiogroup" aria-label="نوع الخدمة">
+                <button type="button" class="on" data-t="موقع تعريفي">موقع تعريفي</button>
+                <button type="button" data-t="متجر إلكتروني">متجر إلكتروني</button>
+                <button type="button" data-t="فيديوهات بالذكاء الاصطناعي">فيديوهات AI</button>
+                <button type="button" data-t="إدارة سوشيال ميديا">سوشيال ميديا</button>
+                <button type="button" data-t="شيء آخر">شيء آخر</button>
               </div>
-              <label class="ct-lbl">فكرتك باختصار
-                <textarea id="ct-msg" class="ct-input" rows="3" maxlength="500" placeholder="مثال: عايز موقع لعيادتي فيه حجز مواعيد..."></textarea>
-              </label>
-              <div class="ct-preview" aria-live="polite"><span class="ct-bubble" id="ct-preview"></span></div>
-              <button type="submit" class="ct-send"><i class="fab fa-whatsapp"></i> أرسل على واتساب</button>
-              <p class="ct-note"><i class="fas fa-lock"></i> بيفتح واتساب برسالة جاهزة، ومفيش بيانات بتتخزن على الموقع.</p>
-            </form>
-          </div>
+            </div>
+            <label class="ct-lbl">فكرتك باختصار
+              <textarea id="ct-msg" class="ct-input" rows="3" maxlength="500" placeholder="مثال: عايز موقع لعيادتي فيه حجز مواعيد"></textarea>
+            </label>
+            <button type="submit" class="ct-send"><i class="fab fa-whatsapp"></i> أرسل على واتساب</button>
+          </form>
         </div>
       </div>
     </section>

@@ -1265,3 +1265,24 @@ body, .header-bar, .bg-panel, .art-card, .svc-card, .road-card { transition: bac
 .ct-note i { margin-inline-end: .35rem; color: var(--cyan); }
 [data-theme="light"] .ct-input { background: #f4f6fc; }
 [data-theme="light"] .ct-bubble { color: #0b2a1f; }
+
+/* =========================================================
+   v5 — Contact: light & clear
+========================================================= */
+#contact .contact-bg { display: none; }
+#contact .ct-grid { gap: 2rem; align-items: start; }
+@media (min-width: 900px) { #contact .ct-grid { grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; } }
+#contact .ct-title { font-size: 2rem; margin: .5rem 0 .8rem; }
+@media (min-width: 768px) { #contact .ct-title { font-size: 2.5rem; } }
+#contact .ct-lead { margin-bottom: 1.4rem; font-size: 1rem; line-height: 1.9; }
+#contact .ct-list { gap: .5rem; margin-bottom: 1.1rem; }
+#contact .ct-list a { gap: .8rem; padding: .7rem 1rem; border-radius: 14px; background: transparent; font-weight: 700; font-size: .95rem; color: var(--fog); }
+#contact .ct-list a > i { width: 1.4rem; text-align: center; font-size: 1.1rem; color: var(--c); }
+#contact .ct-list a:hover { transform: none; box-shadow: none; border-color: var(--c); }
+.ct-perk { margin: 0; font-size: .82rem; color: var(--muted); }
+.ct-perk i { color: var(--cyan); margin-inline-end: .4rem; }
+#contact .ct-form { display: grid; gap: 1.1rem; padding: 1.5rem 1.4rem; border-radius: 24px; background: var(--panel); border: 1px solid var(--line); box-shadow: none; }
+#contact .ct-input { border-radius: 12px; }
+#contact .ct-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(var(--cyan-rgb), .15); }
+#contact .ct-topics button { padding: .45rem .85rem; font-size: .82rem; font-weight: 500; }
+#contact .ct-send { border-radius: 14px; box-shadow: none; padding: .85rem 1.2rem; }

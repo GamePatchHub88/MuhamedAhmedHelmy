@@ -1,4 +1,8 @@
 User-agent: *
+Allow: /
 Disallow: /admin.html
+
+User-agent: Googlebot-Image
+Allow: /
 
 Sitemap: https://mohamedahmedhelmi.vercel.app/sitemap.xml

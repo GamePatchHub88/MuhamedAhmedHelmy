@@ -84,6 +84,30 @@ function setMeta(sel, attr, val) {
   if (el) el.setAttribute(attr, val);
 }
 
+
+/* إنشاء/تحديث وسم meta أو link حتى لو مش موجود في الـ HTML */
+function upsert(sel, attr, key, val, tag) {
+  if (val == null || val === "") return;
+  let el = document.querySelector(sel);
+  if (!el) {
+    el = document.createElement(tag || "meta");
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
+  }
+  el.setAttribute(tag === "link" ? "href" : "content", val);
+}
+
+function setLd(id, obj) {
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement("script");
+    el.id = id;
+    el.type = "application/ld+json";
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(obj);
+}
+
 function fmtDate(iso) {
   try {
     return new Date(iso).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" });
@@ -94,7 +118,8 @@ function fmtDate(iso) {
 
 function notFound(msg) {
   root.innerHTML = `<div class="art-state">${escapeHtml(msg)}<br><br><a class="share-btn" href="articles.html">العودة للمقالات</a></div>`;
-  setMeta('meta[name="robots"]', "content", "noindex");
+  setMeta('meta[name="robots"]', "content", "noindex, follow");
+  document.title = "المقال غير موجود | محمد أحمد حلمي";
 }
 
 function estMinutes(text) {
@@ -114,36 +139,72 @@ function buildToc(proseEl) {
 }
 
 function showArticle(a) {
-  const url = location.origin + location.pathname + "?slug=" + encodeURIComponent(a.slug);
-  const desc = (a.excerpt || "").slice(0, 160);
   const mins = parseInt(a.read_minutes, 10) || estMinutes(a.content);
+
+  /* ---------- SEO ديناميكي لكل مقال ---------- */
+  const SITE = "https://mohamedahmedhelmi.vercel.app";
+  const plain = String(a.content || "").replace(/```[\s\S]*?```/g, " ").replace(/[#>*`\[\]()!_-]/g, " ").replace(/\s+/g, " ").trim();
+  const descFull = (a.excerpt || plain).trim();
+  const metaDesc = descFull.length > 158 ? descFull.slice(0, 155).replace(/\s+\S*$/, "") + "…" : descFull;
+  const pageUrl = SITE + "/article.html?slug=" + encodeURIComponent(a.slug);
+  const cat = a.category || "عام";
+  const cover = a.cover_url && /^https?:/i.test(a.cover_url) ? a.cover_url : SITE + "/2.jpg";
+  const words = plain ? plain.split(" ").length : 0;
+  const iso = (d) => { try { return new Date(d).toISOString(); } catch (_) { return undefined; } };
 
   document.title = a.title + " | محمد أحمد حلمي";
   const crumb = document.getElementById("crumb-title");
   if (crumb) crumb.textContent = a.title;
-  setMeta('meta[name="description"]', "content", desc);
-  setMeta('link[rel="canonical"]', "href", url);
-  setMeta('meta[property="og:title"]', "content", a.title);
-  setMeta('meta[property="og:description"]', "content", desc);
-  setMeta('meta[property="og:url"]', "content", url);
-  if (a.cover_url && /^https?:/i.test(a.cover_url)) setMeta('meta[property="og:image"]', "content", a.cover_url);
+  upsert('meta[name="description"]', "name", "description", metaDesc);
+  upsert('meta[name="keywords"]', "name", "keywords", [cat, "مقالات", "محمد أحمد حلمي", ...a.title.split(/\s+/).filter((w) => w.length > 3).slice(0, 6)].join(", "));
+  upsert('link[rel="canonical"]', "rel", "canonical", pageUrl, "link");
+  upsert('meta[property="og:type"]', "property", "og:type", "article");
+  upsert('meta[property="og:title"]', "property", "og:title", a.title);
+  upsert('meta[property="og:description"]', "property", "og:description", metaDesc);
+  upsert('meta[property="og:url"]', "property", "og:url", pageUrl);
+  upsert('meta[property="og:image"]', "property", "og:image", cover);
+  upsert('meta[property="og:image:alt"]', "property", "og:image:alt", a.title);
+  upsert('meta[property="article:published_time"]', "property", "article:published_time", iso(a.created_at));
+  upsert('meta[property="article:modified_time"]', "property", "article:modified_time", iso(a.updated_at || a.created_at));
+  upsert('meta[property="article:section"]', "property", "article:section", cat);
+  upsert('meta[name="twitter:title"]', "name", "twitter:title", a.title);
+  upsert('meta[name="twitter:description"]', "name", "twitter:description", metaDesc);
+  upsert('meta[name="twitter:image"]', "name", "twitter:image", cover);
+  upsert('meta[name="twitter:image:alt"]', "name", "twitter:image:alt", a.title);
 
-  if (!document.getElementById("ld-article")) {
-    const ld = document.createElement("script");
-    ld.id = "ld-article";
-    ld.type = "application/ld+json";
-    ld.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Article",
-      headline: a.title,
-      description: desc,
-      datePublished: a.created_at,
-      dateModified: a.updated_at || a.created_at,
-      author: { "@type": "Person", name: "محمد أحمد حلمي" },
-      mainEntityOfPage: url,
-    });
-    document.head.appendChild(ld);
-  }
+  setLd("ld-article", {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": pageUrl + "#article",
+    headline: a.title.slice(0, 110),
+    name: a.title,
+    description: metaDesc,
+    image: [cover],
+    url: pageUrl,
+    mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+    datePublished: iso(a.created_at),
+    dateModified: iso(a.updated_at || a.created_at),
+    inLanguage: "ar",
+    articleSection: cat,
+    keywords: cat,
+    wordCount: words,
+    timeRequired: "PT" + mins + "M",
+    isAccessibleForFree: true,
+    author: { "@type": "Person", "@id": SITE + "/#person", name: "محمد أحمد حلمي", url: SITE + "/" },
+    publisher: { "@type": "Person", "@id": SITE + "/#person", name: "محمد أحمد حلمي", url: SITE + "/", image: SITE + "/profile.webp" },
+    isPartOf: { "@type": "Blog", name: "مقالات محمد أحمد حلمي", url: SITE + "/articles.html" },
+  });
+  setLd("ld-crumbs", {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "الرئيسية", item: SITE + "/" },
+      { "@type": "ListItem", position: 2, name: "المقالات", item: SITE + "/articles.html" },
+      { "@type": "ListItem", position: 3, name: a.title, item: pageUrl },
+    ],
+  });
+  const url = pageUrl;
+  const desc = metaDesc;
 
   const enc = encodeURIComponent;
   root.innerHTML = `
@@ -153,12 +214,12 @@ function showArticle(a) {
         <h1 class="article-title">${escapeHtml(a.title)}</h1>
         ${a.excerpt ? `<p class="art-lead">${escapeHtml(a.excerpt)}</p>` : ""}
         <div class="byline">
-          <img src="profile.webp" alt="" width="42" height="42" />
+          <img src="profile.webp" alt="محمد أحمد حلمي" width="42" height="42" />
           <div><b>محمد أحمد حلمي</b>
-            <small>${fmtDate(a.created_at)} · <i class="far fa-clock"></i> ${mins} د قراءة</small></div>
+            <small><time datetime="${escapeHtml(String(a.created_at || ""))}">${fmtDate(a.created_at)}</time> · <i class="far fa-clock"></i> ${mins} د قراءة</small></div>
         </div>
       </header>
-      ${a.cover_url ? `<img class="article-hero" src="${escapeHtml(safeUrl(a.cover_url))}" alt="" fetchpriority="high" decoding="async" />` : ""}
+      ${a.cover_url ? `<img class="article-hero" src="${escapeHtml(safeUrl(a.cover_url))}" alt="${escapeHtml(a.title)}" width="1280" height="720" fetchpriority="high" decoding="async" />` : ""}
       <div class="art-layout">
         <div class="prose" id="prose">${renderMarkdown(a.content)}</div>
       </div>
@@ -257,7 +318,7 @@ function relCard(a) {
   return `
     <a href="article.html?slug=${encodeURIComponent(a.slug)}" class="art-card card-hover">
       <div class="art-cover${a.cover_url ? "" : " ph"}"><span class="art-tag">${escapeHtml(a.category || "عام")}</span>${
-        a.cover_url ? `<img src="${escapeHtml(safeUrl(a.cover_url))}" alt="" loading="lazy" decoding="async" />` : `<i class="fas fa-pen-nib"></i>`
+        a.cover_url ? `<img src="${escapeHtml(safeUrl(a.cover_url))}" alt="${escapeHtml(a.title)}" loading="lazy" decoding="async" />` : `<i class="fas fa-pen-nib"></i>`
       }</div>
       <div class="art-body">
         <div class="art-meta"><span><i class="far fa-clock"></i>${parseInt(a.read_minutes, 10) || 1} د قراءة</span></div>

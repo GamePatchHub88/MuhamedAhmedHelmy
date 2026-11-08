@@ -29,7 +29,7 @@ function coverHtml(a, eager) {
   const cat = escapeHtml(a.category || "عام");
   const badge = isNew(a.created_at) ? `<span class="art-badge-new">جديد</span>` : "";
   const img = a.cover_url
-    ? `<img src="${escapeHtml(safeUrl(a.cover_url))}" alt="" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`
+    ? `<img src="${escapeHtml(safeUrl(a.cover_url))}" alt="${escapeHtml(a.title)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`
     : `<i class="fas fa-pen-nib"></i>`;
   return `<div class="art-cover${a.cover_url ? "" : " ph"}"><span class="art-tag">${cat}</span>${badge}${img}</div>`;
 }
@@ -126,8 +126,32 @@ searchEl.addEventListener("input", () => {
   searchTimer = setTimeout(renderList, 120);
 });
 
+function setListLd(list) {
+  const SITE = "https://mohamedahmedhelmi.vercel.app";
+  let el = document.getElementById("ld-list");
+  if (!el) {
+    el = document.createElement("script");
+    el.id = "ld-list";
+    el.type = "application/ld+json";
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "مقالات محمد أحمد حلمي",
+    numberOfItems: list.length,
+    itemListElement: list.slice(0, 50).map((x, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: SITE + "/article.html?slug=" + encodeURIComponent(x.slug),
+      name: x.title,
+    })),
+  });
+}
+
 sbLoad("articles", LIST_QUERY, (data) => {
   ALL = Array.isArray(data) ? data : [];
+  setListLd(ALL);
   if (activeCat && !ALL.some((a) => (a.category || "عام") === activeCat)) activeCat = "";
   renderCats();
   renderList();

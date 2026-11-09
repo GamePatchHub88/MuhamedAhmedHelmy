@@ -236,4 +236,20 @@ function makeLogic({ db, ObjectId }) {
   };
 }
 
-module.exports = { makeLogic };
+// رسالة عربية مفهومة لأي خطأ (بدون كشف أسرار)
+function explainError(e) {
+  const m = String((e && e.message) || e || "");
+  if (/MONGODB_URI/.test(m)) return "MONGODB_URI غير مضبوط في متغيرات Vercel";
+  if (e && (e.code === 18 || e.code === 8000 || /bad auth|authentication failed/i.test(m))) {
+    return "فشل تسجيل الدخول إلى MongoDB: تحقق من اسم المستخدم وكلمة المرور في MONGODB_URI";
+  }
+  if (e && (e.code === 13 || /not authorized|unauthorized/i.test(m))) {
+    return "المستخدم لا يملك صلاحية على قاعدة qureo_solutions: امنحه Read and write to any database من Atlas";
+  }
+  if (e && (e.name === "MongoServerSelectionError" || e.name === "MongoNetworkError" || /ENOTFOUND|ECONNREFUSED|timed out|ReplicaSetNoPrimary/i.test(m))) {
+    return "تعذر الاتصال بـ MongoDB: تحقق من Network Access في Atlas (اسمح 0.0.0.0/0) ومن صحة الرابط";
+  }
+  return "خطأ في الخادم: " + m.slice(0, 120);
+}
+
+module.exports = { makeLogic, explainError };

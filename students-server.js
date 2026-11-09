@@ -2,7 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ObjectId } = require("mongodb");
-const { makeLogic } = require("./students-logic");
+const { makeLogic, explainError } = require("./students-logic");
 
 const MONGODB_URI = process.env.MONGODB_URI;
 // قاعدة بيانات مستقلة لموقع الحلول داخل نفس الـ cluster (الموقع الأول يبقى على قاعدته hightech كما هي)
@@ -22,7 +22,9 @@ async function getLogic() {
   if (!MONGODB_URI) throw new Error("MONGODB_URI غير مضبوط");
   const client = new MongoClient(MONGODB_URI, { maxPoolSize: 5, serverSelectionTimeoutMS: 8000 });
   await client.connect();
-  const logic = makeLogic({ db: client.db(DB_NAME), ObjectId });
+  const db = client.db(DB_NAME);
+  global.__studentsDb = db;
+  const logic = makeLogic({ db, ObjectId });
   await logic.ensureIndexes().catch(() => {});
   cached = global.__studentsLogic = logic;
   return logic;
@@ -31,11 +33,11 @@ async function getLogic() {
 const app = express();
 app.set("trust proxy", 1);
 app.use(
-  cors({
-    origin(origin, cb) {
-      if (!origin || !ALLOWED.length || ALLOWED.includes(origin)) return cb(null, true);
-      cb(new Error("origin not allowed"));
-    },
+  cors((req, cb) => {
+    const o = req.headers.origin;
+    const sameOrigin = o && (o === "https://" + req.headers.host || o === "http://" + req.headers.host);
+    // الأصل غير المسموح لا يحصل على رؤوس CORS (يحجبه المتصفح) بدل أن يتسبب في خطأ 500
+    cb(null, { origin: !o || sameOrigin || !ALLOWED.length || ALLOWED.includes(o) });
   })
 );
 app.use(express.json({ limit: "1mb" }));
@@ -57,11 +59,34 @@ const wrap = (fn) => async (req, res) => {
     res.json(await fn(await getLogic(), req));
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "server error" });
+    res.status(500).json({ error: explainError(e) });
   }
 };
 
 app.get(["/api", "/api/"], (_req, res) => res.json({ ok: true, service: "students-api" }));
+
+// فحص سريع للإعدادات والاتصال بالقاعدة: افتح /api/health في المتصفح
+app.get("/api/health", async (_req, res) => {
+  const out = {
+    env: {
+      MONGODB_URI: !!MONGODB_URI,
+      MONGODB_DB: DB_NAME,
+      ADMIN_EMAIL: !!ADMIN_EMAIL,
+      ALLOWED_ORIGINS: ALLOWED,
+    },
+    mongo: "not-tested",
+  };
+  try {
+    await getLogic();
+    await global.__studentsDb.command({ ping: 1 });
+    out.mongo = "connected";
+  } catch (e) {
+    console.error(e);
+    out.mongo = "error";
+    out.message = explainError(e);
+  }
+  res.status(out.mongo === "connected" ? 200 : 500).json(out);
+});
 
 /* ---------- للطلاب: نفس أسماء الدوال القديمة وتنسيق الإجابات ---------- */
 const rpc = express.Router();
@@ -114,6 +139,12 @@ admin.post("/messages", wrap((l, r) => l.adminSend(r.body || {})));
 admin.post("/unlock/:device", wrap(async (l, r) => ({ ok: await l.adminUnlock(r.params.device) })));
 admin.delete("/messages/:device", wrap(async (l, r) => ({ ok: await l.adminClear(r.params.device) })));
 app.use("/api/admin", admin);
+
+// أي خطأ غير متوقع يرجع JSON واضح بدل صفحة HTML
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(err.status || 500).json({ error: explainError(err) });
+});
 
 module.exports = app;
 

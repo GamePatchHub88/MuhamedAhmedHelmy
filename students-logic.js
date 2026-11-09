@@ -17,6 +17,8 @@ function makeLogic({ db, ObjectId }) {
   // أسماء خاصة بموقع الحلول حتى لا تتعارض أبدًا مع مجموعات الموقع الأول (مثل students)
   const students = db.collection("qureo_students");
   const messages = db.collection("qureo_messages");
+  const reviews = db.collection("qureo_reviews"); // تقييمات الطلاب
+  const photos = db.collection("qureo_photos"); // صور الطلاب الذين أنهوا المنصة
 
   const toId = (id) => {
     try { return new ObjectId(String(id)); } catch (_) { return null; }
@@ -224,14 +226,156 @@ function makeLogic({ db, ObjectId }) {
     return true;
   }
 
+
+  /* =========================================================
+     تقييمات الطلاب (reviews) — status: pending | published
+     - الطالب يرسل تقييمًا من الموقع فيدخل "pending" حتى يوافق عليه المدير
+     - المدير يضيف/يعدّل/ينشر/يحذف من لوحة التحكم
+  ========================================================= */
+  const clip = (raw, max) => String(raw == null ? "" : raw).replace(/\s+/g, " ").trim().slice(0, max);
+  const reviewOut = (r) => ({
+    id: String(r._id), name: r.name, role: r.role || "طالب", text: r.text,
+    order: r.order || 0, status: r.status, created_at: r.created_at,
+  });
+
+  async function publicReviews() {
+    const rows = await reviews.find({ status: "published" }).sort({ order: 1, created_at: -1 }).limit(60).toArray();
+    return { reviews: rows.map((r) => { const o = reviewOut(r); return { id: o.id, name: o.name, role: o.role, text: o.text }; }) };
+  }
+
+  async function reviewSubmit(device, name, text, grade) {
+    if (!DEVICE_OK(device)) return { status: "invalid" };
+    const st = await latestStudent(device);
+    if (!st || st.status !== "approved") return { status: "invalid" };
+    const n = clip(name, 40), t = clip(text, 400);
+    if (n.length < 2 || t.length < 10) return { status: "invalid" };
+    const recent = await reviews.countDocuments({ device_id: device, created_at: { $gt: new Date(Date.now() - 24 * ONE_HOUR) } });
+    if (recent >= 1) return { status: "rate_limited" };
+    if ((await reviews.countDocuments({ device_id: device })) >= 3) return { status: "limit" };
+    const g = { 1: "الصف الأول الثانوي", 2: "الصف الثاني الثانوي" }[String(grade)];
+    const now = new Date();
+    await reviews.insertOne({
+      device_id: device, name: n, role: g ? "طالب — " + g : "طالب من موقع الحلول", text: t,
+      order: 0, status: "pending", created_at: now, updated_at: now,
+    });
+    return { status: "ok" };
+  }
+
+  async function adminReviews() {
+    const rows = await reviews.find({}).sort({ created_at: -1 }).limit(500).toArray();
+    return { reviews: rows.map(reviewOut) };
+  }
+
+  // إنشاء (بدون id) أو تعديل (مع id)
+  async function adminReviewSave({ id, name, role, text, order, status }) {
+    const n = clip(name, 40), t = clip(text, 400), r = clip(role, 80) || "طالب من موقع الحلول";
+    if (n.length < 2 || t.length < 3) return { status: "invalid" };
+    const ord = Math.max(-9999, Math.min(9999, Math.round(Number(order) || 0)));
+    const st = status === "pending" ? "pending" : "published";
+    const now = new Date();
+    if (id) {
+      const oid = toId(id);
+      if (!oid) return { status: "invalid" };
+      const res = await reviews.updateOne({ _id: oid }, { $set: { name: n, role: r, text: t, order: ord, status: st, updated_at: now } });
+      return { status: res.matchedCount ? "ok" : "not_found" };
+    }
+    await reviews.insertOne({ name: n, role: r, text: t, order: ord, status: st, created_at: now, updated_at: now });
+    return { status: "ok" };
+  }
+
+  async function adminReviewDelete(id) {
+    const oid = toId(id);
+    if (!oid) return false;
+    return (await reviews.deleteOne({ _id: oid })).deletedCount > 0;
+  }
+
+  /* =========================================================
+     صور الطلاب الذين أنهوا المنصة (photos)
+     كل صورة تُخزَّن بنسختين: thumb صغيرة للمعرض + full للتكبير.
+     الصور تُخدَّم كملفات (وليس داخل JSON) مع كاش طويل، فلا تثقل الصفحة.
+  ========================================================= */
+  const MAX_PHOTOS = 60, MAX_THUMB = 150 * 1024, MAX_FULL = 900 * 1024;
+
+  function decodeImage(dataUrl, maxBytes) {
+    const m = /^data:image\/(?:webp|jpeg|png);base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl || ""));
+    if (!m) return null;
+    const buf = Buffer.from(m[1], "base64");
+    if (!buf.length || buf.length > maxBytes) return null;
+    // نتحقق من نوع الملف الحقيقي (وليس من الادعاء) قبل الحفظ
+    let type = null;
+    if (buf.slice(0, 4).toString("latin1") === "RIFF" && buf.slice(8, 12).toString("latin1") === "WEBP") type = "image/webp";
+    else if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) type = "image/jpeg";
+    else if (buf.slice(1, 4).toString("latin1") === "PNG") type = "image/png";
+    return type ? { buf, type } : null;
+  }
+
+  const photoOut = (p) => ({
+    id: String(p._id), caption: p.caption || "", name: p.name || "", w: p.w || 0, h: p.h || 0,
+    order: p.order || 0, v: new Date(p.updated_at || p.created_at).getTime(),
+  });
+
+  async function publicPhotos() {
+    const rows = await photos.find({}, { projection: { thumb: 0, full: 0 } }).sort({ order: 1, created_at: -1 }).limit(MAX_PHOTOS).toArray();
+    return { photos: rows.map(photoOut) };
+  }
+
+  async function photoImage(id, kind) {
+    const oid = toId(id);
+    if (!oid || (kind !== "thumb" && kind !== "full")) return null;
+    const p = await photos.findOne({ _id: oid }, { projection: { [kind]: 1, [kind + "_type"]: 1 } });
+    if (!p || !p[kind]) return null;
+    const raw = p[kind];
+    return { buf: Buffer.isBuffer(raw) ? raw : Buffer.from(raw.buffer), type: p[kind + "_type"] || "image/webp" };
+  }
+
+  const adminPhotos = publicPhotos;
+
+  // إضافة (بدون id: الصورتان مطلوبتان) أو تعديل (مع id: الصور اختيارية)
+  async function adminPhotoSave({ id, caption, name, order, thumb, full, w, h }) {
+    const set = {
+      caption: clip(caption, 120), name: clip(name, 40),
+      order: Math.max(-9999, Math.min(9999, Math.round(Number(order) || 0))), updated_at: new Date(),
+    };
+    let t = null, f = null;
+    if (thumb || full || !id) {
+      t = decodeImage(thumb, MAX_THUMB);
+      f = decodeImage(full, MAX_FULL);
+      if (!t || !f) return { status: "invalid_image" };
+      set.thumb = t.buf; set.thumb_type = t.type;
+      set.full = f.buf; set.full_type = f.type;
+      set.w = Math.max(1, Math.min(4000, Math.round(Number(w) || 0))) || 1;
+      set.h = Math.max(1, Math.min(4000, Math.round(Number(h) || 0))) || 1;
+    }
+    if (id) {
+      const oid = toId(id);
+      if (!oid) return { status: "invalid" };
+      const res = await photos.updateOne({ _id: oid }, { $set: set });
+      return { status: res.matchedCount ? "ok" : "not_found" };
+    }
+    if ((await photos.countDocuments({})) >= MAX_PHOTOS) return { status: "too_many" };
+    await photos.insertOne({ ...set, created_at: new Date() });
+    return { status: "ok" };
+  }
+
+  async function adminPhotoDelete(id) {
+    const oid = toId(id);
+    if (!oid) return false;
+    return (await photos.deleteOne({ _id: oid })).deletedCount > 0;
+  }
+
   async function ensureIndexes() {
     await students.createIndex({ device_id: 1, created_at: -1 });
     await messages.createIndex({ device_id: 1, created_at: 1 });
+    await reviews.createIndex({ status: 1, order: 1, created_at: -1 });
+    await reviews.createIndex({ device_id: 1, created_at: -1 });
+    await photos.createIndex({ order: 1, created_at: -1 });
   }
 
   return {
     check, register, inbox, audio, markRead, send,
     adminList, adminSetStatus, adminDeleteStudent, adminMessages, adminAudio, adminSend, adminUnlock, adminClear,
+    publicReviews, reviewSubmit, adminReviews, adminReviewSave, adminReviewDelete,
+    publicPhotos, photoImage, adminPhotos, adminPhotoSave, adminPhotoDelete,
     ensureIndexes,
   };
 }

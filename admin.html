@@ -440,6 +440,10 @@
       .dv-facts div { min-width: 0; }
       .dv-facts small { display: block; font-size: .66rem; opacity: .7; }
       .dv-facts b { display: block; color: var(--fog); font-weight: 700; overflow-wrap: anywhere; }
+      .item-icon.dv-mini[data-stid] { cursor: pointer; border-radius: 10px; transition: background .15s; }
+      .item-icon.dv-mini[data-stid]:hover { background: rgba(var(--hx-rgb), .15); }
+      .dvp-sec { margin-top: .9rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+      .dvp-sec h4 { color: var(--fog); font-size: .8rem; font-weight: 800; margin-bottom: .55rem; }
       .dv-sim { color: #fb923c; font-weight: 700; }
 
       /* لوحة الأوامر Ctrl+K */
@@ -1046,6 +1050,23 @@
     </div>
 
     <div id="toast-wrap"></div>
+
+    <!-- نافذة بيانات الجهاز والطالب -->
+    <div id="dv-pop" class="stc-back" hidden>
+      <div class="stc-box" role="dialog" aria-modal="true" aria-labelledby="dvp-name" style="max-width:480px;height:auto;max-height:88vh;overflow:auto">
+        <div class="stc-head">
+          <div><b id="dvp-name"></b><small id="dvp-sub"></small></div>
+          <button id="dvp-close" class="stc-x" type="button" aria-label="إغلاق">×</button>
+        </div>
+        <div style="padding:.2rem .9rem 1rem">
+          <div class="dvp-sec" style="border-top:0;margin-top:.2rem"><h4>الجهاز</h4><div id="dvp-dev"></div></div>
+          <div class="dvp-sec"><h4>الطالب</h4><div id="dvp-stu" class="dv-facts"></div></div>
+          <div class="stc-tools" style="border-top:0;padding:.9rem 0 0">
+            <button id="dvp-chat" type="button"><i class="fas fa-comments"></i> فتح المحادثة</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- محادثة الطالب -->
     <div id="st-chat" class="stc-back" hidden>
@@ -1919,6 +1940,31 @@
         return escapeHtml(st.device_type || "نوع الجهاز غير معروف");
       }
 
+      function openDevPop(id) {
+        const st = studentsCache.find((x) => x.id === id);
+        if (!st) return;
+        const info = studentsInfo[st.device_id] || { unread: 0 };
+        const banned = studentsBanned.has(st.device_id);
+        const state = st.status === "rejected" ? "مرفوض" : banned ? "محظور بالكامل" : info.locked ? "محجوب حتى يرد" : "مقبول";
+        const same = studentsCache.filter((x) => x.device_id === st.device_id);
+        const on = isOnline(st);
+        const rows = [
+          ["الاسم", st.name], ["الحالة", state],
+          ["الظهور", on ? "نشط الآن" : st.last_seen ? agoText(st.last_seen) : "—"],
+          ["آخر ظهور", st.last_seen ? studentWhen(st.last_seen) : "—"],
+          ["تاريخ التسجيل", studentWhen(st.created_at)],
+          ["رسائل غير مقروءة", String(info.unread || 0)],
+          ["أسماء مسجلة على هذا الجهاز", same.length > 1 ? same.map((x) => x.name).join("، ") : "اسم واحد"],
+          ["معرّف الجهاز", st.device_id.slice(0, 8) + "…" + st.device_id.slice(-4)],
+        ];
+        $stc("dvp-name").textContent = st.name;
+        $stc("dvp-sub").textContent = st.device_type || "نوع الجهاز غير معروف";
+        $stc("dvp-dev").innerHTML = devFacts(st);
+        $stc("dvp-stu").innerHTML = rows.map((r) => `<div><small>${r[0]}</small><b>${escapeHtml(String(r[1]))}</b></div>`).join("");
+        $stc("dvp-chat").onclick = () => { $stc("dv-pop").hidden = true; openStudentChat(st.device_id, st.name); };
+        $stc("dv-pop").hidden = false;
+      }
+
       function stRow(st) {
         const rej = st.status === "rejected";
         const on = isOnline(st);
@@ -1949,7 +1995,7 @@
           <div class="hx-row${sel ? " sel" : ""}" style="${rej ? "opacity:.75" : ""}">
             <div class="flex items-center gap-3" style="min-width:0">
               <input type="checkbox" class="st-ck" data-id="${st.id}" ${sel ? "checked" : ""} aria-label="تحديد" />
-              <div class="item-icon dv-mini">${rej ? '<i class="fas fa-user-slash"></i>' : devArt(st)}</div>
+              <div class="item-icon dv-mini" data-stid="${st.id}" role="button" tabindex="0" title="بيانات الجهاز والطالب">${rej ? '<i class="fas fa-user-slash"></i>' : devArt(st)}</div>
               <div style="min-width:0">
                 <div class="text-sm font-bold text-white" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">${escapeHtml(st.name)}</div>
                 ${presence ? `<div class="text-xs" style="margin-top:2px">${presence}</div>` : ""}
@@ -2020,6 +2066,8 @@
       document.getElementById("students-list").addEventListener("click", async (e) => {
         const msg = e.target.closest(".st-msg-btn");
         if (msg) return openStudentChat(msg.dataset.device, msg.dataset.name);
+        const dvm = e.target.closest(".dv-mini[data-stid]");
+        if (dvm) return openDevPop(dvm.dataset.stid);
         const ban = e.target.closest(".student-ban-btn");
         if (ban) {
           const on = ban.dataset.banned !== "1";
@@ -2558,6 +2606,14 @@
       $stc("stc-mic").addEventListener("click", startAdminRec);
       $stc("stc-rstop").addEventListener("click", () => stopAdminRec(false));
       $stc("stc-rcancel").addEventListener("click", () => stopAdminRec(true));
+
+      $stc("dvp-close").addEventListener("click", () => { $stc("dv-pop").hidden = true; });
+      $stc("dv-pop").addEventListener("click", (e) => { if (e.target === $stc("dv-pop")) $stc("dv-pop").hidden = true; });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$stc("dv-pop").hidden) $stc("dv-pop").hidden = true; });
+      document.getElementById("students-list").addEventListener("keydown", (e) => {
+        const dvm = e.target.closest(".dv-mini[data-stid]");
+        if (dvm && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openDevPop(dvm.dataset.stid); }
+      });
 
       $stc("stc-ban").addEventListener("click", async () => {
         if (!stc.device) return;

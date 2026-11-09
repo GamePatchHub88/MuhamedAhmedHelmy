@@ -214,20 +214,6 @@
       .rv-state.published { background: rgba(74,222,155,.16); color: #4ade9b; }
       .rv-text { font-size: .8rem; color: var(--muted); line-height: 1.8; margin-top: .25rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
       .sol-icon-btn { background: none; border: none; cursor: pointer; font-size: .95rem; padding: .25rem; }
-      .ph-drop {
-        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; text-align: center; padding: 1.4rem 1rem;
-        border: 2px dashed var(--line); border-radius: 16px; cursor: pointer; color: var(--muted); font-size: .85rem; transition: border-color .2s, background .2s;
-      }
-      .ph-drop:hover, .ph-drop.over { border-color: var(--cyan); background: rgba(var(--violet-rgb), .06); }
-      .ph-drop i { font-size: 1.6rem; color: var(--cyan); }
-      .ph-preview { display: none; margin-top: .9rem; align-items: center; gap: .9rem; }
-      .ph-preview.show { display: flex; }
-      .ph-preview img { width: 96px; height: 96px; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
-      .ph-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .9rem; }
-      .ph-card { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--panel); }
-      .ph-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: rgba(var(--violet-rgb), .08); }
-      .ph-card .ph-meta { padding: .55rem .65rem; font-size: .75rem; line-height: 1.6; }
-      .ph-card .ph-acts { display: flex; justify-content: space-between; align-items: center; padding: 0 .65rem .55rem; }
 
       /* ---------- Ribbon badge + edit mode ---------- */
       .swatches { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
@@ -706,7 +692,6 @@
           <div class="sol-nav" role="tablist" aria-label="أدوات موقع الحلول">
             <button class="sol-btn active" type="button" data-sol="students"><i class="fas fa-user-graduate"></i> الطلاب والرسائل</button>
             <button class="sol-btn" type="button" data-sol="reviews"><i class="fas fa-star"></i> تقييمات الطلاب <span id="sol-pending-badge" class="sol-badge" hidden>0</span></button>
-            <button class="sol-btn" type="button" data-sol="photos"><i class="fas fa-images"></i> صور الطلاب</button>
           </div>
 
           <!-- ===== (1) الطلاب والرسائل ===== -->
@@ -785,47 +770,6 @@
             </div>
           </div>
 
-          <!-- ===== (3) صور الطلاب الذين أنهوا المنصة ===== -->
-          <div class="sol-pane" id="sol-photos">
-            <div class="flex items-center gap-3 mb-8" style="flex-wrap: wrap">
-              <span class="stat-chip">إجمالي الصور: <b id="sph-count">0</b> / 60</span>
-              <button id="sph-refresh" class="admin-btn" type="button" style="width:auto;padding:.55rem 1rem;margin-inline-start:auto"><i class="fas fa-rotate"></i> تحديث</button>
-            </div>
-
-            <div class="bg-panel border border-line rounded-2xl p-7 mb-8" id="sph-form-card">
-              <h2 class="text-lg font-bold text-white mb-1" id="sph-form-title">إضافة صورة طالب</h2>
-              <p class="text-xs text-muted mb-6">تظهر في معرض "طلاب أنهوا المنصة". تُضغط الصورة تلقائيًا في متصفحك قبل الرفع (نسخة صغيرة للمعرض ونسخة أكبر للتكبير) فلا تثقل الموقع.</p>
-              <label class="ph-drop" id="sph-drop" for="sph-file">
-                <i class="fas fa-cloud-arrow-up"></i>
-                <span id="sph-drop-text">اضغط لاختيار صورة أو اسحبها هنا</span>
-                <small class="text-muted">JPG / PNG / WebP — لا حاجة لتصغيرها يدويًا</small>
-              </label>
-              <input id="sph-file" type="file" accept="image/*" hidden />
-              <div class="ph-preview" id="sph-preview"><img id="sph-preview-img" alt="" /><div class="text-xs text-muted" id="sph-preview-info"></div></div>
-              <div class="mb-5 mt-5">
-                <label class="admin-label">اسم الطالب — اختياري</label>
-                <input id="sph-name" type="text" maxlength="40" class="admin-input" placeholder="مثال: محمد س." />
-              </div>
-              <div class="mb-5">
-                <label class="admin-label">وصف قصير — اختياري</label>
-                <input id="sph-caption" type="text" maxlength="120" class="admin-input" placeholder="مثال: أنهى كل مستويات الصف الأول" />
-              </div>
-              <div class="mb-2">
-                <label class="admin-label">الترتيب (الأصغر أولًا)</label>
-                <input id="sph-order" type="number" class="admin-input" value="0" />
-              </div>
-              <div class="flex items-center gap-3 mt-5" style="flex-wrap:wrap">
-                <button id="sph-save" class="admin-btn" type="button" style="width:auto"><i class="fas fa-plus"></i> <span id="sph-save-label">إضافة الصورة</span></button>
-                <button id="sph-cancel" class="admin-btn admin-btn-ghost" type="button" style="width:auto" hidden>إلغاء التعديل</button>
-              </div>
-            </div>
-
-            <div class="bg-panel border border-line rounded-2xl p-7">
-              <h2 class="text-lg font-bold text-white mb-1">الصور الحالية</h2>
-              <p class="text-xs text-muted mb-5">الرقم الأصغر يظهر أولًا في الموقع.</p>
-              <div id="sph-list" class="ph-grid"></div>
-            </div>
-          </div>
         </div>
       </main>
     </div>
@@ -1752,7 +1696,6 @@
           document.querySelectorAll(".sol-btn").forEach((x) => x.classList.toggle("active", x === b));
           document.querySelectorAll(".sol-pane").forEach((p) => p.classList.toggle("active", p.id === "sol-" + b.dataset.sol));
           if (b.dataset.sol === "reviews") loadSolReviews();
-          if (b.dataset.sol === "photos") loadSolPhotos();
         });
       });
 
@@ -1900,190 +1843,6 @@
       });
       $sv("srv-cancel").addEventListener("click", srvReset);
       $sv("srv-refresh").addEventListener("click", () => loadSolReviews());
-
-      /* ---------- صور الطلاب الذين أنهوا المنصة ---------- */
-      let sphCache = [];
-      let sphEditId = null;
-      let sphPicked = null; // { thumb, full, w, h }
-
-      function sphReset() {
-        sphEditId = null;
-        sphPicked = null;
-        $sv("sph-file").value = "";
-        $sv("sph-name").value = "";
-        $sv("sph-caption").value = "";
-        $sv("sph-order").value = "0";
-        $sv("sph-preview").classList.remove("show");
-        $sv("sph-drop-text").textContent = "اضغط لاختيار صورة أو اسحبها هنا";
-        $sv("sph-form-title").textContent = "إضافة صورة طالب";
-        $sv("sph-save-label").textContent = "إضافة الصورة";
-        $sv("sph-cancel").hidden = true;
-        $sv("sph-form-card").classList.remove("edit-mode-card");
-      }
-
-      const sphUrl = (p, kind) => STUDENTS_API + "/public/photos/" + encodeURIComponent(p.id) + "/" + kind + "?v=" + p.v;
-
-      function sphStartEdit(id) {
-        const p = sphCache.find((x) => x.id === id);
-        if (!p) return;
-        sphReset();
-        sphEditId = id;
-        $sv("sph-name").value = p.name;
-        $sv("sph-caption").value = p.caption;
-        $sv("sph-order").value = p.order;
-        $sv("sph-preview-img").src = sphUrl(p, "thumb");
-        $sv("sph-preview-info").textContent = "الصورة الحالية — اختر صورة جديدة فقط لو أردت استبدالها";
-        $sv("sph-preview").classList.add("show");
-        $sv("sph-form-title").textContent = "تعديل الصورة";
-        $sv("sph-save-label").textContent = "حفظ التعديلات";
-        $sv("sph-cancel").hidden = false;
-        $sv("sph-form-card").classList.add("edit-mode-card");
-        $sv("sph-form-card").scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-
-      function sphReadImage(file) {
-        return new Promise((resolve, reject) => {
-          const url = URL.createObjectURL(file);
-          const img = new Image();
-          img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-          img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("تعذر قراءة الصورة")); };
-          img.src = url;
-        });
-      }
-
-      // يصغّر الصورة ويضغطها (WebP إن أمكن) حتى تدخل في الحد المسموح
-      function sphCompress(img, maxSide, quality, maxBytes) {
-        let scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
-        let q = quality;
-        for (let i = 0; i < 7; i++) {
-          const w = Math.max(1, Math.round(img.naturalWidth * scale));
-          const h = Math.max(1, Math.round(img.naturalHeight * scale));
-          const c = document.createElement("canvas");
-          c.width = w;
-          c.height = h;
-          const ctx = c.getContext("2d");
-          ctx.fillStyle = "#fff";
-          ctx.fillRect(0, 0, w, h);
-          ctx.drawImage(img, 0, 0, w, h);
-          let data = c.toDataURL("image/webp", q);
-          if (!data.startsWith("data:image/webp")) data = c.toDataURL("image/jpeg", q);
-          const bytes = Math.floor(((data.length - data.indexOf(",") - 1) * 3) / 4);
-          if (bytes <= maxBytes) return { data, w, h, bytes };
-          if (q > 0.5) q -= 0.1;
-          else scale *= 0.85;
-        }
-        throw new Error("الصورة كبيرة جدًا حتى بعد الضغط");
-      }
-
-      async function sphPick(file) {
-        if (!file) return;
-        if (!/^image\//.test(file.type)) { toast("اختر ملف صورة", false); return; }
-        if (file.size > 25 * 1024 * 1024) { toast("الصورة أكبر من 25MB", false); return; }
-        try {
-          const img = await sphReadImage(file);
-          const thumb = sphCompress(img, 480, 0.78, 140 * 1024);
-          const full = sphCompress(img, 1400, 0.82, 800 * 1024);
-          sphPicked = { thumb: thumb.data, full: full.data, w: full.w, h: full.h };
-          $sv("sph-preview-img").src = thumb.data;
-          $sv("sph-preview-info").textContent =
-            "بعد الضغط: معرض " + Math.round(thumb.bytes / 1024) + "KB · تكبير " + Math.round(full.bytes / 1024) + "KB (" + full.w + "×" + full.h + ")";
-          $sv("sph-preview").classList.add("show");
-          $sv("sph-drop-text").textContent = file.name;
-        } catch (e) {
-          sphPicked = null;
-          toast(e.message, false);
-        }
-      }
-
-      $sv("sph-file").addEventListener("change", (e) => sphPick(e.target.files[0]));
-      const sphDrop = $sv("sph-drop");
-      ["dragenter", "dragover"].forEach((ev) => sphDrop.addEventListener(ev, (e) => { e.preventDefault(); sphDrop.classList.add("over"); }));
-      ["dragleave", "drop"].forEach((ev) => sphDrop.addEventListener(ev, (e) => { e.preventDefault(); sphDrop.classList.remove("over"); }));
-      sphDrop.addEventListener("drop", (e) => sphPick(e.dataTransfer.files[0]));
-
-      function renderSolPhotos() {
-        const list = $sv("sph-list");
-        $sv("sph-count").textContent = sphCache.length;
-        if (!sphCache.length) {
-          list.style.display = "block";
-          list.innerHTML = '<p class="text-muted text-sm">لا توجد صور بعد.</p>';
-          return;
-        }
-        list.style.display = "";
-        list.innerHTML = sphCache
-          .map(
-            (p) => `
-          <div class="ph-card">
-            <img src="${escapeHtml(sphUrl(p, "thumb"))}" alt="${escapeHtml(p.caption || p.name || "صورة طالب")}" loading="lazy" decoding="async" />
-            <div class="ph-meta">
-              <b class="text-white">${escapeHtml(p.name || "—")}</b>
-              <div class="text-muted" style="overflow-wrap:anywhere">${escapeHtml(p.caption)}</div>
-            </div>
-            <div class="ph-acts">
-              <span class="mono text-xs text-muted">#${p.order}</span>
-              <span>
-                <button class="sol-icon-btn sph-edit" data-id="${p.id}" title="تعديل" style="color:var(--cyan)"><i class="fas fa-pen"></i></button>
-                <button class="sol-icon-btn sph-del" data-id="${p.id}" title="حذف" style="color:#f87171"><i class="fas fa-trash"></i></button>
-              </span>
-            </div>
-          </div>`,
-          )
-          .join("");
-        list.querySelectorAll(".sph-edit").forEach((b) => b.addEventListener("click", () => sphStartEdit(b.dataset.id)));
-        list.querySelectorAll(".sph-del").forEach((b) =>
-          b.addEventListener("click", async () => {
-            if (!confirm("حذف هذه الصورة نهائيًا؟")) return;
-            try {
-              await sApi("/admin/solutions/photos/" + encodeURIComponent(b.dataset.id), { method: "DELETE" });
-              if (sphEditId === b.dataset.id) sphReset();
-              toast("تم الحذف", true);
-              loadSolPhotos(true);
-            } catch (e) {
-              toast("تعذر الحذف: " + e.message, false);
-            }
-          }),
-        );
-      }
-
-      async function loadSolPhotos(silent) {
-        const list = $sv("sph-list");
-        if (silent !== true) { list.style.display = "block"; list.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>'; }
-        try {
-          sphCache = (await sApi("/admin/solutions/photos")).photos || [];
-        } catch (e) {
-          list.style.display = "block";
-          list.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل الصور: ' + escapeHtml(e.message) + "</p>";
-          return;
-        }
-        renderSolPhotos();
-      }
-
-      $sv("sph-save").addEventListener("click", async () => {
-        if (!sphEditId && !sphPicked) { toast("اختر صورة أولًا", false); return; }
-        const body = {
-          id: sphEditId || undefined,
-          name: $sv("sph-name").value,
-          caption: $sv("sph-caption").value,
-          order: $sv("sph-order").value,
-        };
-        if (sphPicked) Object.assign(body, sphPicked);
-        const btn = $sv("sph-save");
-        btn.disabled = true;
-        try {
-          const res = await sApi("/admin/solutions/photos", { method: "POST", body });
-          if (res.status === "too_many") throw new Error("وصلت للحد الأقصى (60 صورة). احذف صورة قديمة أولًا");
-          if (res.status === "invalid_image") throw new Error("الصورة غير صالحة أو كبيرة");
-          if (res.status !== "ok") throw new Error("تعذر الحفظ");
-          toast(sphEditId ? "تم حفظ التعديلات" : "تمت إضافة الصورة", true);
-          sphReset();
-          loadSolPhotos(true);
-        } catch (e) {
-          toast(e.message, false);
-        }
-        btn.disabled = false;
-      });
-      $sv("sph-cancel").addEventListener("click", sphReset);
-      $sv("sph-refresh").addEventListener("click", () => loadSolPhotos());
 
       /* ---------- محادثة الطالب (نص / صوت) ---------- */
       const stc = {

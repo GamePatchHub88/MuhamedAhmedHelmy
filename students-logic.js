@@ -87,6 +87,11 @@ function cleanInfo(raw) {
   };
 }
 
+function cleanIp(raw) {
+  const v = String(raw == null ? "" : raw).trim().slice(0, 45);
+  return /^[0-9a-fA-F:.]+$/.test(v) ? v : null;
+}
+
 function analyzeDevice(clientTypeRaw, ua, rawInfo) {
   const u = parseUA(ua), c = cleanInfo(rawInfo), ct = cleanType(clientTypeRaw);
   if (!u && !c) return { type: ct, info: null };
@@ -169,7 +174,7 @@ function makeLogic({ db, ObjectId }) {
   }
 
   /* ---------- عام (للطلاب) ---------- */
-  async function check(device, type, ua, info) {
+  async function check(device, type, ua, info, ip) {
     if (!DEVICE_OK(device)) return { status: "none" };
     const r = await latestStudent(device);
     if (!r) {
@@ -181,6 +186,7 @@ function makeLogic({ db, ObjectId }) {
       const d = analyzeDevice(type, ua, info);
       if (d.type) set.device_type = d.type;
       if (d.info) set.device_info = d.info;
+      if (cleanIp(ip)) set.last_ip = cleanIp(ip);
       await students.updateOne({ _id: r._id }, { $set: set });
     }
     return {
@@ -192,7 +198,7 @@ function makeLogic({ db, ObjectId }) {
     };
   }
 
-  async function register(device, name, type, ua, info) {
+  async function register(device, name, type, ua, info, ip) {
     if (!DEVICE_OK(device)) return { status: "invalid" };
     const clean = cleanName(name);
     if (clean.length < 2 || clean.length > 40) return { status: "invalid" };
@@ -209,7 +215,7 @@ function makeLogic({ db, ObjectId }) {
     const d = analyzeDevice(type, ua, info);
     await students.insertOne({
       device_id: device, name: clean, status: "approved",
-      device_type: d.type, device_info: d.info, created_at: now, last_seen: now,
+      device_type: d.type, device_info: d.info, first_ip: cleanIp(ip), last_ip: cleanIp(ip), created_at: now, last_seen: now,
     });
     await isBanned(device); // ينقل الحظر فورًا لو كانت البصمة مطابقة لجهاز محظور
     return { status: "approved", name: clean };
@@ -316,6 +322,7 @@ function makeLogic({ db, ObjectId }) {
         id: String(s._id), device_id: s.device_id, name: s.name, status: s.status,
         created_at: s.created_at, last_seen: s.last_seen, device_type: s.device_type || null,
         device_info: s.device_info ? { ...s.device_info, fp: undefined, hw: undefined } : null,
+        last_ip: s.last_ip || null, first_ip: s.first_ip || null,
       })),
       info,
       banned,

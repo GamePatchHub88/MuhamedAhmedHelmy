@@ -1955,14 +1955,16 @@
           ["تاريخ التسجيل", studentWhen(st.created_at)],
           ["رسائل غير مقروءة", String(info.unread || 0)],
           ["أسماء مسجلة على هذا الجهاز", same.length > 1 ? same.map((x) => x.name).join("، ") : "اسم واحد"],
+          ["IP الحالي", st.last_ip || "غير مسجل بعد (يُسجَّل عند دخول الطالب مجددًا)"],
+          ["IP عند التسجيل", st.first_ip || "—"],
           ["معرّف الجهاز", st.device_id],
         ];
         $stc("dvp-name").textContent = st.name;
         $stc("dvp-sub").textContent = st.device_type || "نوع الجهاز غير معروف";
         $stc("dvp-dev").innerHTML = devFacts(st);
-        $stc("dvp-stu").innerHTML = rows.map((r) => r[0] === "معرّف الجهاز"
+        $stc("dvp-stu").innerHTML = rows.map((r) => /^(معرّف الجهاز)$/.test(r[0])
           ? `<div style="grid-column:1/-1"><small>${r[0]}</small><b dir="ltr" style="text-align:start;user-select:all;font-family:'JetBrains Mono',monospace;font-size:.72rem">${escapeHtml(String(r[1]))}</b></div>`
-          : `<div><small>${r[0]}</small><b>${escapeHtml(String(r[1]))}</b></div>`).join("");
+          : `<div><small>${r[0]}</small><b${/^IP/.test(r[0]) ? ' dir="ltr" style="text-align:start;user-select:all"' : ""}>${escapeHtml(String(r[1]))}</b></div>`).join("");
         $stc("dvp-chat").onclick = () => { $stc("dv-pop").hidden = true; openStudentChat(st.device_id, st.name); };
         $stc("dv-pop").hidden = false;
       }
@@ -2042,10 +2044,10 @@
           if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // حماية من حقن الصيغ في Excel
           return '"' + s.replace(/"/g, '""') + '"';
         };
-        const head = ["الاسم", "الحالة", "نوع الجهاز", "محظور", "تاريخ التسجيل", "آخر ظهور", "رسائل غير مقروءة", "معرّف الجهاز"];
+        const head = ["الاسم", "الحالة", "نوع الجهاز", "IP", "محظور", "تاريخ التسجيل", "آخر ظهور", "رسائل غير مقروءة", "معرّف الجهاز"];
         const lines = studentsCache.map((st) => {
           const info = studentsInfo[st.device_id] || {};
-          return [st.name, st.status === "rejected" ? "مرفوض" : "مقبول", st.device_type || "", studentsBanned.has(st.device_id) ? "نعم" : "", st.created_at, st.last_seen || "", info.unread || 0, st.device_id].map(cell).join(",");
+          return [st.name, st.status === "rejected" ? "مرفوض" : "مقبول", st.device_type || "", st.last_ip || "", studentsBanned.has(st.device_id) ? "نعم" : "", st.created_at, st.last_seen || "", info.unread || 0, st.device_id].map(cell).join(",");
         });
         const blob = new Blob(["\ufeff" + [head.map(cell).join(","), ...lines].join("\r\n")], { type: "text/csv;charset=utf-8" });
         const a = document.createElement("a");

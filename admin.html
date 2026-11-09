@@ -1924,7 +1924,7 @@
         const model = i.model ? ((i.brand && i.brand !== "Apple" && !i.model.toLowerCase().startsWith(i.brand.toLowerCase()) ? i.brand + " " : "") + i.model) : "";
         const br = (BR_ICON.find(([re]) => re.test(i.browser || "")) || [])[1];
         const rows = [
-          ["نوع الجهاز", i.kind], ["الموديل", model || (i.kind === "هاتف" || i.kind === "تابلت" ? "غير معلن من المتصفح" : "")],
+          ["نوع الجهاز", i.kind], ["الموديل", model || (i.kind === "هاتف" || i.kind === "تابلت" ? (i.w ? "غير معلن من المتصفح" : "غير متاح بعد (يظهر بعد تفعيل إرسال بيانات الجهاز من موقع الطالب)") : "")],
           ["الشركة", i.brand], ["النظام", [i.os, i.os_ver].filter(Boolean).join(" ")],
           ["المتصفح", [i.browser, i.browser_ver].filter(Boolean).join(" ")],
           ["الشاشة", i.w && i.h ? i.w + "×" + i.h + (i.dpr ? " @" + i.dpr + "x" : "") : ""],
@@ -1955,12 +1955,14 @@
           ["تاريخ التسجيل", studentWhen(st.created_at)],
           ["رسائل غير مقروءة", String(info.unread || 0)],
           ["أسماء مسجلة على هذا الجهاز", same.length > 1 ? same.map((x) => x.name).join("، ") : "اسم واحد"],
-          ["معرّف الجهاز", st.device_id.slice(0, 8) + "…" + st.device_id.slice(-4)],
+          ["معرّف الجهاز", st.device_id],
         ];
         $stc("dvp-name").textContent = st.name;
         $stc("dvp-sub").textContent = st.device_type || "نوع الجهاز غير معروف";
         $stc("dvp-dev").innerHTML = devFacts(st);
-        $stc("dvp-stu").innerHTML = rows.map((r) => `<div><small>${r[0]}</small><b>${escapeHtml(String(r[1]))}</b></div>`).join("");
+        $stc("dvp-stu").innerHTML = rows.map((r) => r[0] === "معرّف الجهاز"
+          ? `<div style="grid-column:1/-1"><small>${r[0]}</small><b dir="ltr" style="text-align:start;user-select:all;font-family:'JetBrains Mono',monospace;font-size:.72rem">${escapeHtml(String(r[1]))}</b></div>`
+          : `<div><small>${r[0]}</small><b>${escapeHtml(String(r[1]))}</b></div>`).join("");
         $stc("dvp-chat").onclick = () => { $stc("dv-pop").hidden = true; openStudentChat(st.device_id, st.name); };
         $stc("dv-pop").hidden = false;
       }

@@ -1396,6 +1396,22 @@
       }
 
       /* ---------- Students (أسماء طلاب موقع الحلول + النشاط + الرسائل) ---------- */
+      // خادم Node.js + MongoDB داخل نفس المشروع على Vercel (مجلد api)
+      const STUDENTS_API = "/api";
+
+      async function sApi(path, opts = {}) {
+        const { data } = await supabaseClient.auth.getSession();
+        const token = data && data.session ? data.session.access_token : "";
+        const res = await fetch(STUDENTS_API + path, {
+          method: opts.method || "GET",
+          headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+          body: opts.body ? JSON.stringify(opts.body) : undefined,
+        });
+        const json = await res.json().catch(() => null);
+        if (!res.ok) throw new Error((json && json.error) || "http " + res.status);
+        return json;
+      }
+
       let studentsCache = [];
       let studentsInfo = {}; // device_id -> { unread, locked }
       const ONLINE_MS = 90 * 1000;
@@ -1482,7 +1498,7 @@
               <button data-id="${st.id}" data-status="${rej ? "approved" : "rejected"}" class="student-status-btn" title="${actionTitle}" style="background:none;border:none;color:${actionColor};cursor:pointer;font-size:0.95rem">
                 <i class="fas ${actionIcon}"></i>
               </button>
-              <button data-table="students" data-id="${st.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
+              <button data-id="${st.id}" class="student-del-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -1493,13 +1509,28 @@
         list.querySelectorAll(".student-status-btn").forEach((b) => {
           b.addEventListener("click", async () => {
             b.disabled = true;
-            const { error } = await supabaseClient.from("students").update({ status: b.dataset.status }).eq("id", b.dataset.id);
-            if (error) {
+            try {
+              await sApi("/admin/students/" + encodeURIComponent(b.dataset.id), { method: "PATCH", body: { status: b.dataset.status } });
+            } catch (e) {
               b.disabled = false;
-              toast("تعذر التحديث: " + error.message, false);
+              toast("تعذر التحديث: " + e.message, false);
               return;
             }
             toast(b.dataset.status === "rejected" ? "تم رفض الاسم" : "تم إلغاء الرفض", true);
+            loadStudents();
+          });
+        });
+
+        list.querySelectorAll(".student-del-btn").forEach((b) => {
+          b.addEventListener("click", async () => {
+            if (!confirm("حذف هذا الاسم نهائيًا؟")) return;
+            try {
+              await sApi("/admin/students/" + encodeURIComponent(b.dataset.id), { method: "DELETE" });
+            } catch (e) {
+              toast("تعذر الحذف: " + e.message, false);
+              return;
+            }
+            toast("تم الحذف", true);
             loadStudents();
           });
         });
@@ -1508,48 +1539,22 @@
           b.addEventListener("click", () => openStudentChat(b.dataset.device, b.dataset.name));
         });
 
-        wireRowActions("students", () => loadStudents());
       }
 
       async function loadStudents(silent) {
         const list = document.getElementById("students-list");
         if (silent !== true) list.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
 
-        const [stRes, msgRes] = await Promise.all([
-          supabaseClient
-            .from("students")
-            .select("id, device_id, name, status, created_at, last_seen, device_type")
-            .order("created_at", { ascending: false }),
-          supabaseClient
-            .from("student_messages")
-            .select("device_id, sender, requires_reply, read_by_admin, created_at")
-            .order("created_at", { ascending: false })
-            .limit(2000),
-        ]);
-
-        if (stRes.error) {
-          list.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل القائمة (هل شغّلت students-setup.sql؟)</p>';
+        let payload;
+        try {
+          payload = await sApi("/admin/students");
+        } catch (e) {
+          list.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل القائمة: ' + escapeHtml(e.message) + " (تأكد من رابط STUDENTS_API وتشغيل الخادم)</p>";
           return;
         }
-
-        // معلومات الرسائل لكل جهاز: غير مقروء + محجوب حتى الرد
-        const info = {};
-        const lastReq = {};
-        const lastStu = {};
-        ((!msgRes.error && msgRes.data) || []).forEach((m) => {
-          const i = (info[m.device_id] = info[m.device_id] || { unread: 0, locked: false });
-          const t = new Date(m.created_at).getTime();
-          if (m.sender === "student") {
-            if (!m.read_by_admin) i.unread++;
-            if (!lastStu[m.device_id] || t > lastStu[m.device_id]) lastStu[m.device_id] = t;
-          } else if (m.requires_reply) {
-            if (!lastReq[m.device_id] || t > lastReq[m.device_id]) lastReq[m.device_id] = t;
-          }
-        });
-        Object.keys(lastReq).forEach((d) => {
-          info[d].locked = lastReq[d] > (lastStu[d] || 0);
-        });
-        studentsInfo = info;
+        studentsInfo = payload.info || {};
+        const info = studentsInfo;
+        const stRes = { data: payload.students || [] };
 
         const seen = new Set();
         studentsCache = (stRes.data || []).map((st) => {
@@ -1618,33 +1623,19 @@
       async function loadStudentChat(force) {
         const device = stc.device;
         if (!device) return;
-        const { data, error } = await supabaseClient
-          .from("student_messages")
-          .select("id, sender, kind, body, duration, requires_reply, read_by_admin, created_at")
-          .eq("device_id", device)
-          .order("created_at", { ascending: true })
-          .limit(200);
-        if (error || device !== stc.device) {
-          if (error) toast("تعذر تحميل الرسائل (هل شغّلت students-setup.sql؟)", false);
+        let res;
+        try {
+          res = await sApi("/admin/messages/" + encodeURIComponent(device));
+        } catch (e) {
+          if (device === stc.device) toast("تعذر تحميل الرسائل: " + e.message, false);
           return;
         }
-        const msgs = data || [];
+        if (device !== stc.device) return;
+        const msgs = res.messages || [];
+        const isLocked = !!res.locked;
+        $stc("stc-unlock").hidden = !isLocked;
 
-        // حالة المنع: آخر رسالة طلبت ردًا ولم يرد الطالب بعدها
-        let lastReq = 0, lastStu = 0;
-        msgs.forEach((m) => {
-          const t = new Date(m.created_at).getTime();
-          if (m.sender === "student") lastStu = Math.max(lastStu, t);
-          else if (m.requires_reply) lastReq = Math.max(lastReq, t);
-        });
-        $stc("stc-unlock").hidden = !(lastReq > lastStu);
-
-        const unreadIds = msgs.filter((m) => m.sender === "student" && !m.read_by_admin).map((m) => m.id);
-        if (unreadIds.length) {
-          await supabaseClient.from("student_messages").update({ read_by_admin: true }).in("id", unreadIds);
-        }
-
-        const ids = msgs.map((m) => m.id).join(",") + "|" + (lastReq > lastStu ? "L" : "");
+        const ids = msgs.map((m) => m.id).join(",") + "|" + (isLocked ? "L" : "");
         if (!force && ids === stc.ids) return;
         stc.ids = ids;
 
@@ -1696,8 +1687,11 @@
           return;
         }
         b.textContent = "جاري التحميل...";
-        const { data, error } = await supabaseClient.from("student_messages").select("audio").eq("id", m.id).single();
-        if (error || !data || !data.audio) {
+        let data = null;
+        try {
+          data = await sApi("/admin/audio/" + encodeURIComponent(m.id));
+        } catch (_) {}
+        if (!data || !data.audio) {
           b.textContent = label;
           toast("تعذر تحميل التسجيل", false);
           return;
@@ -1718,13 +1712,15 @@
         if (!stc.device || stc.sending) return;
         stc.sending = true;
         $stc("stc-send").disabled = true;
-        const { error } = await supabaseClient.from("student_messages").insert({
-          device_id: stc.device,
-          sender: "admin",
-          read_by_admin: true,
-          requires_reply: $stc("stc-lock").checked,
-          ...fields,
-        });
+        let error = null;
+        try {
+          await sApi("/admin/messages", {
+            method: "POST",
+            body: { device_id: stc.device, requires_reply: $stc("stc-lock").checked, ...fields },
+          });
+        } catch (e) {
+          error = e;
+        }
         stc.sending = false;
         $stc("stc-send").disabled = false;
         if (error) {
@@ -1838,14 +1834,10 @@
 
       $stc("stc-unlock").addEventListener("click", async () => {
         if (!stc.device) return;
-        const { error } = await supabaseClient
-          .from("student_messages")
-          .update({ requires_reply: false })
-          .eq("device_id", stc.device)
-          .eq("sender", "admin")
-          .eq("requires_reply", true);
-        if (error) {
-          toast("تعذر رفع المنع: " + error.message, false);
+        try {
+          await sApi("/admin/unlock/" + encodeURIComponent(stc.device), { method: "POST" });
+        } catch (e) {
+          toast("تعذر رفع المنع: " + e.message, false);
           return;
         }
         toast("تم رفع المنع، يدخل الطالب الموقع في خلال لحظات", true);
@@ -1855,9 +1847,10 @@
       $stc("stc-clear").addEventListener("click", async () => {
         if (!stc.device) return;
         if (!confirm("حذف كل رسائل هذه المحادثة نهائيًا؟")) return;
-        const { error } = await supabaseClient.from("student_messages").delete().eq("device_id", stc.device);
-        if (error) {
-          toast("تعذر الحذف: " + error.message, false);
+        try {
+          await sApi("/admin/messages/" + encodeURIComponent(stc.device), { method: "DELETE" });
+        } catch (e) {
+          toast("تعذر الحذف: " + e.message, false);
           return;
         }
         toast("تم حذف المحادثة", true);

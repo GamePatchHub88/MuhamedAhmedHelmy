@@ -228,6 +228,40 @@
       .item-row.is-editing { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(255, 196, 107, 0.12); }
 
       @media (max-width: 640px) { .item-row { flex-wrap: wrap; } }
+
+      /* ---------- Students chat ---------- */
+      .st-dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-inline-end:6px; background:#8d97b8; }
+      .st-dot.on { background:#4ade9b; box-shadow:0 0 0 4px rgba(74,222,155,.18); }
+      .st-msg-btn { position:relative; background:none; border:none; color:var(--cyan); cursor:pointer; font-size:1rem; }
+      .st-badge { position:absolute; top:-8px; inset-inline-start:-8px; min-width:17px; height:17px; padding:0 4px; border-radius:9px; background:#f87171; color:#fff; font-size:.65rem; font-weight:800; line-height:17px; text-align:center; }
+      .st-lock { color:#f87171; font-weight:700; }
+      .stc-back { position:fixed; inset:0; z-index:200; display:grid; place-items:center; padding:1rem; background:rgba(5,8,20,.65); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); }
+      .stc-back[hidden] { display:none; }
+      .stc-box { width:min(560px,100%); height:min(680px,calc(100vh - 2rem)); display:flex; flex-direction:column; border-radius:20px; background:var(--panel); border:1px solid var(--line); overflow:hidden; box-shadow:0 30px 60px -30px rgba(0,0,0,.6); }
+      .stc-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.9rem 1.1rem; border-bottom:1px solid var(--line); }
+      .stc-head b { color:var(--fog); }
+      .stc-head small { display:block; color:var(--muted); font-size:.72rem; margin-top:2px; }
+      .stc-x { background:none; border:none; color:var(--muted); font-size:1.6rem; line-height:1; cursor:pointer; }
+      .stc-list { flex:1; overflow:auto; padding:.9rem; display:flex; flex-direction:column; gap:.55rem; }
+      .stc-empty { margin:auto; color:var(--muted); font-size:.85rem; text-align:center; }
+      .stc-m { max-width:82%; padding:.5rem .8rem; border-radius:14px; font-size:.9rem; line-height:1.7; }
+      .stc-m small { display:block; margin-top:2px; font-size:.68rem; opacity:.7; }
+      .stc-st { align-self:flex-start; background:var(--panel2); border:1px solid var(--line); color:var(--fog); }
+      .stc-ad { align-self:flex-end; background:var(--grad); color:#07101a; }
+      .stc-t { white-space:pre-wrap; overflow-wrap:anywhere; }
+      .stc-v { border:0; border-radius:10px; padding:.45rem .8rem; cursor:pointer; font:inherit; font-weight:700; background:rgba(0,0,0,.14); color:inherit; }
+      .stc-tools { display:flex; flex-wrap:wrap; align-items:center; gap:.6rem 1rem; padding:.6rem .9rem; border-top:1px solid var(--line); font-size:.78rem; color:var(--muted); }
+      .stc-tools label { display:inline-flex; align-items:center; gap:.4rem; cursor:pointer; }
+      .stc-tools button { background:none; border:1px solid var(--line); border-radius:10px; padding:.3rem .7rem; color:var(--fog); cursor:pointer; font:inherit; }
+      .stc-tools button.danger { color:#f87171; }
+      .stc-bar, .stc-rec { display:flex; align-items:flex-end; gap:.5rem; padding:.7rem .9rem; border-top:1px solid var(--line); }
+      .stc-bar[hidden], .stc-rec[hidden], .stc-tools button[hidden] { display:none; }
+      .stc-bar textarea { flex:1; resize:none; background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:.55rem .8rem; color:var(--fog); font:inherit; }
+      .stc-mic { width:2.6rem; height:2.6rem; border-radius:12px; border:1px solid var(--line); background:var(--panel2); color:var(--cyan); cursor:pointer; }
+      .stc-rec { align-items:center; }
+      .stc-rec .rd { width:10px; height:10px; border-radius:50%; background:#f87171; animation:stcp 1s infinite; }
+      .stc-rec .rt { flex:1; font-weight:700; color:var(--fog); }
+      @keyframes stcp { 50% { opacity:.25; } }
     </style>
   </head>
   <body class="bg-ink text-fog antialiased">
@@ -638,6 +672,8 @@
           <div class="flex items-center gap-3 mb-8" style="flex-wrap: wrap">
             <span class="stat-chip">إجمالي الأسماء: <b id="students-count">0</b></span>
             <span class="stat-chip">مرفوض: <b id="students-rejected-count">0</b></span>
+            <span class="stat-chip">نشط الآن: <b id="students-online-count" style="color:#4ade9b">0</b></span>
+            <span class="stat-chip">رسائل جديدة: <b id="students-unread-count">0</b></span>
             <button id="students-refresh-btn" class="admin-btn" type="button" style="width: auto; padding: .55rem 1rem; margin-inline-start: auto">
               <i class="fas fa-rotate"></i> تحديث
             </button>
@@ -1359,8 +1395,10 @@
         wireRowActions("reviews", loadReviews);
       }
 
-      /* ---------- Students (أسماء طلاب موقع الحلول) ---------- */
+      /* ---------- Students (أسماء طلاب موقع الحلول + النشاط + الرسائل) ---------- */
       let studentsCache = [];
+      let studentsInfo = {}; // device_id -> { unread, locked }
+      const ONLINE_MS = 90 * 1000;
 
       function studentWhen(iso) {
         try {
@@ -1370,10 +1408,26 @@
         }
       }
 
+      function agoText(iso) {
+        const sec = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000));
+        if (sec < 60) return "منذ لحظات";
+        const min = Math.round(sec / 60);
+        if (min < 60) return "منذ " + min + " دقيقة";
+        const h = Math.round(min / 60);
+        if (h < 24) return "منذ " + h + " ساعة";
+        return "منذ " + Math.round(h / 24) + " يوم";
+      }
+
+      function isOnline(st) {
+        return st.status === "approved" && st.isLatest && Date.now() - new Date(st.last_seen).getTime() < ONLINE_MS;
+      }
+
       function renderStudents() {
         const list = document.getElementById("students-list");
         const q = (document.getElementById("students-search").value || "").trim().toLowerCase();
-        const rows = studentsCache.filter((st) => !q || st.name.toLowerCase().includes(q) || (st.device_type || "").toLowerCase().includes(q));
+        const rows = studentsCache.filter(
+          (st) => !q || st.name.toLowerCase().includes(q) || (st.device_type || "").toLowerCase().includes(q)
+        );
 
         if (!studentsCache.length) {
           list.innerHTML = '<p class="text-muted text-sm">لا توجد أسماء بعد.</p>';
@@ -1387,28 +1441,44 @@
         list.innerHTML = rows
           .map((st) => {
             const rej = st.status === "rejected";
+            const on = isOnline(st);
+            const info = studentsInfo[st.device_id] || { unread: 0, locked: false };
             const badge = rej
               ? '<span style="color:#f87171;font-weight:700">مرفوض</span>'
               : '<span style="color:#4ade9b;font-weight:700">مقبول</span>';
+            const presence = rej
+              ? ""
+              : st.isLatest
+              ? `<span class="st-dot ${on ? "on" : ""}"></span><span style="color:${on ? "#4ade9b" : "var(--muted)"};font-weight:700">${on ? "نشط الآن" : "آخر ظهور " + escapeHtml(agoText(st.last_seen))}</span>`
+              : "";
             const dt = st.device_type || "";
             const devIcon = dt.startsWith("هاتف") ? "fa-mobile-screen" : dt.startsWith("تابلت") ? "fa-tablet-screen-button" : "fa-desktop";
             const devLine = dt
               ? `<div class="text-xs text-muted" style="margin-top:2px"><i class="fas ${devIcon}" style="margin-inline-end:6px"></i>${escapeHtml(dt)}</div>`
               : '<div class="text-xs text-muted" style="margin-top:2px">نوع الجهاز: غير معروف</div>';
+            const lockLine = info.locked && st.isLatest ? '<div class="text-xs st-lock" style="margin-top:2px"><i class="fas fa-lock"></i> محجوب عن الحلول حتى يرد على رسالتك</div>' : "";
             const actionIcon = rej ? "fa-rotate-left" : "fa-ban";
             const actionColor = rej ? "#4ade9b" : "#f87171";
             const actionTitle = rej ? "إلغاء الرفض" : "رفض الاسم";
+            const msgBtn = st.isLatest
+              ? `<button class="st-msg-btn" data-device="${escapeHtml(st.device_id)}" data-name="${escapeHtml(st.name)}" title="الرسائل">
+                  <i class="fas fa-comments"></i>${info.unread ? `<span class="st-badge">${info.unread > 9 ? "9+" : info.unread}</span>` : ""}
+                </button>`
+              : "";
             return `
           <div class="item-row" style="${rej ? "opacity:.75" : ""}">
             <div class="flex items-center gap-3" style="min-width: 0">
               <div class="item-icon"><i class="fas ${rej ? "fa-user-slash" : "fa-user-graduate"}"></i></div>
               <div style="min-width: 0">
                 <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(st.name)}</div>
+                ${presence ? `<div class="text-xs" style="margin-top:2px">${presence}</div>` : ""}
                 ${devLine}
+                ${lockLine}
                 <div class="mono text-xs text-muted">${badge} · ${escapeHtml(studentWhen(st.created_at))}</div>
               </div>
             </div>
             <div class="flex items-center gap-3">
+              ${msgBtn}
               <button data-id="${st.id}" data-status="${rej ? "approved" : "rejected"}" class="student-status-btn" title="${actionTitle}" style="background:none;border:none;color:${actionColor};cursor:pointer;font-size:0.95rem">
                 <i class="fas ${actionIcon}"></i>
               </button>
@@ -1434,30 +1504,365 @@
           });
         });
 
-        wireRowActions("students", loadStudents);
+        list.querySelectorAll(".st-msg-btn").forEach((b) => {
+          b.addEventListener("click", () => openStudentChat(b.dataset.device, b.dataset.name));
+        });
+
+        wireRowActions("students", () => loadStudents());
       }
 
-      async function loadStudents() {
+      async function loadStudents(silent) {
         const list = document.getElementById("students-list");
-        list.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
-        const { data, error } = await supabaseClient
-          .from("students")
-          .select("id, name, status, created_at, device_type")
-          .order("created_at", { ascending: false });
+        if (silent !== true) list.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
 
-        if (error) {
+        const [stRes, msgRes] = await Promise.all([
+          supabaseClient
+            .from("students")
+            .select("id, device_id, name, status, created_at, last_seen, device_type")
+            .order("created_at", { ascending: false }),
+          supabaseClient
+            .from("student_messages")
+            .select("device_id, sender, requires_reply, read_by_admin, created_at")
+            .order("created_at", { ascending: false })
+            .limit(2000),
+        ]);
+
+        if (stRes.error) {
           list.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل القائمة (هل شغّلت students-setup.sql؟)</p>';
           return;
         }
-        studentsCache = data || [];
+
+        // معلومات الرسائل لكل جهاز: غير مقروء + محجوب حتى الرد
+        const info = {};
+        const lastReq = {};
+        const lastStu = {};
+        ((!msgRes.error && msgRes.data) || []).forEach((m) => {
+          const i = (info[m.device_id] = info[m.device_id] || { unread: 0, locked: false });
+          const t = new Date(m.created_at).getTime();
+          if (m.sender === "student") {
+            if (!m.read_by_admin) i.unread++;
+            if (!lastStu[m.device_id] || t > lastStu[m.device_id]) lastStu[m.device_id] = t;
+          } else if (m.requires_reply) {
+            if (!lastReq[m.device_id] || t > lastReq[m.device_id]) lastReq[m.device_id] = t;
+          }
+        });
+        Object.keys(lastReq).forEach((d) => {
+          info[d].locked = lastReq[d] > (lastStu[d] || 0);
+        });
+        studentsInfo = info;
+
+        const seen = new Set();
+        studentsCache = (stRes.data || []).map((st) => {
+          const latest = !seen.has(st.device_id);
+          seen.add(st.device_id);
+          return { ...st, isLatest: latest };
+        });
+
         document.getElementById("students-count").textContent = studentsCache.length;
         document.getElementById("students-rejected-count").textContent = studentsCache.filter((x) => x.status === "rejected").length;
+        document.getElementById("students-online-count").textContent = studentsCache.filter(isOnline).length;
+        document.getElementById("students-unread-count").textContent = Object.values(info).reduce((n, x) => n + x.unread, 0);
         renderStudents();
       }
 
-      document.getElementById("students-refresh-btn").addEventListener("click", loadStudents);
+      document.getElementById("students-refresh-btn").addEventListener("click", () => loadStudents());
       document.getElementById("students-search").addEventListener("input", renderStudents);
-      document.querySelector('.tab-btn[data-tab="students"]').addEventListener("click", loadStudents);
+      document.querySelector('.tab-btn[data-tab="students"]').addEventListener("click", () => loadStudents());
+      // تحديث تلقائي لحالة النشاط والرسائل أثناء فتح التبويب
+      setInterval(() => {
+        const tab = document.getElementById("tab-students");
+        if (!document.hidden && tab && tab.classList.contains("active")) loadStudents(true);
+      }, 15000);
+
+      /* ---------- محادثة الطالب (نص / صوت) ---------- */
+      const stc = {
+        device: null,
+        name: "",
+        ids: "",
+        timer: null,
+        audios: {},
+        rec: null,
+        sending: false,
+      };
+      const $stc = (id) => document.getElementById(id);
+
+      function stcFmtDur(s) {
+        s = Math.max(0, s | 0);
+        return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2);
+      }
+
+      async function openStudentChat(device, name) {
+        stc.device = device;
+        stc.name = name;
+        stc.ids = "";
+        $stc("stc-name").textContent = name;
+        const st = studentsCache.find((x) => x.device_id === device && x.isLatest);
+        $stc("stc-sub").textContent = st ? (st.device_type || "") : "";
+        $stc("stc-lock").checked = false;
+        $stc("st-chat").hidden = false;
+        await loadStudentChat(true);
+        clearInterval(stc.timer);
+        stc.timer = setInterval(() => {
+          if (!document.hidden) loadStudentChat(false);
+        }, 6000);
+      }
+
+      function closeStudentChat() {
+        if (stc.rec) stopAdminRec(true);
+        clearInterval(stc.timer);
+        $stc("st-chat").hidden = true;
+        stc.device = null;
+        loadStudents(true);
+      }
+
+      async function loadStudentChat(force) {
+        const device = stc.device;
+        if (!device) return;
+        const { data, error } = await supabaseClient
+          .from("student_messages")
+          .select("id, sender, kind, body, duration, requires_reply, read_by_admin, created_at")
+          .eq("device_id", device)
+          .order("created_at", { ascending: true })
+          .limit(200);
+        if (error || device !== stc.device) {
+          if (error) toast("تعذر تحميل الرسائل (هل شغّلت students-setup.sql؟)", false);
+          return;
+        }
+        const msgs = data || [];
+
+        // حالة المنع: آخر رسالة طلبت ردًا ولم يرد الطالب بعدها
+        let lastReq = 0, lastStu = 0;
+        msgs.forEach((m) => {
+          const t = new Date(m.created_at).getTime();
+          if (m.sender === "student") lastStu = Math.max(lastStu, t);
+          else if (m.requires_reply) lastReq = Math.max(lastReq, t);
+        });
+        $stc("stc-unlock").hidden = !(lastReq > lastStu);
+
+        const unreadIds = msgs.filter((m) => m.sender === "student" && !m.read_by_admin).map((m) => m.id);
+        if (unreadIds.length) {
+          await supabaseClient.from("student_messages").update({ read_by_admin: true }).in("id", unreadIds);
+        }
+
+        const ids = msgs.map((m) => m.id).join(",") + "|" + (lastReq > lastStu ? "L" : "");
+        if (!force && ids === stc.ids) return;
+        stc.ids = ids;
+
+        const list = $stc("stc-list");
+        list.textContent = "";
+        if (!msgs.length) {
+          const p = document.createElement("p");
+          p.className = "stc-empty";
+          p.textContent = "لا توجد رسائل بعد. اكتب رسالة للطالب أو سجّل رسالة صوتية.";
+          list.appendChild(p);
+          return;
+        }
+        msgs.forEach((m) => {
+          const row = document.createElement("div");
+          row.className = "stc-m " + (m.sender === "admin" ? "stc-ad" : "stc-st");
+          if (m.kind === "voice") {
+            const b = document.createElement("button");
+            b.type = "button";
+            b.className = "stc-v";
+            b.textContent = "▶ رسالة صوتية · " + stcFmtDur(m.duration);
+            b.addEventListener("click", () => playAdminVoice(m, b));
+            row.appendChild(b);
+          } else {
+            const t = document.createElement("div");
+            t.className = "stc-t";
+            t.textContent = m.body || "";
+            row.appendChild(t);
+          }
+          const meta = document.createElement("small");
+          meta.textContent =
+            (m.sender === "admin" ? "أنت" : stc.name) + " · " + studentWhen(m.created_at) + (m.requires_reply ? " · يمنع الدخول حتى الرد" : "");
+          row.appendChild(meta);
+          list.appendChild(row);
+        });
+        list.scrollTop = list.scrollHeight;
+      }
+
+      async function playAdminVoice(m, b) {
+        const label = "▶ رسالة صوتية · " + stcFmtDur(m.duration);
+        const cached = stc.audios[m.id];
+        if (cached) {
+          if (cached.paused) {
+            cached.play();
+            b.textContent = "⏸ إيقاف مؤقت";
+          } else {
+            cached.pause();
+            b.textContent = label;
+          }
+          return;
+        }
+        b.textContent = "جاري التحميل...";
+        const { data, error } = await supabaseClient.from("student_messages").select("audio").eq("id", m.id).single();
+        if (error || !data || !data.audio) {
+          b.textContent = label;
+          toast("تعذر تحميل التسجيل", false);
+          return;
+        }
+        const au = new Audio(data.audio);
+        stc.audios[m.id] = au;
+        au.onended = () => (b.textContent = label);
+        au.play().then(
+          () => (b.textContent = "⏸ إيقاف مؤقت"),
+          () => {
+            b.textContent = label;
+            toast("تعذر تشغيل التسجيل", false);
+          }
+        );
+      }
+
+      async function sendAdminMessage(fields) {
+        if (!stc.device || stc.sending) return;
+        stc.sending = true;
+        $stc("stc-send").disabled = true;
+        const { error } = await supabaseClient.from("student_messages").insert({
+          device_id: stc.device,
+          sender: "admin",
+          read_by_admin: true,
+          requires_reply: $stc("stc-lock").checked,
+          ...fields,
+        });
+        stc.sending = false;
+        $stc("stc-send").disabled = false;
+        if (error) {
+          toast("تعذر الإرسال: " + error.message, false);
+          return;
+        }
+        $stc("stc-text").value = "";
+        toast($stc("stc-lock").checked ? "أُرسلت الرسالة وحُجب الطالب حتى يرد" : "تم إرسال الرسالة", true);
+        $stc("stc-lock").checked = false;
+        await loadStudentChat(true);
+      }
+
+      function stcSendText() {
+        const t = $stc("stc-text").value.trim();
+        if (!t) return;
+        sendAdminMessage({ kind: "text", body: t });
+      }
+
+      function showAdminRec(on) {
+        $stc("stc-rec").hidden = !on;
+        $stc("stc-bar").hidden = on;
+      }
+
+      async function startAdminRec() {
+        if (stc.rec || stc.sending) return;
+        if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder)) {
+          toast("التسجيل الصوتي غير مدعوم في هذا المتصفح", false);
+          return;
+        }
+        let stream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch (_) {
+          toast("لم يتم السماح باستخدام الميكروفون", false);
+          return;
+        }
+        const mime = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"].find((m) => {
+          try {
+            return MediaRecorder.isTypeSupported(m);
+          } catch (_) {
+            return false;
+          }
+        });
+        let mr;
+        try {
+          mr = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 24000 } : { audioBitsPerSecond: 24000 });
+        } catch (_) {
+          mr = new MediaRecorder(stream);
+        }
+        const chunks = [];
+        const r = { mr, stream, t0: Date.now(), cancel: false, timer: 0 };
+        stc.rec = r;
+        mr.ondataavailable = (e) => {
+          if (e.data && e.data.size) chunks.push(e.data);
+        };
+        mr.onstop = () => {
+          clearInterval(r.timer);
+          stream.getTracks().forEach((t) => t.stop());
+          stc.rec = null;
+          showAdminRec(false);
+          if (r.cancel) return;
+          const dur = Math.max(1, Math.round((Date.now() - r.t0) / 1000));
+          const blob = new Blob(chunks, { type: mr.mimeType || mime || "audio/webm" });
+          const fr = new FileReader();
+          fr.onload = () => {
+            const url = String(fr.result);
+            if (url.length > 590000) {
+              toast("التسجيل طويل جدًا، سجّل رسالة أقصر", false);
+              return;
+            }
+            sendAdminMessage({ kind: "voice", audio: url, duration: dur });
+          };
+          fr.readAsDataURL(blob);
+        };
+        mr.start();
+        showAdminRec(true);
+        $stc("stc-rt").textContent = "0:00";
+        r.timer = setInterval(() => {
+          const s = Math.round((Date.now() - r.t0) / 1000);
+          $stc("stc-rt").textContent = stcFmtDur(s);
+          if (s >= 60) stopAdminRec(false);
+        }, 250);
+      }
+
+      function stopAdminRec(cancel) {
+        if (!stc.rec) return;
+        stc.rec.cancel = !!cancel;
+        try {
+          stc.rec.mr.stop();
+        } catch (_) {
+          stc.rec.stream.getTracks().forEach((t) => t.stop());
+          stc.rec = null;
+          showAdminRec(false);
+        }
+      }
+
+      $stc("stc-close").addEventListener("click", closeStudentChat);
+      $stc("st-chat").addEventListener("click", (e) => {
+        if (e.target === $stc("st-chat")) closeStudentChat();
+      });
+      $stc("stc-send").addEventListener("click", stcSendText);
+      $stc("stc-text").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          stcSendText();
+        }
+      });
+      $stc("stc-mic").addEventListener("click", startAdminRec);
+      $stc("stc-rstop").addEventListener("click", () => stopAdminRec(false));
+      $stc("stc-rcancel").addEventListener("click", () => stopAdminRec(true));
+
+      $stc("stc-unlock").addEventListener("click", async () => {
+        if (!stc.device) return;
+        const { error } = await supabaseClient
+          .from("student_messages")
+          .update({ requires_reply: false })
+          .eq("device_id", stc.device)
+          .eq("sender", "admin")
+          .eq("requires_reply", true);
+        if (error) {
+          toast("تعذر رفع المنع: " + error.message, false);
+          return;
+        }
+        toast("تم رفع المنع، يدخل الطالب الموقع في خلال لحظات", true);
+        await loadStudentChat(true);
+      });
+
+      $stc("stc-clear").addEventListener("click", async () => {
+        if (!stc.device) return;
+        if (!confirm("حذف كل رسائل هذه المحادثة نهائيًا؟")) return;
+        const { error } = await supabaseClient.from("student_messages").delete().eq("device_id", stc.device);
+        if (error) {
+          toast("تعذر الحذف: " + error.message, false);
+          return;
+        }
+        toast("تم حذف المحادثة", true);
+        await loadStudentChat(true);
+      });
 
       /* ---------- Articles ---------- */
       const articlesList = document.getElementById("articles-list");
@@ -1901,5 +2306,31 @@
         });
       })();
     </script>
+  
+    <!-- محادثة الطالب -->
+    <div id="st-chat" class="stc-back" hidden>
+      <div class="stc-box" role="dialog" aria-modal="true" aria-labelledby="stc-name">
+        <div class="stc-head">
+          <div><b id="stc-name"></b><small id="stc-sub"></small></div>
+          <button id="stc-close" class="stc-x" type="button" aria-label="إغلاق">×</button>
+        </div>
+        <div id="stc-list" class="stc-list"></div>
+        <div class="stc-tools">
+          <label><input type="checkbox" id="stc-lock" /> منع الطالب من دخول الحلول حتى يرد</label>
+          <button id="stc-unlock" type="button" hidden>رفع المنع الآن</button>
+          <button id="stc-clear" type="button" class="danger">حذف المحادثة</button>
+        </div>
+        <div id="stc-rec" class="stc-rec" hidden>
+          <span class="rd"></span><span id="stc-rt" class="rt">0:00</span>
+          <button id="stc-rcancel" type="button" class="stc-mic" style="width:auto;padding:0 .8rem">إلغاء</button>
+          <button id="stc-rstop" type="button" class="admin-btn" style="width:auto;padding:.55rem 1rem">إرسال التسجيل</button>
+        </div>
+        <div id="stc-bar" class="stc-bar">
+          <textarea id="stc-text" rows="2" maxlength="1000" placeholder="اكتب رسالة للطالب..."></textarea>
+          <button id="stc-mic" type="button" class="stc-mic" aria-label="تسجيل صوتي"><i class="fas fa-microphone"></i></button>
+          <button id="stc-send" type="button" class="admin-btn" style="width:auto;padding:.6rem 1.1rem">إرسال</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

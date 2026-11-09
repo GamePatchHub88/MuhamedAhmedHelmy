@@ -179,6 +179,12 @@ admin.post("/messages", wrap((l, r) => l.adminSend(r.body || {})));
 admin.post("/unlock/:device", wrap(async (l, r) => ({ ok: await l.adminUnlock(r.params.device) })));
 admin.delete("/messages/:device", wrap(async (l, r) => ({ ok: await l.adminClear(r.params.device) })));
 
+/* لوحة القيادة + العمليات الجماعية + الإعلان الجماعي */
+admin.get("/solutions/stats", wrap((l) => l.adminStats()));
+admin.post("/students/bulk", wrap((l, r) => l.adminBulk((r.body || {}).ids, (r.body || {}).action)));
+admin.post("/broadcast", wrap((l, r) => l.adminBroadcast(r.body || {})));
+admin.post("/solutions/reviews/publish-all", wrap((l) => l.adminReviewsPublishAll()));
+
 /* أدوات موقع الحلول: التقييمات + صور الطلاب */
 admin.get("/solutions/reviews", wrap((l) => l.adminReviews()));
 admin.post("/solutions/reviews", wrap((l, r) => l.adminReviewSave(r.body || {})));

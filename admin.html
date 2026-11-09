@@ -255,7 +255,7 @@
       .st-msg-btn { position:relative; background:none; border:none; color:var(--cyan); cursor:pointer; font-size:1rem; }
       .st-badge { position:absolute; top:-8px; inset-inline-start:-8px; min-width:17px; height:17px; padding:0 4px; border-radius:9px; background:#f87171; color:#fff; font-size:.65rem; font-weight:800; line-height:17px; text-align:center; }
       .st-lock { color:#f87171; font-weight:700; }
-      .stc-back { position:fixed; inset:0; z-index:200; display:grid; place-items:center; padding:1rem; background:rgba(5,8,20,.65); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); }
+      .stc-back { position:fixed; inset:0; z-index:200; display:grid; place-items:center; padding:1rem; background:rgba(5,8,20,.78); }
       .stc-back[hidden] { display:none; }
       .stc-box { width:min(560px,100%); height:min(680px,calc(100vh - 2rem)); display:flex; flex-direction:column; border-radius:20px; background:var(--panel); border:1px solid var(--line); overflow:hidden; box-shadow:0 30px 60px -30px rgba(0,0,0,.6); }
       .stc-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.9rem 1.1rem; border-bottom:1px solid var(--line); }
@@ -282,6 +282,176 @@
       .stc-rec .rd { width:10px; height:10px; border-radius:50%; background:#f87171; animation:stcp 1s infinite; }
       .stc-rec .rt { flex:1; font-weight:700; color:var(--fog); }
       @keyframes stcp { 50% { opacity:.25; } }
+
+      /* =========================================================
+         مركز قيادة موقع الحلول (Command Center) — ستايل هاكر خفيف
+         بدون مكتبات: SVG/CSS فقط، بدون حركات مستمرة ثقيلة
+      ========================================================= */
+      #panel main.sol-wide { max-width: 76rem; }
+      .hx { --hx: #39ff88; --hx-rgb: 57, 255, 136; --hx-warn: #ffb84d; --hx-bad: #ff5c7a; --hx-vio: #8b7bff; }
+      [data-theme="light"] .hx { --hx: #0a9d52; --hx-rgb: 10, 157, 82; --hx-warn: #b45f06; --hx-bad: #d6264b; --hx-vio: #6552f0; }
+      .hx .mono, .hx-mono { font-family: "JetBrains Mono", ui-monospace, monospace; direction: ltr; unicode-bidi: plaintext; }
+
+      .hx-term {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem 1rem;
+        padding: .7rem 1rem; margin-bottom: 1rem; border-radius: 14px; border: 1px solid rgba(var(--hx-rgb), .35);
+        background: linear-gradient(180deg, rgba(var(--hx-rgb), .07), rgba(var(--hx-rgb), .02));
+        font-family: "JetBrains Mono", monospace; font-size: .78rem; direction: ltr; color: var(--fog);
+      }
+      .hx-term .p { color: var(--hx); font-weight: 700; }
+      .hx-term .r { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .8rem; }
+      .hx-live { display: inline-flex; align-items: center; gap: .35rem; color: var(--hx); font-weight: 700; }
+      .hx-live i { width: 8px; height: 8px; border-radius: 50%; background: var(--hx); animation: hx-pulse 1.6s ease-in-out infinite; }
+      .hx-live.off { color: var(--hx-bad); } .hx-live.off i { background: var(--hx-bad); animation: none; }
+      @keyframes hx-pulse { 50% { opacity: .25; } }
+      .hx-sel, .hx-btn {
+        font: inherit; font-size: .74rem; color: var(--fog); background: var(--panel2); border: 1px solid var(--line);
+        border-radius: 8px; padding: .28rem .6rem; cursor: pointer; direction: ltr;
+      }
+      .hx-btn:hover, .hx-sel:hover { border-color: rgba(var(--hx-rgb), .6); color: var(--hx); }
+      .hx-btn.on { color: var(--hx); border-color: rgba(var(--hx-rgb), .6); background: rgba(var(--hx-rgb), .09); }
+      .hx-btn.danger:hover { color: var(--hx-bad); border-color: var(--hx-bad); }
+      .hx-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+      .hx-insights { display: grid; gap: .45rem; margin-bottom: 1rem; }
+      .hx-ins {
+        display: flex; align-items: center; gap: .7rem; padding: .55rem .9rem; border-radius: 12px; font-size: .82rem; font-weight: 700;
+        border: 1px solid var(--line); background: var(--panel2); color: var(--fog);
+      }
+      .hx-ins i { flex: none; }
+      .hx-ins.warn { border-color: rgba(255, 184, 77, .45); } .hx-ins.warn i { color: var(--hx-warn); }
+      .hx-ins.good { border-color: rgba(var(--hx-rgb), .4); } .hx-ins.good i { color: var(--hx); }
+      .hx-ins.info i { color: var(--cyan); }
+      .hx-ins button { margin-inline-start: auto; }
+
+      .hx-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .75rem; margin-bottom: 1rem; }
+      @media (max-width: 900px) { .hx-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      .hx-card {
+        position: relative; overflow: hidden; border-radius: 16px; padding: 1rem 1.1rem;
+        background: var(--panel); border: 1px solid var(--line);
+        content-visibility: auto; contain-intrinsic-size: auto 240px;
+      }
+      .hx-card::before { /* قوس الزاوية */
+        content: ""; position: absolute; top: 0; inset-inline-start: 0; width: 16px; height: 16px; pointer-events: none;
+        border-top: 2px solid var(--hx); border-inline-start: 2px solid var(--hx); border-start-start-radius: 16px; opacity: .85;
+      }
+      .hx-card::after { /* خطوط المسح (ثابتة = بلا تكلفة) */
+        content: ""; position: absolute; inset: 0; pointer-events: none;
+        background: repeating-linear-gradient(0deg, rgba(var(--hx-rgb), .028) 0 1px, transparent 1px 3px);
+      }
+      .hx-card > * { position: relative; z-index: 1; }
+      .hx-k { padding: .85rem 1rem; contain-intrinsic-size: auto 118px; }
+      .hx-k .l { font-size: .68rem; color: var(--muted); font-weight: 700; letter-spacing: .02em; }
+      .hx-k .v { font-family: "JetBrains Mono", monospace; font-size: 1.85rem; font-weight: 700; line-height: 1.15; color: var(--hx); margin-top: .15rem; direction: ltr; text-align: start; }
+      .hx-k.warn .v { color: var(--hx-warn); } .hx-k.bad .v { color: var(--hx-bad); } .hx-k.vio .v { color: var(--hx-vio); }
+      .hx-k .s { display: flex; align-items: center; justify-content: space-between; gap: .4rem; margin-top: .25rem; min-height: 26px; }
+      .hx-k .d { font-family: "JetBrains Mono", monospace; font-size: .7rem; font-weight: 700; direction: ltr; }
+      .hx-k .d.up { color: var(--hx); } .hx-k .d.down { color: var(--hx-bad); } .hx-k .d.flat { color: var(--muted); }
+      .hx-k svg { width: 78px; height: 26px; flex: none; }
+
+      .hx-grid { display: grid; gap: 1rem; margin-bottom: 1rem; }
+      .hx-g21 { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+      .hx-g12 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      @media (max-width: 860px) { .hx-g21, .hx-g12 { grid-template-columns: minmax(0, 1fr); } }
+      .hx-h { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; margin-bottom: .7rem; }
+      .hx-h h3 { font-size: .9rem; font-weight: 800; color: var(--fog); display: flex; align-items: center; gap: .5rem; }
+      .hx-h h3 i { color: var(--hx); font-size: .85rem; }
+      .hx-h .sub { font-family: "JetBrains Mono", monospace; font-size: .68rem; color: var(--muted); direction: ltr; }
+      .hx-chips { display: inline-flex; gap: .3rem; }
+
+      .hx-chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+      .hx-chart text { font-family: "JetBrains Mono", monospace; font-size: 9px; fill: var(--muted); }
+      .hx-chart .gl { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 4; }
+      .hx-col .hit { fill: transparent; }
+      .hx-col .cl, .hx-col .dot { opacity: 0; pointer-events: none; }
+      .hx-col:hover .cl, .hx-col:hover .dot { opacity: 1; }
+      .hx-bar { transition: opacity .15s; } .hx-col:hover .hx-bar { opacity: .75; }
+      .hx-legend { display: flex; flex-wrap: wrap; gap: .4rem .9rem; margin-top: .6rem; font-size: .72rem; color: var(--muted); }
+      .hx-legend span { display: inline-flex; align-items: center; gap: .35rem; }
+      .hx-legend i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+
+      .hx-donut { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+      .hx-donut svg { width: 128px; height: 128px; flex: none; }
+      .hx-donut .c1 { font-family: "JetBrains Mono", monospace; font-size: 7px; font-weight: 700; fill: var(--fog); }
+      .hx-donut .c2 { font-size: 3.4px; fill: var(--muted); }
+      .hx-rank { display: grid; gap: .55rem; }
+      .hx-rank .r { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr) auto; align-items: center; gap: .6rem; font-size: .8rem; }
+      .hx-rank .r b { font-family: "JetBrains Mono", monospace; color: var(--hx); direction: ltr; }
+      .hx-rank .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fog); font-weight: 700; }
+      .hx-rank .bar { height: 5px; border-radius: 4px; margin-top: .25rem; background: linear-gradient(90deg, var(--hx), var(--cyan)); }
+      .hx-rank .no { font-family: "JetBrains Mono", monospace; color: var(--muted); font-size: .7rem; }
+
+      .hx-heat { display: grid; grid-template-columns: 3.2rem repeat(24, minmax(0, 1fr)); gap: 2px; direction: ltr; }
+      .hx-heat .d { font-size: .62rem; color: var(--muted); display: flex; align-items: center; justify-content: flex-end; padding-inline-end: .35rem; font-family: "Tajawal", sans-serif; direction: rtl; }
+      .hx-heat .h { font-family: "JetBrains Mono", monospace; font-size: .55rem; color: var(--muted); text-align: center; }
+      .hx-heat .c { aspect-ratio: 1; border-radius: 3px; background: rgba(var(--hx-rgb), .05); }
+      .hx-heat .c:hover { outline: 1px solid var(--hx); }
+
+      .hx-pipe { display: flex; height: 10px; border-radius: 6px; overflow: hidden; background: var(--panel2); margin: .6rem 0; }
+      .hx-stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: .6rem; margin-top: .8rem; }
+      .hx-stat div { padding: .55rem .7rem; border-radius: 10px; border: 1px solid var(--line); background: var(--panel2); font-size: .7rem; color: var(--muted); }
+      .hx-stat b { display: block; font-family: "JetBrains Mono", monospace; font-size: 1.15rem; color: var(--fog); direction: ltr; text-align: start; }
+
+      .hx-log { font-family: "JetBrains Mono", monospace; font-size: .74rem; line-height: 1.9; max-height: 300px; overflow: auto; direction: ltr; text-align: left; }
+      .hx-log .ln { display: grid; grid-template-columns: 4.2rem 5.4rem minmax(0, 1fr); gap: .6rem; padding: .05rem 0; border-bottom: 1px dashed rgba(148, 163, 255, .08); }
+      .hx-log .t { color: var(--muted); }
+      .hx-log .k { font-weight: 700; }
+      .hx-log .k.signup { color: var(--hx); } .hx-log .k.msg { color: var(--cyan); } .hx-log .k.review { color: var(--hx-warn); }
+      .hx-log .tx { color: var(--fog); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; unicode-bidi: plaintext; }
+      .hx-err { color: var(--hx-bad); font-family: "JetBrains Mono", monospace; font-size: .8rem; direction: ltr; text-align: left; }
+      .hx-skel { color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: .78rem; direction: ltr; text-align: left; }
+
+      #hx-tip {
+        position: fixed; z-index: 300; pointer-events: none; display: none; max-width: 240px; padding: .35rem .6rem; border-radius: 8px;
+        font-family: "JetBrains Mono", monospace; font-size: .72rem; line-height: 1.6; white-space: pre-line; direction: rtl; text-align: start;
+        background: var(--panel); color: var(--fog); border: 1px solid rgba(var(--hx-rgb), .6); box-shadow: 0 8px 20px -10px rgba(0, 0, 0, .7);
+      }
+
+      /* شريط أدوات الطلاب (فلاتر + فرز + تصدير) */
+      .hx-bar2 { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; margin-bottom: 1rem; }
+      .hx-chip {
+        font-family: inherit; font-size: .76rem; font-weight: 700; color: var(--muted); background: transparent; border: 1px solid var(--line);
+        border-radius: 999px; padding: .3rem .8rem; cursor: pointer; transition: all .15s;
+      }
+      .hx-chip:hover { color: var(--fog); border-color: rgba(var(--violet-rgb), .5); }
+      .hx-chip.on { color: var(--fog); background: var(--grad-soft); border-color: rgba(var(--violet-rgb), .5); }
+      .hx-chip em { font-style: normal; font-family: "JetBrains Mono", monospace; font-size: .68rem; opacity: .75; margin-inline-start: .25rem; }
+      .hx-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .7rem .9rem; border: 1px solid var(--line); border-radius: 16px; margin-bottom: .55rem; background: var(--panel2); content-visibility: auto; contain-intrinsic-size: auto 78px; }
+      .hx-row.sel { border-color: rgba(var(--cyan-rgb), .7); background: rgba(var(--cyan-rgb), .06); }
+      .hx-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--cyan); cursor: pointer; flex: none; }
+      .hx-bulk {
+        position: sticky; bottom: .8rem; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-top: .8rem;
+        padding: .6rem .9rem; border-radius: 14px; background: var(--panel); border: 1px solid rgba(var(--cyan-rgb), .6); box-shadow: 0 14px 30px -14px rgba(0, 0, 0, .7);
+      }
+      .hx-bulk[hidden] { display: none; }
+      .hx-bulk b { font-family: "JetBrains Mono", monospace; color: var(--cyan); }
+
+      /* معرض الصور */
+      .ph-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .8rem; }
+      .ph-card { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--panel2); content-visibility: auto; contain-intrinsic-size: auto 220px; }
+      .ph-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--panel); }
+      .ph-card .m { padding: .55rem .7rem; font-size: .75rem; }
+      .ph-card .m b { display: block; color: var(--fog); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .ph-card .m span { color: var(--muted); font-size: .68rem; }
+      .ph-card .a { display: flex; gap: .2rem; justify-content: flex-end; padding: 0 .4rem .4rem; }
+      .ph-prev { max-width: 100%; max-height: 160px; border-radius: 12px; margin-top: .7rem; border: 1px solid var(--line); }
+
+      /* لوحة الأوامر Ctrl+K */
+      .hx-pal { position: fixed; inset: 0; z-index: 250; display: grid; place-items: start center; padding: 12vh 1rem 1rem; background: rgba(5, 8, 20, .7); }
+      .hx-pal[hidden] { display: none; }
+      .hx-pal .bx { width: min(560px, 100%); border-radius: 16px; background: var(--panel); border: 1px solid rgba(var(--hx-rgb), .5); overflow: hidden; }
+      .hx-pal input { width: 100%; padding: 1rem 1.1rem; background: transparent; border: 0; border-bottom: 1px solid var(--line); color: var(--fog); font: inherit; font-family: "JetBrains Mono", monospace; outline: none; direction: ltr; }
+      .hx-pal ul { list-style: none; margin: 0; padding: .4rem; max-height: 320px; overflow: auto; }
+      .hx-pal li { display: flex; align-items: center; gap: .7rem; padding: .6rem .8rem; border-radius: 10px; cursor: pointer; font-size: .85rem; color: var(--fog); }
+      .hx-pal li i { width: 1.2rem; text-align: center; color: var(--cyan); }
+      .hx-pal li.on, .hx-pal li:hover { background: rgba(var(--hx-rgb), .12); }
+      .hx-pal li small { margin-inline-start: auto; color: var(--muted); font-family: "JetBrains Mono", monospace; }
+      .stc-quick { display: flex; flex-wrap: wrap; gap: .35rem; padding: .5rem .9rem 0; }
+      .stc-quick button { font: inherit; font-size: .72rem; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: .2rem .65rem; cursor: pointer; }
+      .stc-quick button:hover { color: var(--cyan); border-color: var(--cyan); }
+      @media (prefers-reduced-motion: reduce) { .hx-live i, .blink { animation: none !important; } }
+      @media (max-width: 640px) { .hx-row { flex-wrap: wrap; } .hx-k .v { font-size: 1.5rem; } }
+      .hx-pipe i { display: block; height: 100%; }
     </style>
   </head>
   <body class="bg-ink text-fog antialiased">
@@ -343,7 +513,7 @@
         </div>
       </header>
 
-      <main class="container mx-auto px-6 py-10 max-w-3xl">
+      <main id="admin-main" class="container mx-auto px-6 py-10 max-w-3xl">
         <div class="tab-bar">
           <button class="tab-btn active" data-tab="skills">
             <i class="fas fa-code"></i> المهارات
@@ -690,12 +860,81 @@
         <!-- ===================== STUDENTS TAB (موقع حلول كيريو) ===================== -->
         <div class="tab-panel" id="tab-students">
           <div class="sol-nav" role="tablist" aria-label="أدوات موقع الحلول">
-            <button class="sol-btn active" type="button" data-sol="students"><i class="fas fa-user-graduate"></i> الطلاب والرسائل</button>
+            <button class="sol-btn active" type="button" data-sol="dash"><i class="fas fa-chart-line"></i> لوحة القيادة</button>
+            <button class="sol-btn" type="button" data-sol="students"><i class="fas fa-user-graduate"></i> الطلاب والرسائل <span id="sol-unread-badge" class="sol-badge" style="background:#f87171;color:#fff" hidden>0</span></button>
             <button class="sol-btn" type="button" data-sol="reviews"><i class="fas fa-star"></i> تقييمات الطلاب <span id="sol-pending-badge" class="sol-badge" hidden>0</span></button>
+            <button class="sol-btn" type="button" data-sol="photos"><i class="fas fa-images"></i> صور الطلاب</button>
+            <button class="sol-btn" type="button" id="hx-open-pal" title="لوحة الأوامر (Ctrl+K)" style="margin-inline-start:auto"><i class="fas fa-terminal"></i> <span class="mono" style="font-size:.72rem">Ctrl+K</span></button>
+          </div>
+
+          <!-- ===== (0) لوحة القيادة ===== -->
+          <div class="sol-pane active hx" id="sol-dash">
+            <div class="hx-term">
+              <div><span class="p">root@solutions:~#</span> <span id="hx-cmd">monitor --live --tz=Africa/Cairo</span><span class="blink">_</span></div>
+              <div class="r">
+                <span id="hx-live" class="hx-live off"><i></i> OFFLINE</span>
+                <span id="hx-sync">--:--:--</span>
+                <span id="hx-lat">-- ms</span>
+                <select id="hx-int" class="hx-sel" aria-label="فترة التحديث التلقائي">
+                  <option value="0">auto: off</option>
+                  <option value="15">auto: 15s</option>
+                  <option value="30" selected>auto: 30s</option>
+                  <option value="60">auto: 60s</option>
+                </select>
+                <button id="hx-refresh" class="hx-btn" type="button"><i class="fas fa-rotate"></i> sync</button>
+              </div>
+            </div>
+            <div id="hx-insights" class="hx-insights"></div>
+            <div id="hx-kpis" class="hx-kpis"><div class="hx-skel">$ loading metrics<span class="blink">_</span></div></div>
+
+            <div class="hx-grid hx-g21">
+              <section class="hx-card">
+                <div class="hx-h">
+                  <h3><i class="fas fa-user-plus"></i> التسجيلات اليومية</h3>
+                  <div class="hx-chips" id="hx-range">
+                    <button class="hx-btn" type="button" data-r="7">7d</button>
+                    <button class="hx-btn" type="button" data-r="14">14d</button>
+                    <button class="hx-btn on" type="button" data-r="30">30d</button>
+                  </div>
+                </div>
+                <div id="hx-signups" class="hx-chart"></div>
+              </section>
+              <section class="hx-card">
+                <div class="hx-h"><h3><i class="fas fa-laptop-mobile"></i> الأجهزة</h3></div>
+                <div id="hx-devices"></div>
+              </section>
+            </div>
+
+            <div class="hx-grid hx-g12">
+              <section class="hx-card">
+                <div class="hx-h"><h3><i class="fas fa-comments"></i> الرسائل (آخر 14 يومًا)</h3><span class="sub" id="hx-msgsub"></span></div>
+                <div id="hx-msgs" class="hx-chart"></div>
+              </section>
+              <section class="hx-card">
+                <div class="hx-h"><h3><i class="fas fa-ranking-star"></i> الأكثر تفاعلًا (30 يومًا)</h3></div>
+                <div id="hx-top"></div>
+              </section>
+            </div>
+
+            <div class="hx-grid hx-g21">
+              <section class="hx-card">
+                <div class="hx-h"><h3><i class="fas fa-fire"></i> خريطة النشاط الحرارية</h3><span class="sub">tz: Africa/Cairo · 30d</span></div>
+                <div id="hx-heat"></div>
+              </section>
+              <section class="hx-card">
+                <div class="hx-h"><h3><i class="fas fa-star-half-stroke"></i> مسار التقييمات</h3></div>
+                <div id="hx-rev"></div>
+              </section>
+            </div>
+
+            <section class="hx-card">
+              <div class="hx-h"><h3><i class="fas fa-terminal"></i> سجل النشاط المباشر</h3><span class="sub">tail -f activity.log</span></div>
+              <div id="hx-feed" class="hx-log"></div>
+            </section>
           </div>
 
           <!-- ===== (1) الطلاب والرسائل ===== -->
-          <div class="sol-pane active" id="sol-students">
+          <div class="sol-pane" id="sol-students">
           <div class="flex items-center gap-3 mb-8" style="flex-wrap: wrap">
             <span class="stat-chip">إجمالي الأسماء: <b id="students-count">0</b></span>
             <span class="stat-chip">مرفوض: <b id="students-rejected-count">0</b></span>
@@ -715,8 +954,27 @@
               <i class="fas fa-trash" style="color:#f87171"></i>
               يحذف الاسم فيُطلب من الجهاز كتابة اسمه من جديد.
             </p>
-            <input id="students-search" type="text" class="admin-input" placeholder="بحث بالاسم أو نوع الجهاز..." style="margin-bottom: 1rem" />
+            <input id="students-search" type="text" class="admin-input" placeholder="بحث بالاسم أو نوع الجهاز..." style="margin-bottom: .8rem" />
+            <div class="hx-bar2" id="st-filters"></div>
+            <div class="hx-bar2">
+              <select id="st-sort" class="admin-select" style="width:auto;padding:.4rem .8rem;font-size:.78rem" aria-label="الترتيب">
+                <option value="recent">الأحدث تسجيلًا</option>
+                <option value="seen">آخر ظهور</option>
+                <option value="name">الاسم (أ → ي)</option>
+              </select>
+              <label class="hx-chip" style="display:inline-flex;align-items:center;gap:.4rem;cursor:pointer"><input type="checkbox" id="st-selall" style="accent-color:var(--cyan)" /> تحديد المعروض</label>
+              <button id="st-export" class="hx-chip" type="button"><i class="fas fa-file-csv"></i> تصدير CSV</button>
+              <button id="st-broadcast" class="hx-chip" type="button"><i class="fas fa-bullhorn"></i> إعلان للجميع</button>
+            </div>
             <div id="students-list"></div>
+            <div id="students-more" style="text-align:center"></div>
+            <div id="st-bulk" class="hx-bulk" hidden>
+              <span>محدد: <b id="st-bulk-n">0</b></span>
+              <button class="hx-chip" type="button" data-bulk="approve" style="color:#4ade9b"><i class="fas fa-rotate-left"></i> قبول</button>
+              <button class="hx-chip" type="button" data-bulk="reject" style="color:#f59e0b"><i class="fas fa-ban"></i> رفض</button>
+              <button class="hx-chip" type="button" data-bulk="delete" style="color:#f87171"><i class="fas fa-trash"></i> حذف</button>
+              <button class="hx-chip" type="button" data-bulk="clear" style="margin-inline-start:auto">إلغاء التحديد</button>
+            </div>
           </div>
           </div>
 
@@ -766,7 +1024,45 @@
             <div class="bg-panel border border-line rounded-2xl p-7">
               <h2 class="text-lg font-bold text-white mb-1">كل التقييمات</h2>
               <p class="text-xs text-muted mb-5">التقييمات قيد المراجعة تظهر أولًا. زر <i class="fas fa-check" style="color:#4ade9b"></i> للنشر، <i class="fas fa-pen" style="color:var(--cyan)"></i> للتعديل، <i class="fas fa-trash" style="color:#f87171"></i> للحذف.</p>
+              <div class="hx-bar2">
+                <button class="hx-chip on" type="button" data-rf="all">الكل<em id="rf-all">0</em></button>
+                <button class="hx-chip" type="button" data-rf="pending">قيد المراجعة<em id="rf-pending">0</em></button>
+                <button class="hx-chip" type="button" data-rf="published">منشور<em id="rf-published">0</em></button>
+                <input id="srv-search" type="text" class="admin-input" placeholder="بحث..." style="flex:1;min-width:120px;padding:.4rem .8rem;font-size:.8rem" />
+                <button id="srv-puball" class="hx-chip" type="button" style="color:#4ade9b" hidden><i class="fas fa-check-double"></i> نشر كل المعلّقة</button>
+              </div>
               <div id="srv-list"></div>
+            </div>
+          </div>
+
+          <!-- ===== (3) صور الطلاب ===== -->
+          <div class="sol-pane" id="sol-photos">
+            <div class="flex items-center gap-3 mb-8" style="flex-wrap:wrap">
+              <span class="stat-chip">عدد الصور: <b id="ph-count">0</b> / 60</span>
+              <button id="ph-refresh" class="admin-btn" type="button" style="width:auto;padding:.55rem 1rem;margin-inline-start:auto"><i class="fas fa-rotate"></i> تحديث</button>
+            </div>
+            <div class="bg-panel border border-line rounded-2xl p-7 mb-8" id="ph-form-card">
+              <h2 class="text-lg font-bold text-white mb-1" id="ph-form-title">إضافة صورة طالب</h2>
+              <p class="text-xs text-muted mb-5">تُضغط الصورة تلقائيًا في متصفحك (نسخة مصغّرة + نسخة للتكبير) قبل الرفع، فلا تثقل الموقع.</p>
+              <div class="mb-5">
+                <label class="admin-label" id="ph-file-label">الصورة</label>
+                <input id="ph-file" type="file" accept="image/*" class="admin-input" />
+                <div id="ph-note" class="text-xs text-muted" style="margin-top:.4rem"></div>
+                <img id="ph-prev" class="ph-prev" alt="" hidden />
+              </div>
+              <div class="mb-5" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                <div><label class="admin-label">اسم الطالب (اختياري)</label><input id="ph-name" type="text" maxlength="40" class="admin-input" /></div>
+                <div><label class="admin-label">الترتيب (الأصغر أولًا)</label><input id="ph-order" type="number" class="admin-input" value="0" /></div>
+              </div>
+              <div class="mb-2"><label class="admin-label">تعليق (اختياري)</label><input id="ph-caption" type="text" maxlength="120" class="admin-input" /></div>
+              <div class="flex items-center gap-3 mt-5" style="flex-wrap:wrap">
+                <button id="ph-save" class="admin-btn" type="button" style="width:auto"><i class="fas fa-cloud-arrow-up"></i> <span id="ph-save-label">رفع الصورة</span></button>
+                <button id="ph-cancel" class="admin-btn admin-btn-ghost" type="button" style="width:auto" hidden>إلغاء التعديل</button>
+              </div>
+            </div>
+            <div class="bg-panel border border-line rounded-2xl p-7">
+              <h2 class="text-lg font-bold text-white mb-4">المعرض</h2>
+              <div id="ph-list" class="ph-grid"></div>
             </div>
           </div>
 
@@ -794,6 +1090,7 @@
           <button id="stc-rcancel" type="button" class="stc-mic" style="width:auto;padding:0 .8rem">إلغاء</button>
           <button id="stc-rstop" type="button" class="admin-btn" style="width:auto;padding:.55rem 1rem">إرسال التسجيل</button>
         </div>
+        <div id="stc-quick" class="stc-quick"></div>
         <div id="stc-bar" class="stc-bar">
           <textarea id="stc-text" rows="2" maxlength="1000" placeholder="اكتب رسالة للطالب..."></textarea>
           <button id="stc-mic" type="button" class="stc-mic" aria-label="تسجيل صوتي"><i class="fas fa-microphone"></i></button>
@@ -801,6 +1098,27 @@
         </div>
       </div>
     </div>
+    <!-- إعلان جماعي -->
+    <div id="bc-modal" class="stc-back" hidden>
+      <div class="stc-box" style="height:auto" role="dialog" aria-modal="true" aria-labelledby="bc-title">
+        <div class="stc-head"><div><b id="bc-title">إعلان لجميع الطلاب</b><small>رسالة نصية تصل صندوق كل طالب مقبول (لا تمنع الدخول)</small></div><button id="bc-x" class="stc-x" type="button" aria-label="إغلاق">×</button></div>
+        <div style="padding:1rem;display:grid;gap:.8rem">
+          <select id="bc-aud" class="admin-select"><option value="all">كل الطلاب المقبولين</option><option value="active24">النشطون آخر 24 ساعة</option><option value="online">المتصلون الآن</option></select>
+          <textarea id="bc-text" rows="4" maxlength="1000" class="admin-textarea" placeholder="اكتب الإعلان..."></textarea>
+          <div class="flex items-center gap-3"><button id="bc-send" class="admin-btn" type="button" style="width:auto"><i class="fas fa-paper-plane"></i> إرسال</button><span class="text-xs text-muted mono" id="bc-len">0/1000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- لوحة الأوامر -->
+    <div id="hx-pal" class="hx-pal hx" hidden>
+      <div class="bx" role="dialog" aria-modal="true" aria-label="لوحة الأوامر">
+        <input id="hx-pal-q" type="text" placeholder="> اكتب أمرًا... (dashboard, students, export)" autocomplete="off" spellcheck="false" />
+        <ul id="hx-pal-list"></ul>
+      </div>
+    </div>
+    <div id="hx-tip" class="hx"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="supabase-config.js"></script>
     <script>
@@ -1543,108 +1861,187 @@
         return st.status === "approved" && st.isLatest && Date.now() - new Date(st.last_seen).getTime() < ONLINE_MS;
       }
 
-      function renderStudents() {
-        const list = document.getElementById("students-list");
+      /* ---------- قائمة الطلاب: فلاتر + فرز + تحديد جماعي + تصفح تدريجي (خفيفة على المتصفح) ---------- */
+      const ST_PAGE = 40;
+      const ST_FILTERS = [["all", "الكل"], ["online", "نشط الآن"], ["unread", "رسائل جديدة"], ["locked", "محجوب"], ["today", "جدد (24س)"], ["rejected", "مرفوض"]];
+      let stFilter = "all", stSort = "recent", stShown = ST_PAGE;
+      const stSel = new Set();
+
+      function stMatch(st, f) {
+        const info = studentsInfo[st.device_id] || {};
+        if (f === "online") return isOnline(st);
+        if (f === "unread") return st.isLatest && info.unread > 0;
+        if (f === "locked") return st.isLatest && !!info.locked;
+        if (f === "today") return Date.now() - new Date(st.created_at).getTime() < 864e5;
+        if (f === "rejected") return st.status === "rejected";
+        return true;
+      }
+
+      function stVisible() {
         const q = (document.getElementById("students-search").value || "").trim().toLowerCase();
-        const rows = studentsCache.filter(
-          (st) => !q || st.name.toLowerCase().includes(q) || (st.device_type || "").toLowerCase().includes(q)
+        let rows = studentsCache.filter(
+          (st) => stMatch(st, stFilter) && (!q || st.name.toLowerCase().includes(q) || (st.device_type || "").toLowerCase().includes(q))
         );
+        if (stSort === "seen") rows = [...rows].sort((a, b) => new Date(b.last_seen || 0) - new Date(a.last_seen || 0));
+        else if (stSort === "name") rows = [...rows].sort((a, b) => a.name.localeCompare(b.name, "ar"));
+        return rows;
+      }
 
-        if (!studentsCache.length) {
-          list.innerHTML = '<p class="text-muted text-sm">لا توجد أسماء بعد.</p>';
-          return;
-        }
-        if (!rows.length) {
-          list.innerHTML = '<p class="text-muted text-sm">لا توجد نتائج مطابقة.</p>';
-          return;
-        }
+      function stBulkUI() {
+        const n = stSel.size;
+        document.getElementById("st-bulk").hidden = !n;
+        document.getElementById("st-bulk-n").textContent = n;
+      }
 
-        list.innerHTML = rows
-          .map((st) => {
-            const rej = st.status === "rejected";
-            const on = isOnline(st);
-            const info = studentsInfo[st.device_id] || { unread: 0, locked: false };
-            const badge = rej
-              ? '<span style="color:#f87171;font-weight:700">مرفوض</span>'
-              : '<span style="color:#4ade9b;font-weight:700">مقبول</span>';
-            const presence = rej
-              ? ""
-              : st.isLatest
-              ? `<span class="st-dot ${on ? "on" : ""}"></span><span style="color:${on ? "#4ade9b" : "var(--muted)"};font-weight:700">${on ? "نشط الآن" : "آخر ظهور " + escapeHtml(agoText(st.last_seen))}</span>`
-              : "";
-            const dt = st.device_type || "";
-            const devIcon = dt.startsWith("هاتف") ? "fa-mobile-screen" : dt.startsWith("تابلت") ? "fa-tablet-screen-button" : "fa-desktop";
-            const devLine = dt
-              ? `<div class="text-xs text-muted" style="margin-top:2px"><i class="fas ${devIcon}" style="margin-inline-end:6px"></i>${escapeHtml(dt)}</div>`
-              : '<div class="text-xs text-muted" style="margin-top:2px">نوع الجهاز: غير معروف</div>';
-            const lockLine = info.locked && st.isLatest ? '<div class="text-xs st-lock" style="margin-top:2px"><i class="fas fa-lock"></i> محجوب عن الحلول حتى يرد على رسالتك</div>' : "";
-            const actionIcon = rej ? "fa-rotate-left" : "fa-ban";
-            const actionColor = rej ? "#4ade9b" : "#f87171";
-            const actionTitle = rej ? "إلغاء الرفض" : "رفض الاسم";
-            const msgBtn = st.isLatest
-              ? `<button class="st-msg-btn" data-device="${escapeHtml(st.device_id)}" data-name="${escapeHtml(st.name)}" title="الرسائل">
-                  <i class="fas fa-comments"></i>${info.unread ? `<span class="st-badge">${info.unread > 9 ? "9+" : info.unread}</span>` : ""}
-                </button>`
-              : "";
-            return `
-          <div class="item-row" style="${rej ? "opacity:.75" : ""}">
-            <div class="flex items-center gap-3" style="min-width: 0">
+      function stRow(st) {
+        const rej = st.status === "rejected";
+        const on = isOnline(st);
+        const info = studentsInfo[st.device_id] || { unread: 0, locked: false };
+        const sel = stSel.has(st.id);
+        const badge = rej ? '<span style="color:#f87171;font-weight:700">مرفوض</span>' : '<span style="color:#4ade9b;font-weight:700">مقبول</span>';
+        const presence = rej || !st.isLatest
+          ? ""
+          : `<span class="st-dot ${on ? "on" : ""}"></span><span style="color:${on ? "#4ade9b" : "var(--muted)"};font-weight:700">${on ? "نشط الآن" : "آخر ظهور " + escapeHtml(agoText(st.last_seen))}</span>`;
+        const dt = st.device_type || "";
+        const devIcon = dt.startsWith("هاتف") ? "fa-mobile-screen" : dt.startsWith("تابلت") ? "fa-tablet-screen-button" : "fa-desktop";
+        const devLine = dt
+          ? `<div class="text-xs text-muted" style="margin-top:2px"><i class="fas ${devIcon}" style="margin-inline-end:6px"></i>${escapeHtml(dt)}</div>`
+          : '<div class="text-xs text-muted" style="margin-top:2px">نوع الجهاز: غير معروف</div>';
+        const lockLine = info.locked && st.isLatest ? '<div class="text-xs st-lock" style="margin-top:2px"><i class="fas fa-lock"></i> محجوب عن الحلول حتى يرد على رسالتك</div>' : "";
+        const msgBtn = st.isLatest
+          ? `<button class="st-msg-btn" data-device="${escA(st.device_id)}" data-name="${escA(st.name)}" title="الرسائل"><i class="fas fa-comments"></i>${info.unread ? `<span class="st-badge">${info.unread > 9 ? "9+" : info.unread}</span>` : ""}</button>`
+          : "";
+        return `
+          <div class="hx-row${sel ? " sel" : ""}" style="${rej ? "opacity:.75" : ""}">
+            <div class="flex items-center gap-3" style="min-width:0">
+              <input type="checkbox" class="st-ck" data-id="${st.id}" ${sel ? "checked" : ""} aria-label="تحديد" />
               <div class="item-icon"><i class="fas ${rej ? "fa-user-slash" : "fa-user-graduate"}"></i></div>
-              <div style="min-width: 0">
-                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(st.name)}</div>
+              <div style="min-width:0">
+                <div class="text-sm font-bold text-white" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">${escapeHtml(st.name)}</div>
                 ${presence ? `<div class="text-xs" style="margin-top:2px">${presence}</div>` : ""}
-                ${devLine}
-                ${lockLine}
+                ${devLine}${lockLine}
                 <div class="mono text-xs text-muted">${badge} · ${escapeHtml(studentWhen(st.created_at))}</div>
               </div>
             </div>
             <div class="flex items-center gap-3">
               ${msgBtn}
-              <button data-id="${st.id}" data-status="${rej ? "approved" : "rejected"}" class="student-status-btn" title="${actionTitle}" style="background:none;border:none;color:${actionColor};cursor:pointer;font-size:0.95rem">
-                <i class="fas ${actionIcon}"></i>
-              </button>
-              <button data-id="${st.id}" class="student-del-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
-                <i class="fas fa-trash"></i>
-              </button>
+              <button data-id="${st.id}" data-status="${rej ? "approved" : "rejected"}" class="student-status-btn" title="${rej ? "إلغاء الرفض" : "رفض الاسم"}" style="background:none;border:none;color:${rej ? "#4ade9b" : "#f87171"};cursor:pointer;font-size:.95rem"><i class="fas ${rej ? "fa-rotate-left" : "fa-ban"}"></i></button>
+              <button data-id="${st.id}" class="student-del-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:.95rem"><i class="fas fa-trash"></i></button>
             </div>
           </div>`;
-          })
-          .join("");
-
-        list.querySelectorAll(".student-status-btn").forEach((b) => {
-          b.addEventListener("click", async () => {
-            b.disabled = true;
-            try {
-              await sApi("/admin/students/" + encodeURIComponent(b.dataset.id), { method: "PATCH", body: { status: b.dataset.status } });
-            } catch (e) {
-              b.disabled = false;
-              toast("تعذر التحديث: " + e.message, false);
-              return;
-            }
-            toast(b.dataset.status === "rejected" ? "تم رفض الاسم" : "تم إلغاء الرفض", true);
-            loadStudents();
-          });
-        });
-
-        list.querySelectorAll(".student-del-btn").forEach((b) => {
-          b.addEventListener("click", async () => {
-            if (!confirm("حذف هذا الاسم نهائيًا؟")) return;
-            try {
-              await sApi("/admin/students/" + encodeURIComponent(b.dataset.id), { method: "DELETE" });
-            } catch (e) {
-              toast("تعذر الحذف: " + e.message, false);
-              return;
-            }
-            toast("تم الحذف", true);
-            loadStudents();
-          });
-        });
-
-        list.querySelectorAll(".st-msg-btn").forEach((b) => {
-          b.addEventListener("click", () => openStudentChat(b.dataset.device, b.dataset.name));
-        });
-
       }
+
+      function renderStudents() {
+        const list = document.getElementById("students-list");
+        const more = document.getElementById("students-more");
+        const ids = new Set(studentsCache.map((s) => s.id));
+        [...stSel].forEach((id) => { if (!ids.has(id)) stSel.delete(id); });
+
+        document.getElementById("st-filters").innerHTML = ST_FILTERS.map(([k, t]) => {
+          const n = k === "all" ? studentsCache.length : studentsCache.filter((s) => stMatch(s, k)).length;
+          return `<button class="hx-chip${stFilter === k ? " on" : ""}" type="button" data-f="${k}">${t}<em>${n}</em></button>`;
+        }).join("");
+
+        if (!studentsCache.length) { list.innerHTML = '<p class="text-muted text-sm">لا توجد أسماء بعد.</p>'; more.innerHTML = ""; stBulkUI(); return; }
+        const rows = stVisible();
+        if (!rows.length) { list.innerHTML = '<p class="text-muted text-sm">لا توجد نتائج مطابقة.</p>'; more.innerHTML = ""; stBulkUI(); return; }
+
+        list.innerHTML = rows.slice(0, stShown).map(stRow).join("");
+        more.innerHTML = rows.length > stShown
+          ? `<button class="hx-chip" type="button" id="st-more-btn">عرض المزيد (${rows.length - stShown} متبقٍ)</button>`
+          : "";
+        stBulkUI();
+      }
+
+      function stExport() {
+        const cell = (v) => {
+          let s = String(v == null ? "" : v);
+          if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // حماية من حقن الصيغ في Excel
+          return '"' + s.replace(/"/g, '""') + '"';
+        };
+        const head = ["الاسم", "الحالة", "نوع الجهاز", "تاريخ التسجيل", "آخر ظهور", "رسائل غير مقروءة", "معرّف الجهاز"];
+        const lines = studentsCache.map((st) => {
+          const info = studentsInfo[st.device_id] || {};
+          return [st.name, st.status === "rejected" ? "مرفوض" : "مقبول", st.device_type || "", st.created_at, st.last_seen || "", info.unread || 0, st.device_id].map(cell).join(",");
+        });
+        const blob = new Blob(["\ufeff" + [head.map(cell).join(","), ...lines].join("\r\n")], { type: "text/csv;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "students-" + new Date().toISOString().slice(0, 10) + ".csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        toast("تم تصدير " + studentsCache.length + " سجل", true);
+      }
+
+      function setUnreadUI(n) {
+        const b = document.getElementById("sol-unread-badge");
+        if (b) { b.textContent = n > 99 ? "99+" : n; b.hidden = !n; }
+        document.title = (n ? "(" + n + ") " : "") + "لوحة التحكم";
+      }
+
+      // مستمعات واحدة (event delegation) بدل مستمع لكل زر
+      document.getElementById("students-list").addEventListener("click", async (e) => {
+        const msg = e.target.closest(".st-msg-btn");
+        if (msg) return openStudentChat(msg.dataset.device, msg.dataset.name);
+        const stat = e.target.closest(".student-status-btn");
+        if (stat) {
+          stat.disabled = true;
+          try { await sApi("/admin/students/" + encodeURIComponent(stat.dataset.id), { method: "PATCH", body: { status: stat.dataset.status } }); }
+          catch (err) { stat.disabled = false; return toast("تعذر التحديث: " + err.message, false); }
+          toast(stat.dataset.status === "rejected" ? "تم رفض الاسم" : "تم إلغاء الرفض", true);
+          return loadStudents(true);
+        }
+        const del = e.target.closest(".student-del-btn");
+        if (del) {
+          if (!confirm("حذف هذا الاسم نهائيًا؟")) return;
+          try { await sApi("/admin/students/" + encodeURIComponent(del.dataset.id), { method: "DELETE" }); }
+          catch (err) { return toast("تعذر الحذف: " + err.message, false); }
+          toast("تم الحذف", true);
+          loadStudents(true);
+        }
+      });
+      document.getElementById("students-list").addEventListener("change", (e) => {
+        const ck = e.target.closest(".st-ck");
+        if (!ck) return;
+        ck.checked ? stSel.add(ck.dataset.id) : stSel.delete(ck.dataset.id);
+        ck.closest(".hx-row").classList.toggle("sel", ck.checked);
+        stBulkUI();
+      });
+      document.getElementById("st-filters").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-f]");
+        if (!b) return;
+        stFilter = b.dataset.f; stShown = ST_PAGE; renderStudents();
+      });
+      document.getElementById("students-more").addEventListener("click", (e) => {
+        if (e.target.closest("#st-more-btn")) { stShown += ST_PAGE; renderStudents(); }
+      });
+      document.getElementById("st-sort").addEventListener("change", (e) => { stSort = e.target.value; stShown = ST_PAGE; renderStudents(); });
+      document.getElementById("st-selall").addEventListener("change", (e) => {
+        stVisible().slice(0, stShown).forEach((st) => (e.target.checked ? stSel.add(st.id) : stSel.delete(st.id)));
+        renderStudents();
+      });
+      document.getElementById("st-export").addEventListener("click", stExport);
+      document.getElementById("st-bulk").addEventListener("click", async (e) => {
+        const b = e.target.closest("[data-bulk]");
+        if (!b) return;
+        const act = b.dataset.bulk;
+        if (act === "clear") { stSel.clear(); document.getElementById("st-selall").checked = false; return renderStudents(); }
+        const n = stSel.size;
+        const txt = { approve: "قبول", reject: "رفض", delete: "حذف نهائي لـ" }[act];
+        if (!confirm(txt + " " + n + " اسم؟")) return;
+        b.disabled = true;
+        try {
+          const r = await sApi("/admin/students/bulk", { method: "POST", body: { ids: [...stSel], action: act } });
+          if (r.status !== "ok") throw new Error("بيانات غير صالحة");
+          toast("تم تنفيذ العملية على " + r.n + " اسم", true);
+          stSel.clear();
+          document.getElementById("st-selall").checked = false;
+          loadStudents(true);
+        } catch (err) { toast("تعذر التنفيذ: " + err.message, false); }
+        b.disabled = false;
+      });
 
       async function loadStudents(silent) {
         const list = document.getElementById("students-list");
@@ -1671,12 +2068,14 @@
         document.getElementById("students-count").textContent = studentsCache.length;
         document.getElementById("students-rejected-count").textContent = studentsCache.filter((x) => x.status === "rejected").length;
         document.getElementById("students-online-count").textContent = studentsCache.filter(isOnline).length;
-        document.getElementById("students-unread-count").textContent = Object.values(info).reduce((n, x) => n + x.unread, 0);
+        const unreadTotal = Object.values(info).reduce((n, x) => n + x.unread, 0);
+        document.getElementById("students-unread-count").textContent = unreadTotal;
+        setUnreadUI(unreadTotal);
         renderStudents();
       }
 
       document.getElementById("students-refresh-btn").addEventListener("click", () => loadStudents());
-      document.getElementById("students-search").addEventListener("input", renderStudents);
+      document.getElementById("students-search").addEventListener("input", () => { stShown = ST_PAGE; renderStudents(); });
       document.querySelector('.tab-btn[data-tab="students"]').addEventListener("click", () => loadStudents());
       // تحديث تلقائي لحالة النشاط والرسائل أثناء فتح التبويب
       setInterval(() => {
@@ -1691,13 +2090,7 @@
       ========================================================= */
       const $sv = (id) => document.getElementById(id);
 
-      document.querySelectorAll(".sol-btn").forEach((b) => {
-        b.addEventListener("click", () => {
-          document.querySelectorAll(".sol-btn").forEach((x) => x.classList.toggle("active", x === b));
-          document.querySelectorAll(".sol-pane").forEach((p) => p.classList.toggle("active", p.id === "sol-" + b.dataset.sol));
-          if (b.dataset.sol === "reviews") loadSolReviews();
-        });
-      });
+      // التنقل بين أقسام الحلول يتم عبر solGo() (معرّفة في مركز القيادة أدناه)
 
       /* ---------- تقييمات الطلاب ---------- */
       let srvCache = [];
@@ -1732,30 +2125,30 @@
         $sv("srv-form-card").scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
+      /* ---------- تقييمات الطلاب (فلاتر + بحث + نشر الكل) ---------- */
+      let srvFilter = "all", srvQuery = "";
+
       function renderSolReviews() {
         const list = $sv("srv-list");
         const pending = srvCache.filter((r) => r.status === "pending").length;
         $sv("srv-count").textContent = srvCache.length;
         $sv("srv-pending").textContent = pending;
         $sv("srv-published").textContent = srvCache.length - pending;
-        [$sv("sol-pending-badge"), $sv("sol-tab-badge")].forEach((b) => {
-          b.textContent = pending;
-          b.hidden = !pending;
-        });
-        if (!srvCache.length) {
-          list.innerHTML = '<p class="text-muted text-sm">لا توجد تقييمات بعد.</p>';
-          return;
-        }
-        const rows = [...srvCache].sort(
-          (a, b) =>
-            (a.status === "pending" ? 0 : 1) - (b.status === "pending" ? 0 : 1) ||
-            a.order - b.order ||
-            new Date(b.created_at) - new Date(a.created_at),
-        );
-        list.innerHTML = rows
-          .map(
-            (r) => `
-          <div class="item-row" style="align-items:flex-start">
+        [$sv("sol-pending-badge"), $sv("sol-tab-badge")].forEach((b) => { b.textContent = pending; b.hidden = !pending; });
+        $sv("rf-all").textContent = srvCache.length;
+        $sv("rf-pending").textContent = pending;
+        $sv("rf-published").textContent = srvCache.length - pending;
+        $sv("srv-puball").hidden = !pending;
+        document.querySelectorAll("[data-rf]").forEach((c) => c.classList.toggle("on", c.dataset.rf === srvFilter));
+
+        if (!srvCache.length) { list.innerHTML = '<p class="text-muted text-sm">لا توجد تقييمات بعد.</p>'; return; }
+        const q = srvQuery.trim().toLowerCase();
+        const rows = srvCache
+          .filter((r) => (srvFilter === "all" || r.status === srvFilter) && (!q || (r.name + " " + r.text + " " + r.role).toLowerCase().includes(q)))
+          .sort((a, b) => (a.status === "pending" ? 0 : 1) - (b.status === "pending" ? 0 : 1) || a.order - b.order || new Date(b.created_at) - new Date(a.created_at));
+        if (!rows.length) { list.innerHTML = '<p class="text-muted text-sm">لا توجد نتائج مطابقة.</p>'; return; }
+        list.innerHTML = rows.map((r) => `
+          <div class="hx-row" style="align-items:flex-start">
             <div style="min-width:0;flex:1">
               <div class="flex items-center gap-3" style="flex-wrap:wrap">
                 <span class="text-sm font-bold text-white">${escapeHtml(r.name)}</span>
@@ -1766,42 +2159,51 @@
               <div class="rv-text">${escapeHtml(r.text)}</div>
             </div>
             <div class="flex items-center gap-3" style="flex:none">
-              ${r.status === "pending" ? `<button class="sol-icon-btn srv-pub" data-id="${r.id}" title="نشر" style="color:#4ade9b"><i class="fas fa-check"></i></button>` : ""}
+              ${r.status === "pending"
+                ? `<button class="sol-icon-btn srv-pub" data-id="${r.id}" title="نشر" style="color:#4ade9b"><i class="fas fa-check"></i></button>`
+                : `<button class="sol-icon-btn srv-unpub" data-id="${r.id}" title="إخفاء (قيد المراجعة)" style="color:#f59e0b"><i class="fas fa-eye-slash"></i></button>`}
               <button class="sol-icon-btn srv-edit" data-id="${r.id}" title="تعديل" style="color:var(--cyan)"><i class="fas fa-pen"></i></button>
               <button class="sol-icon-btn srv-del" data-id="${r.id}" title="حذف" style="color:#f87171"><i class="fas fa-trash"></i></button>
             </div>
-          </div>`,
-          )
-          .join("");
-
-        list.querySelectorAll(".srv-edit").forEach((b) => b.addEventListener("click", () => srvStartEdit(b.dataset.id)));
-        list.querySelectorAll(".srv-pub").forEach((b) =>
-          b.addEventListener("click", async () => {
-            const r = srvCache.find((x) => x.id === b.dataset.id);
-            if (!r) return;
-            try {
-              await sApi("/admin/solutions/reviews", { method: "POST", body: { ...r, status: "published" } });
-              toast("تم نشر التقييم", true);
-              loadSolReviews(true);
-            } catch (e) {
-              toast("تعذر النشر: " + e.message, false);
-            }
-          }),
-        );
-        list.querySelectorAll(".srv-del").forEach((b) =>
-          b.addEventListener("click", async () => {
-            if (!confirm("حذف هذا التقييم نهائيًا؟")) return;
-            try {
-              await sApi("/admin/solutions/reviews/" + encodeURIComponent(b.dataset.id), { method: "DELETE" });
-              if (srvEditId === b.dataset.id) srvReset();
-              toast("تم الحذف", true);
-              loadSolReviews(true);
-            } catch (e) {
-              toast("تعذر الحذف: " + e.message, false);
-            }
-          }),
-        );
+          </div>`).join("");
       }
+
+      $sv("srv-list").addEventListener("click", async (e) => {
+        const b = e.target.closest("button[data-id]");
+        if (!b) return;
+        const id = b.dataset.id;
+        if (b.classList.contains("srv-edit")) return srvStartEdit(id);
+        if (b.classList.contains("srv-pub") || b.classList.contains("srv-unpub")) {
+          const r = srvCache.find((x) => x.id === id);
+          if (!r) return;
+          const st = b.classList.contains("srv-pub") ? "published" : "pending";
+          try {
+            await sApi("/admin/solutions/reviews", { method: "POST", body: { ...r, status: st } });
+            toast(st === "published" ? "تم نشر التقييم" : "أُخفي التقييم (قيد المراجعة)", true);
+            loadSolReviews(true);
+          } catch (err) { toast("تعذر التحديث: " + err.message, false); }
+          return;
+        }
+        if (b.classList.contains("srv-del")) {
+          if (!confirm("حذف هذا التقييم نهائيًا؟")) return;
+          try {
+            await sApi("/admin/solutions/reviews/" + encodeURIComponent(id), { method: "DELETE" });
+            if (srvEditId === id) srvReset();
+            toast("تم الحذف", true);
+            loadSolReviews(true);
+          } catch (err) { toast("تعذر الحذف: " + err.message, false); }
+        }
+      });
+      document.querySelectorAll("[data-rf]").forEach((c) => c.addEventListener("click", () => { srvFilter = c.dataset.rf; renderSolReviews(); }));
+      $sv("srv-search").addEventListener("input", (e) => { srvQuery = e.target.value; renderSolReviews(); });
+      $sv("srv-puball").addEventListener("click", async () => {
+        if (!confirm("نشر كل التقييمات المعلّقة الآن؟")) return;
+        try {
+          const r = await sApi("/admin/solutions/reviews/publish-all", { method: "POST" });
+          toast("تم نشر " + r.n + " تقييم", true);
+          loadSolReviews(true);
+        } catch (err) { toast("تعذر النشر: " + err.message, false); }
+      });
 
       async function loadSolReviews(silent) {
         const list = $sv("srv-list");
@@ -2120,6 +2522,517 @@
         }
         toast("تم حذف المحادثة", true);
         await loadStudentChat(true);
+      });
+
+      /* =========================================================
+         مركز قيادة موقع الحلول: لوحة القيادة (SVG خفيف) + صور الطلاب
+         + لوحة الأوامر Ctrl+K + الإعلان الجماعي + ردود سريعة
+      ========================================================= */
+      const $h = (id) => document.getElementById(id);
+      const escA = (s) => escapeHtml(s).replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      const hxFmt = (n) => Number(n || 0).toLocaleString("en-US");
+      const DAYS_AR = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+      const hxDay = (k) => k.slice(8) + "/" + k.slice(5, 7);
+      const hxHour = (h) => (h % 12 || 12) + (h < 12 ? " ص" : " م");
+      // سقف المحور: رقم زوجي "جميل" حتى تكون القيم الوسطى أعدادًا صحيحة
+      function hxEven(m) {
+        if (m <= 20) return Math.max(4, Math.ceil(m / 2) * 2);
+        const p = Math.pow(10, Math.floor(Math.log10(m))), f = m / p;
+        return ([1, 2, 3, 4, 5, 6, 8, 10].find((x) => f <= x) || 10) * p;
+      }
+      // لا نعيد بناء DOM إذا لم يتغير الناتج (يوفر المعالج)
+      function hxSet(id, html) {
+        const el = $h(id);
+        if (el && el.__h !== html) { el.__h = html; el.innerHTML = html; }
+      }
+
+      /* ---------- مكوّنات الرسم ---------- */
+      function hxSpark(vals, stroke) {
+        const w = 78, h = 26, n = vals.length, mx = Math.max(1, ...vals);
+        const pts = vals.map((v, i) => (n > 1 ? (i / (n - 1)) * w : 0).toFixed(1) + "," + (h - 3 - (v / mx) * (h - 7)).toFixed(1)).join(" ");
+        return `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline points="${pts}" fill="none" style="stroke:${stroke}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      }
+
+      function hxGrid(W, H, pl, pr, pt, pb, mx) {
+        return [0, 0.5, 1].map((f) => {
+          const y = pt + (1 - f) * (H - pt - pb);
+          return `<line class="gl" x1="${pl}" x2="${W - pr}" y1="${y}" y2="${y}"/><text x="${pl - 5}" y="${y + 3}" text-anchor="end">${mx * f}</text>`;
+        }).join("");
+      }
+
+      function hxArea(vals, keys) {
+        const W = 600, H = 190, pl = 30, pr = 8, pt = 10, pb = 22, n = vals.length;
+        const mx = hxEven(Math.max(1, ...vals));
+        const X = (i) => pl + (n > 1 ? (i / (n - 1)) * (W - pl - pr) : (W - pl - pr) / 2);
+        const Y = (v) => pt + (1 - v / mx) * (H - pt - pb);
+        const P = vals.map((v, i) => [X(i), Y(v)]);
+        const sl = P.map((p, i) => {
+          if (i === 0 || i === n - 1) return 0;
+          const a = (p[1] - P[i - 1][1]) / (p[0] - P[i - 1][0]), b = (P[i + 1][1] - p[1]) / (P[i + 1][0] - p[0]);
+          if (a * b <= 0) return 0; // قمة/قاع محلي: لا نتجاوز القيمة
+          const m = (a + b) / 2, lim = 3 * Math.min(Math.abs(a), Math.abs(b));
+          return Math.sign(m) * Math.min(Math.abs(m), lim);
+        });
+        let line = "M" + P[0][0].toFixed(1) + " " + P[0][1].toFixed(1);
+        for (let i = 1; i < n; i++) {
+          const dx = P[i][0] - P[i - 1][0];
+          line += ` C${(P[i - 1][0] + dx / 3).toFixed(1)} ${(P[i - 1][1] + (sl[i - 1] * dx) / 3).toFixed(1)} ${(P[i][0] - dx / 3).toFixed(1)} ${(P[i][1] - (sl[i] * dx) / 3).toFixed(1)} ${P[i][0].toFixed(1)} ${P[i][1].toFixed(1)}`;
+        }
+        const area = `${line} L${X(n - 1).toFixed(1)} ${H - pb} L${X(0).toFixed(1)} ${H - pb} Z`;
+        const step = Math.max(1, Math.ceil(n / 6));
+        const xl = keys.map((k, i) => (i % step === 0 || i === n - 1 ? `<text x="${X(i).toFixed(1)}" y="${H - 6}" text-anchor="middle">${hxDay(k)}</text>` : "")).join("");
+        const cw = n > 1 ? (W - pl - pr) / (n - 1) : W - pl - pr;
+        const cols = vals.map((v, i) =>
+          `<g class="hx-col"><line class="cl" x1="${X(i).toFixed(1)}" x2="${X(i).toFixed(1)}" y1="${pt}" y2="${H - pb}" style="stroke:var(--hx)" stroke-dasharray="2 3"/><circle class="dot" cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="3.4" style="fill:var(--hx)"/><rect class="hit" x="${(X(i) - cw / 2).toFixed(1)}" y="${pt}" width="${cw.toFixed(1)}" height="${H - pt - pb}" data-tip="${keys[i]}&#10;${v} تسجيل"/></g>`
+        ).join("");
+        return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="التسجيلات اليومية"><defs><linearGradient id="hxga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--hx);stop-opacity:.32"/><stop offset="1" style="stop-color:var(--hx);stop-opacity:0"/></linearGradient></defs>${hxGrid(W, H, pl, pr, pt, pb, mx)}${xl}<path d="${area}" fill="url(#hxga)"/><path d="${line}" fill="none" style="stroke:var(--hx)" stroke-width="2" stroke-linejoin="round"/>${cols}</svg>`;
+      }
+
+      function hxBars(a, b, keys) {
+        const W = 600, H = 180, pl = 30, pr = 8, pt = 10, pb = 22, n = keys.length;
+        const mx = hxEven(Math.max(1, ...a.map((v, i) => v + b[i])));
+        const slot = (W - pl - pr) / n, bw = slot * 0.6;
+        const Y = (v) => pt + (1 - v / mx) * (H - pt - pb);
+        const step = Math.max(1, Math.ceil(n / 7));
+        const xl = keys.map((k, i) => (i % step === 0 ? `<text x="${(pl + i * slot + slot / 2).toFixed(1)}" y="${H - 6}" text-anchor="middle">${hxDay(k)}</text>` : "")).join("");
+        const bars = keys.map((k, i) => {
+          const x = pl + i * slot + (slot - bw) / 2, ya = Y(a[i]), yb = Y(a[i] + b[i]);
+          return `<g class="hx-col"><rect class="hx-bar" x="${x.toFixed(1)}" y="${ya.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0, H - pb - ya).toFixed(1)}" rx="2" style="fill:var(--hx)"/><rect class="hx-bar" x="${x.toFixed(1)}" y="${yb.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0, ya - yb).toFixed(1)}" rx="2" style="fill:var(--hx-vio)"/><rect class="hit" x="${(pl + i * slot).toFixed(1)}" y="${pt}" width="${slot.toFixed(1)}" height="${H - pt - pb}" data-tip="${k}&#10;من الطلاب: ${a[i]}&#10;منك: ${b[i]}"/></g>`;
+        }).join("");
+        return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="الرسائل اليومية">${hxGrid(W, H, pl, pr, pt, pb, mx)}${xl}${bars}</svg>
+          <div class="hx-legend"><span><i style="background:var(--hx)"></i>من الطلاب (${a.reduce((x, y) => x + y, 0)})</span><span><i style="background:var(--hx-vio)"></i>منك (${b.reduce((x, y) => x + y, 0)})</span></div>`;
+      }
+
+      function hxDonut(parts, total, label) {
+        let acc = 0;
+        const segs = parts.map((p) => {
+          const pct = total ? (p.v / total) * 100 : 0;
+          const el = pct ? `<circle cx="18" cy="18" r="15.9155" fill="none" stroke-width="4.2" style="stroke:${p.c}" stroke-dasharray="${pct.toFixed(2)} ${(100 - pct).toFixed(2)}" stroke-dashoffset="${(25 - acc).toFixed(2)}" data-tip="${p.t}&#10;${p.v} (${pct.toFixed(0)}%)"/>` : "";
+          acc += pct;
+          return el;
+        }).join("");
+        return `<svg viewBox="0 0 36 36" role="img"><circle cx="18" cy="18" r="15.9155" fill="none" stroke-width="4.2" style="stroke:var(--panel2)"/>${segs}<text x="18" y="19" text-anchor="middle" class="c1">${hxFmt(total)}</text><text x="18" y="23.6" text-anchor="middle" class="c2">${label}</text></svg>`;
+      }
+
+      function hxHeat(heat) {
+        let mx = 0;
+        heat.forEach((r) => r.forEach((v) => { if (v > mx) mx = v; }));
+        let h = '<div class="hx-heat"><div></div>';
+        for (let i = 0; i < 24; i++) h += `<div class="h">${i % 3 === 0 ? i : ""}</div>`;
+        heat.forEach((row, d) => {
+          h += `<div class="d">${DAYS_AR[d]}</div>`;
+          row.forEach((v, hr) => {
+            h += `<div class="c" ${v ? `style="background:rgba(var(--hx-rgb),${(0.14 + (0.86 * v) / mx).toFixed(2)})" ` : ""}data-tip="${DAYS_AR[d]} ${String(hr).padStart(2, "0")}:00&#10;${v} نشاط"></div>`;
+          });
+        });
+        return h + "</div>";
+      }
+
+      /* ---------- أجزاء اللوحة ---------- */
+      function hxKpis(d) {
+        const k = d.kpi, sp = d.signups.slice(-14), r = d.reviews;
+        const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
+        const delta = (a, b) => {
+          if (!b) return a ? '<span class="d up">▲ new</span>' : '<span class="d flat">— 0%</span>';
+          const p = Math.round(((a - b) / b) * 100);
+          return `<span class="d ${p > 0 ? "up" : p < 0 ? "down" : "flat"}">${p > 0 ? "▲ +" : p < 0 ? "▼ " : "— "}${p}%</span>`;
+        };
+        const flat = (t) => `<span class="d flat">${t}</span>`;
+        const items = [
+          { l: "إجمالي الطلاب (أجهزة)", v: k.devices, s: flat(k.rejected + " مرفوض"), sp },
+          { l: "متصل الآن", v: k.online, s: flat(pct(k.online, k.approved) + "% من المقبولين") },
+          { l: "نشط خلال 24 ساعة", v: k.active24, cls: "vio", s: flat(pct(k.active24, k.approved) + "%") },
+          { l: "جدد خلال 7 أيام", v: k.new7, s: delta(k.new7, k.prev7), sp },
+          { l: "رسائل غير مقروءة", v: k.unread, cls: k.unread ? "warn" : "", s: flat(hxFmt(k.messages) + " رسالة") },
+          { l: "محجوب بانتظار الرد", v: k.locked, cls: k.locked ? "bad" : "", s: flat("حجب مؤقت") },
+          { l: "تقييمات معلّقة", v: r.pending, cls: r.pending ? "warn" : "", s: flat(r.published + " منشور") },
+          { l: "معدل العودة", v: pct(k.returning, k.approved) + "%", cls: "vio", s: flat(k.active7 + " نشط/7 أيام") },
+        ];
+        return items.map((i) => `<div class="hx-card hx-k ${i.cls || ""}"><div class="l">${i.l}</div><div class="v">${i.v}</div><div class="s">${i.s}${i.sp ? hxSpark(i.sp, "var(--hx)") : ""}</div></div>`).join("");
+      }
+
+      function hxInsights(d) {
+        const k = d.kpi, out = [];
+        if (d.reviews.pending) out.push(["warn", "fa-star", d.reviews.pending + " تقييم بانتظار مراجعتك", "راجِع", "reviews"]);
+        if (k.unread) out.push(["warn", "fa-envelope", k.unread + " رسالة جديدة من الطلاب لم تُقرأ", "افتح", "unread"]);
+        if (k.locked) out.push(["info", "fa-lock", k.locked + " طالب محجوب حتى يردّ على رسالتك", "عرض", "locked"]);
+        if (k.prev7 || k.new7) {
+          const p = k.prev7 ? Math.round(((k.new7 - k.prev7) / k.prev7) * 100) : 100;
+          out.push([p >= 0 ? "good" : "info", p >= 0 ? "fa-arrow-trend-up" : "fa-arrow-trend-down", `التسجيلات الجديدة ${p >= 0 ? "ارتفعت" : "انخفضت"} ${Math.abs(p)}% عن الأسبوع السابق (${k.new7} مقابل ${k.prev7})`]);
+        }
+        let best = 0, bd = 0, bh = 0;
+        d.heat.forEach((row, di) => row.forEach((v, h) => { if (v > best) { best = v; bd = di; bh = h; } }));
+        if (best) out.push(["info", "fa-clock", `ذروة نشاط الطلاب: ${DAYS_AR[bd]} عند ${hxHour(bh)}`]);
+        if (!k.online && k.approved) out.push(["info", "fa-moon", "لا يوجد طلاب متصلون الآن"]);
+        if (hxLat > 1500) out.push(["warn", "fa-gauge-high", "استجابة الخادم بطيئة (" + hxLat + "ms)"]);
+        return out.slice(0, 5).map(([c, i, t, b, go]) => `<div class="hx-ins ${c}"><i class="fas ${i}"></i><span>${t}</span>${b ? `<button class="hx-btn" type="button" data-go="${go}">${b}</button>` : ""}</div>`).join("");
+      }
+
+      function hxDevices(d) {
+        const v = d.devices, total = v.phone + v.tablet + v.desktop + v.unknown;
+        const parts = [
+          { t: "هاتف", v: v.phone, c: "var(--hx)" }, { t: "تابلت", v: v.tablet, c: "var(--cyan)" },
+          { t: "كمبيوتر", v: v.desktop, c: "var(--hx-vio)" }, { t: "غير معروف", v: v.unknown, c: "var(--muted)" },
+        ];
+        const lg = parts.map((p) => `<span><i style="background:${p.c}"></i>${p.t} <b class="mono">${p.v}</b> <small class="mono">${total ? Math.round((p.v / total) * 100) : 0}%</small></span>`).join("");
+        const raw = v.raw.slice(0, 4).map((x) => `<div style="font-size:.68rem;color:var(--muted);unicode-bidi:plaintext;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(x.type)} · ${x.n}</div>`).join("");
+        return `<div class="hx-donut">${hxDonut(parts, total, "جهاز")}<div class="hx-legend" style="flex-direction:column;margin:0">${lg}</div></div><div style="margin-top:.7rem">${raw}</div>`;
+      }
+
+      function hxTop(d) {
+        if (!d.top.length) return '<p class="text-muted text-sm">لا نشاط رسائل بعد.</p>';
+        const mx = Math.max(1, ...d.top.map((t) => t.n));
+        return '<div class="hx-rank">' + d.top.map((t, i) => `<div class="r"><span class="no">#${i + 1}</span><div style="min-width:0"><div class="nm">${escapeHtml(t.name)}</div><div class="bar" style="width:${Math.max(6, (t.n / mx) * 100)}%"></div></div><b>${t.n}</b></div>`).join("") + "</div>";
+      }
+
+      function hxRev(d) {
+        const r = d.reviews, tot = r.total || 1;
+        return `<div class="hx-pipe"><i style="width:${(r.published / tot) * 100}%;background:var(--hx)"></i><i style="width:${(r.pending / tot) * 100}%;background:var(--hx-warn)"></i></div>
+          <div class="hx-legend"><span><i style="background:var(--hx)"></i>منشور ${r.published}</span><span><i style="background:var(--hx-warn)"></i>معلّق ${r.pending}</span></div>
+          <div class="hx-stat"><div><b>${r.total}</b>إجمالي التقييمات</div><div><b>${d.photos}</b>صور المعرض</div><div><b>${hxFmt(d.kpi.voice)}</b>رسائل صوتية</div></div>`;
+      }
+
+      function hxFeed(d) {
+        if (!d.feed.length) return '<div class="hx-skel">$ no events yet</div>';
+        const today = new Date().toDateString(), lab = { signup: "+SIGNUP", msg: "MSG", review: "REVIEW" };
+        return d.feed.map((e) => {
+          const t = new Date(e.t);
+          const when = t.toDateString() === today ? t.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : String(t.getDate()).padStart(2, "0") + "/" + String(t.getMonth() + 1).padStart(2, "0");
+          return `<div class="ln"><span class="t">${when}</span><span class="k ${e.type}">${lab[e.type]}</span><span class="tx">${escapeHtml(e.who)}${e.text ? " — " + escapeHtml(e.text) : ""}</span></div>`;
+        }).join("");
+      }
+
+      /* ---------- التحميل والتحديث التلقائي ---------- */
+      let hxData = null, hxBusy = false, hxLast = 0, hxLat = 0, hxRange = 30, hxInt = 30;
+      try { const sv = parseInt(localStorage.getItem("hx_int"), 10); if ([0, 15, 30, 60].includes(sv)) { hxInt = sv; $h("hx-int").value = String(sv); } } catch (_) {}
+
+      function hxStatus(ok) {
+        const l = $h("hx-live");
+        l.className = "hx-live" + (ok ? "" : " off");
+        l.innerHTML = "<i></i> " + (ok ? "LIVE" : "OFFLINE");
+        if (ok) { $h("hx-sync").textContent = new Date().toLocaleTimeString("en-GB"); $h("hx-lat").textContent = hxLat + " ms"; }
+      }
+
+      function renderSignups() {
+        const d = hxData;
+        if (!d) return;
+        const v = d.signups.slice(-hxRange), sum = v.reduce((a, b) => a + b, 0);
+        hxSet("hx-signups", hxArea(v, d.days.slice(-hxRange)) + `<div class="hx-legend"><span><i style="background:var(--hx)"></i>الإجمالي ${sum} · المتوسط ${(sum / v.length).toFixed(1)} / يوم</span></div>`);
+      }
+
+      function renderDash() {
+        const d = hxData;
+        if (!d) return;
+        hxSet("hx-insights", hxInsights(d));
+        hxSet("hx-kpis", hxKpis(d));
+        renderSignups();
+        hxSet("hx-devices", hxDevices(d));
+        hxSet("hx-msgs", hxBars(d.msgStudent, d.msgAdmin, d.msgDays));
+        $h("hx-msgsub").textContent = hxFmt(d.kpi.messages) + " msgs";
+        hxSet("hx-top", hxTop(d));
+        hxSet("hx-heat", hxHeat(d.heat));
+        hxSet("hx-rev", hxRev(d));
+        hxSet("hx-feed", hxFeed(d));
+        setUnreadUI(d.kpi.unread);
+      }
+
+      async function loadSolDash() {
+        if (hxBusy) return;
+        hxBusy = true;
+        const t0 = performance.now();
+        try {
+          const d = await sApi("/admin/solutions/stats");
+          hxLat = Math.round(performance.now() - t0);
+          hxData = d;
+          hxLast = Date.now();
+          hxStatus(true);
+          renderDash();
+        } catch (e) {
+          hxStatus(false);
+          if (!hxData) $h("hx-kpis").innerHTML = '<div class="hx-err">[ERR] ' + escapeHtml(e.message) + "</div>";
+        }
+        hxBusy = false;
+      }
+
+      // مؤقت واحد خفيف: يعمل فقط والتبويب ظاهر ولوحة القيادة مفتوحة
+      setInterval(() => {
+        if (!hxInt || document.hidden) return;
+        const tab = $h("tab-students"), pane = $h("sol-dash");
+        if (tab && tab.classList.contains("active") && pane && pane.classList.contains("active") && Date.now() - hxLast >= hxInt * 1000) loadSolDash();
+      }, 5000);
+
+      $h("hx-refresh").addEventListener("click", () => loadSolDash());
+      $h("hx-int").addEventListener("change", (e) => {
+        hxInt = parseInt(e.target.value, 10) || 0;
+        try { localStorage.setItem("hx_int", String(hxInt)); } catch (_) {}
+      });
+      $h("hx-range").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-r]");
+        if (!b) return;
+        hxRange = parseInt(b.dataset.r, 10);
+        $h("hx-range").querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
+        renderSignups();
+      });
+
+      /* ---------- التنقل بين الأقسام ---------- */
+      function solGo(name) {
+        document.querySelectorAll(".sol-btn[data-sol]").forEach((x) => x.classList.toggle("active", x.dataset.sol === name));
+        document.querySelectorAll(".sol-pane").forEach((p) => p.classList.toggle("active", p.id === "sol-" + name));
+        if (name === "dash") loadSolDash();
+        else if (name === "students") loadStudents(true);
+        else if (name === "reviews") loadSolReviews();
+        else if (name === "photos") loadPhotos();
+      }
+      function openSol(name, after) {
+        const b = document.querySelector('.tab-btn[data-tab="students"]');
+        if (!b.classList.contains("active")) b.click();
+        solGo(name);
+        if (after) after();
+      }
+      function openStudentsFilter(f) { openSol("students", () => { stFilter = f; stShown = ST_PAGE; renderStudents(); }); }
+
+      document.querySelectorAll(".sol-btn[data-sol]").forEach((b) => b.addEventListener("click", () => solGo(b.dataset.sol)));
+      document.querySelectorAll(".tab-btn").forEach((b) =>
+        b.addEventListener("click", () => {
+          $h("admin-main").classList.toggle("sol-wide", b.dataset.tab === "students");
+          if (b.dataset.tab === "students" && $h("sol-dash").classList.contains("active") && Date.now() - hxLast > 10000) loadSolDash();
+        })
+      );
+      $h("hx-insights").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-go]");
+        if (!b) return;
+        if (b.dataset.go === "reviews") openSol("reviews", () => { srvFilter = "pending"; renderSolReviews(); });
+        else openStudentsFilter(b.dataset.go);
+      });
+
+      /* ---------- تلميح الرسوم (عنصر واحد لكل اللوحة) ---------- */
+      (function () {
+        const tip = $h("hx-tip"), root = $h("sol-dash");
+        let cur = null;
+        root.addEventListener("pointermove", (e) => {
+          const t = e.target.closest("[data-tip]");
+          if (!t) { if (cur) { tip.style.display = "none"; cur = null; } return; }
+          if (t !== cur) { cur = t; tip.textContent = t.getAttribute("data-tip"); tip.style.display = "block"; }
+          tip.style.left = Math.max(6, Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8)) + "px";
+          tip.style.top = Math.min(e.clientY + 16, innerHeight - tip.offsetHeight - 8) + "px";
+        });
+        root.addEventListener("pointerleave", () => { tip.style.display = "none"; cur = null; });
+      })();
+
+      /* ---------- الإعلان الجماعي ---------- */
+      function bcOpen() { $h("bc-modal").hidden = false; $h("bc-text").focus(); }
+      function bcClose() { $h("bc-modal").hidden = true; }
+      $h("st-broadcast").addEventListener("click", bcOpen);
+      $h("bc-x").addEventListener("click", bcClose);
+      $h("bc-modal").addEventListener("click", (e) => { if (e.target === $h("bc-modal")) bcClose(); });
+      $h("bc-text").addEventListener("input", () => ($h("bc-len").textContent = $h("bc-text").value.length + "/1000"));
+      $h("bc-send").addEventListener("click", async () => {
+        const body = $h("bc-text").value.trim(), aud = $h("bc-aud");
+        if (!body) return toast("اكتب نص الإعلان", false);
+        if (!confirm("إرسال هذا الإعلان إلى: " + aud.options[aud.selectedIndex].text + " ؟")) return;
+        const btn = $h("bc-send");
+        btn.disabled = true;
+        try {
+          const r = await sApi("/admin/broadcast", { method: "POST", body: { body, audience: aud.value } });
+          if (r.status !== "ok") throw new Error("بيانات غير صالحة");
+          toast(r.n ? "أُرسل الإعلان إلى " + r.n + " طالب" : "لا يوجد طلاب مطابقون لهذه الفئة", !!r.n);
+          if (r.n) { $h("bc-text").value = ""; $h("bc-len").textContent = "0/1000"; bcClose(); }
+        } catch (e) { toast("تعذر الإرسال: " + e.message, false); }
+        btn.disabled = false;
+      });
+
+      /* ---------- ردود سريعة داخل المحادثة ---------- */
+      const STC_QUICK = ["أحسنت 👏", "ما الخطوة التي توقفت عندها؟", "جرّب تحديث الصفحة ثم أخبرني", "أرسل لي صورة توضّح المشكلة", "تم حل المشكلة ✅"];
+      $h("stc-quick").innerHTML = STC_QUICK.map((t, i) => `<button type="button" data-q="${i}">${t}</button>`).join("");
+      $h("stc-quick").addEventListener("click", (e) => {
+        const b = e.target.closest("button[data-q]");
+        if (!b) return;
+        const ta = $h("stc-text");
+        ta.value = (ta.value ? ta.value + " " : "") + STC_QUICK[b.dataset.q];
+        ta.focus();
+      });
+
+      /* ---------- لوحة الأوامر (Ctrl/⌘ + K) ---------- */
+      const hxCmds = [
+        { k: "dashboard", t: "لوحة القيادة", i: "fa-chart-line", run: () => openSol("dash") },
+        { k: "students", t: "الطلاب والرسائل", i: "fa-user-graduate", run: () => openSol("students") },
+        { k: "unread", t: "الطلاب: رسائل جديدة", i: "fa-envelope", run: () => openStudentsFilter("unread") },
+        { k: "online", t: "الطلاب: المتصلون الآن", i: "fa-circle", run: () => openStudentsFilter("online") },
+        { k: "locked", t: "الطلاب: المحجوبون", i: "fa-lock", run: () => openStudentsFilter("locked") },
+        { k: "reviews", t: "تقييمات الطلاب", i: "fa-star", run: () => openSol("reviews") },
+        { k: "pending", t: "التقييمات قيد المراجعة", i: "fa-hourglass-half", run: () => openSol("reviews", () => { srvFilter = "pending"; renderSolReviews(); }) },
+        { k: "photos", t: "صور الطلاب", i: "fa-images", run: () => openSol("photos") },
+        { k: "broadcast", t: "إرسال إعلان للجميع", i: "fa-bullhorn", run: () => openSol("students", bcOpen) },
+        { k: "export", t: "تصدير الطلاب CSV", i: "fa-file-csv", run: () => openSol("students", stExport) },
+        { k: "refresh", t: "تحديث كل البيانات", i: "fa-rotate", run: () => { loadSolDash(); loadStudents(true); loadSolReviews(true); } },
+        { k: "theme", t: "تبديل الثيم", i: "fa-circle-half-stroke", run: () => { const b = document.querySelector("[data-theme-toggle]"); if (b) b.click(); } },
+      ];
+      let palSel = 0, palList = [];
+      function palRender() {
+        const q = $h("hx-pal-q").value.trim().toLowerCase();
+        palList = hxCmds.filter((c) => !q || c.k.includes(q) || c.t.includes(q));
+        palSel = Math.min(palSel, Math.max(0, palList.length - 1));
+        $h("hx-pal-list").innerHTML = palList.length
+          ? palList.map((c, i) => `<li data-i="${i}" class="${i === palSel ? "on" : ""}"><i class="fas ${c.i}"></i>${c.t}<small>${c.k}</small></li>`).join("")
+          : '<li style="cursor:default;color:var(--muted)">لا أوامر مطابقة</li>';
+      }
+      function palOpen() {
+        if ($h("panel").classList.contains("hidden")) return;
+        $h("hx-pal").hidden = false;
+        $h("hx-pal-q").value = "";
+        palSel = 0;
+        palRender();
+        $h("hx-pal-q").focus();
+      }
+      function palClose() { $h("hx-pal").hidden = true; }
+      function palRun(i) { const c = palList[i]; if (c) { palClose(); c.run(); } }
+      $h("hx-open-pal").addEventListener("click", palOpen);
+      $h("hx-pal").addEventListener("click", (e) => {
+        if (e.target === $h("hx-pal")) return palClose();
+        const li = e.target.closest("li[data-i]");
+        if (li) palRun(+li.dataset.i);
+      });
+      $h("hx-pal-q").addEventListener("input", () => { palSel = 0; palRender(); });
+      $h("hx-pal-q").addEventListener("keydown", (e) => {
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+          e.preventDefault();
+          palSel = (palSel + (e.key === "ArrowDown" ? 1 : -1) + palList.length) % Math.max(1, palList.length);
+          palRender();
+        } else if (e.key === "Enter") { e.preventDefault(); palRun(palSel); }
+      });
+      document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); $h("hx-pal").hidden ? palOpen() : palClose(); }
+        else if (e.key === "Escape") { if (!$h("hx-pal").hidden) palClose(); else if (!$h("bc-modal").hidden) bcClose(); }
+      });
+
+      /* ---------- صور الطلاب (ضغط داخل المتصفح قبل الرفع) ---------- */
+      let phCache = [], phEditId = null, phData = null;
+      const PH_TYPE = (() => { const c = document.createElement("canvas"); c.width = c.height = 1; return c.toDataURL("image/webp").startsWith("data:image/webp") ? "image/webp" : "image/jpeg"; })();
+      const phKB = (n) => Math.round(n / 1024) + "KB";
+
+      async function phLoadImage(file) {
+        if (!/^image\//.test(file.type)) throw new Error("الملف ليس صورة");
+        if (file.size > 25 * 1024 * 1024) throw new Error("الصورة كبيرة جدًا (الحد 25MB)");
+        if (window.createImageBitmap) { try { return await createImageBitmap(file, { imageOrientation: "from-image" }); } catch (_) {} }
+        return new Promise((res, rej) => {
+          const im = new Image(), u = URL.createObjectURL(file);
+          im.onload = () => { URL.revokeObjectURL(u); res(im); };
+          im.onerror = () => rej(new Error("تعذر قراءة الصورة"));
+          im.src = u;
+        });
+      }
+      async function phEncode(src, maxSide, maxBytes) {
+        const sw = src.width || src.naturalWidth, sh = src.height || src.naturalHeight;
+        let scale = Math.min(1, maxSide / Math.max(sw, sh));
+        for (let round = 0; round < 4; round++) {
+          const w = Math.max(1, Math.round(sw * scale)), h = Math.max(1, Math.round(sh * scale));
+          const cv = document.createElement("canvas");
+          cv.width = w; cv.height = h;
+          const ctx = cv.getContext("2d");
+          if (PH_TYPE === "image/jpeg") { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h); }
+          ctx.drawImage(src, 0, 0, w, h);
+          for (const q of [0.82, 0.7, 0.58, 0.46, 0.34]) {
+            const blob = await new Promise((r) => cv.toBlob(r, PH_TYPE, q));
+            if (blob && blob.size <= maxBytes) return { blob, w, h };
+          }
+          scale *= 0.8;
+        }
+        throw new Error("تعذر ضغط الصورة للحجم المطلوب");
+      }
+      const phDataUrl = (blob) => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result)); fr.onerror = () => rej(new Error("فشل قراءة الصورة")); fr.readAsDataURL(blob); });
+
+      function phReset() {
+        phEditId = null; phData = null;
+        $h("ph-file").value = ""; $h("ph-name").value = ""; $h("ph-caption").value = ""; $h("ph-order").value = "0";
+        $h("ph-prev").hidden = true; $h("ph-note").textContent = "";
+        $h("ph-form-title").textContent = "إضافة صورة طالب";
+        $h("ph-save-label").textContent = "رفع الصورة";
+        $h("ph-file-label").textContent = "الصورة";
+        $h("ph-cancel").hidden = true;
+        $h("ph-form-card").classList.remove("edit-mode-card");
+      }
+
+      $h("ph-file").addEventListener("change", async (e) => {
+        const f = e.target.files && e.target.files[0];
+        phData = null; $h("ph-prev").hidden = true;
+        if (!f) return;
+        $h("ph-note").textContent = "جاري ضغط الصورة...";
+        try {
+          const img = await phLoadImage(f);
+          const thumb = await phEncode(img, 480, 140 * 1024), full = await phEncode(img, 1600, 880 * 1024);
+          if (img.close) img.close();
+          phData = { thumb, full };
+          const pv = $h("ph-prev");
+          if (pv.__u) URL.revokeObjectURL(pv.__u);
+          pv.__u = URL.createObjectURL(thumb.blob); pv.src = pv.__u; pv.hidden = false;
+          $h("ph-note").textContent = `تم الضغط: مصغّرة ${phKB(thumb.blob.size)} · كاملة ${phKB(full.blob.size)} (${full.w}×${full.h})`;
+        } catch (err) { $h("ph-note").textContent = ""; e.target.value = ""; toast(err.message, false); }
+      });
+
+      function renderPhotos() {
+        $h("ph-count").textContent = phCache.length;
+        const list = $h("ph-list");
+        if (!phCache.length) { list.innerHTML = '<p class="text-muted text-sm">لا توجد صور بعد.</p>'; return; }
+        list.innerHTML = phCache.map((p) => `
+          <div class="ph-card">
+            <img loading="lazy" decoding="async" src="/api/public/photos/${p.id}/thumb?v=${p.v}" alt="${escA(p.caption || p.name || "صورة طالب")}" />
+            <div class="m"><b>${escapeHtml(p.name || "—")}</b><span>${escapeHtml(p.caption || "")} · #${p.order}</span></div>
+            <div class="a">
+              <button class="sol-icon-btn ph-edit" data-id="${p.id}" title="تعديل" style="color:var(--cyan)"><i class="fas fa-pen"></i></button>
+              <button class="sol-icon-btn ph-del" data-id="${p.id}" title="حذف" style="color:#f87171"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>`).join("");
+      }
+
+      async function loadPhotos() {
+        try { phCache = (await sApi("/admin/solutions/photos")).photos || []; renderPhotos(); }
+        catch (e) { $h("ph-list").innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل الصور: ' + escapeHtml(e.message) + "</p>"; }
+      }
+
+      $h("ph-list").addEventListener("click", async (e) => {
+        const b = e.target.closest("button[data-id]");
+        if (!b) return;
+        const p = phCache.find((x) => x.id === b.dataset.id);
+        if (!p) return;
+        if (b.classList.contains("ph-edit")) {
+          phReset();
+          phEditId = p.id;
+          $h("ph-name").value = p.name; $h("ph-caption").value = p.caption; $h("ph-order").value = p.order;
+          $h("ph-form-title").textContent = "تعديل صورة" + (p.name ? ": " + p.name : "");
+          $h("ph-save-label").textContent = "حفظ التعديلات";
+          $h("ph-file-label").textContent = "استبدال الصورة (اختياري)";
+          $h("ph-cancel").hidden = false;
+          $h("ph-form-card").classList.add("edit-mode-card");
+          $h("ph-form-card").scrollIntoView({ behavior: "smooth", block: "start" });
+        } else if (b.classList.contains("ph-del")) {
+          if (!confirm("حذف هذه الصورة نهائيًا؟")) return;
+          try { await sApi("/admin/solutions/photos/" + encodeURIComponent(p.id), { method: "DELETE" }); }
+          catch (err) { return toast("تعذر الحذف: " + err.message, false); }
+          if (phEditId === p.id) phReset();
+          toast("تم الحذف", true);
+          loadPhotos();
+        }
+      });
+      $h("ph-cancel").addEventListener("click", phReset);
+      $h("ph-refresh").addEventListener("click", loadPhotos);
+      $h("ph-save").addEventListener("click", async () => {
+        if (!phEditId && !phData) return toast("اختر صورة أولًا", false);
+        const btn = $h("ph-save");
+        btn.disabled = true;
+        try {
+          const body = { id: phEditId || undefined, caption: $h("ph-caption").value, name: $h("ph-name").value, order: $h("ph-order").value };
+          if (phData) {
+            body.thumb = await phDataUrl(phData.thumb.blob);
+            body.full = await phDataUrl(phData.full.blob);
+            body.w = phData.full.w; body.h = phData.full.h;
+          }
+          const r = await sApi("/admin/solutions/photos", { method: "POST", body });
+          if (r.status !== "ok") throw new Error({ too_many: "وصلت للحد الأقصى (60 صورة)", invalid_image: "صورة غير صالحة", not_found: "الصورة لم تعد موجودة" }[r.status] || "بيانات غير صالحة");
+          toast(phEditId ? "تم حفظ التعديلات" : "تم رفع الصورة", true);
+          phReset();
+          loadPhotos();
+        } catch (e) { toast("تعذر الحفظ: " + e.message, false); }
+        btn.disabled = false;
       });
 
       /* ---------- Articles ---------- */

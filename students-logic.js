@@ -363,12 +363,203 @@ function makeLogic({ db, ObjectId }) {
     return (await photos.deleteOne({ _id: oid })).deletedCount > 0;
   }
 
+  /* =========================================================
+     لوحة القيادة: إحصائيات مجمّعة داخل MongoDB (بدون سحب البيانات الخام)
+     - كل شيء في استدعاء واحد + كاش 15 ثانية حتى لا تُحمَّل القاعدة
+     - لا تُقرأ حقول الصوت أبدًا
+  ========================================================= */
+  const STATS_TZ = process.env.STATS_TZ || "Africa/Cairo";
+  const DAY = 24 * ONE_HOUR;
+  let statsCache = null;
+
+  // مفاتيح آخر n يوم (YYYY-MM-DD) بحسب المنطقة الزمنية، بحساب تقويمي دقيق (آمن مع التوقيت الصيفي)
+  function dayKeys(n, tz) {
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+    const [y, m, d] = today.split("-").map(Number);
+    const out = [];
+    for (let i = n - 1; i >= 0; i--) out.push(new Date(Date.UTC(y, m - 1, d - i, 12)).toISOString().slice(0, 10));
+    return out;
+  }
+
+  async function adminStats() {
+    if (statsCache && Date.now() - statsCache.t < 15000) return statsCache.data;
+    const tz = STATS_TZ, now = Date.now();
+    const ago = (ms) => new Date(now - ms);
+    const dayExpr = { $dateToString: { format: "%Y-%m-%d", date: "$created_at", timezone: tz } };
+    const hw = { w: { $dayOfWeek: { date: "$created_at", timezone: tz } }, h: { $hour: { date: "$created_at", timezone: tz } } };
+    const keys30 = dayKeys(30, tz), keys14 = keys30.slice(-14);
+    const since30 = ago(30 * DAY), since14 = ago(14 * DAY);
+    const cnt = (cond) => ({ $sum: { $cond: [cond, 1, 0] } });
+    const typeIs = (re) => ({ $regexMatch: { input: { $ifNull: ["$type", ""] }, regex: re } });
+
+    const [dev, stuFacet, rawTypes, msgFacet, unread, voice, totalMsgs, reqs, revAgg, photoCount, recentStu, recentMsg, recentRev] = await Promise.all([
+      // (1) آخر سجل لكل جهاز ثم عدّادات مجمّعة
+      students.aggregate([
+        { $sort: { created_at: -1 } },
+        { $group: { _id: "$device_id", status: { $first: "$status" }, seen: { $first: "$last_seen" }, type: { $first: "$device_type" }, first: { $last: "$created_at" } } },
+        { $group: {
+          _id: null, devices: { $sum: 1 },
+          approved: cnt({ $eq: ["$status", "approved"] }),
+          rejected: cnt({ $eq: ["$status", "rejected"] }),
+          online: cnt({ $and: [{ $eq: ["$status", "approved"] }, { $gt: ["$seen", ago(90 * 1000)] }] }),
+          active24: cnt({ $and: [{ $eq: ["$status", "approved"] }, { $gt: ["$seen", ago(DAY)] }] }),
+          active7: cnt({ $and: [{ $eq: ["$status", "approved"] }, { $gt: ["$seen", ago(7 * DAY)] }] }),
+          new7: cnt({ $gt: ["$first", ago(7 * DAY)] }),
+          prev7: cnt({ $and: [{ $gt: ["$first", ago(14 * DAY)] }, { $lte: ["$first", ago(7 * DAY)] }] }),
+          returning: cnt({ $and: [{ $eq: ["$status", "approved"] }, { $gt: [{ $subtract: ["$seen", "$first"] }, DAY] }] }),
+          phone: cnt(typeIs("^هاتف")), tablet: cnt(typeIs("^تابلت")),
+          desktop: cnt({ $and: [{ $ne: [{ $ifNull: ["$type", ""] }, ""] }, { $not: [typeIs("^(هاتف|تابلت)")] }] }),
+          unknown: cnt({ $eq: [{ $ifNull: ["$type", ""] }, ""] }),
+        } },
+      ]).toArray(),
+      // (2) تسجيلات آخر 30 يومًا: يوميًا + خريطة حرارية
+      students.aggregate([
+        { $match: { created_at: { $gte: since30 } } },
+        { $facet: { daily: [{ $group: { _id: dayExpr, n: { $sum: 1 } } }], heat: [{ $group: { _id: hw, n: { $sum: 1 } } }] } },
+      ]).toArray(),
+      // (3) أكثر أنواع الأجهزة
+      students.aggregate([
+        { $match: { status: "approved", device_type: { $ne: null } } },
+        { $group: { _id: "$device_type", n: { $sum: 1 } } }, { $sort: { n: -1 } }, { $limit: 6 },
+      ]).toArray(),
+      // (4) رسائل آخر 30 يومًا: يومي (14) + خريطة حرارية + الأكثر نشاطًا
+      messages.aggregate([
+        { $match: { created_at: { $gte: since30 } } },
+        { $project: { sender: 1, device_id: 1, created_at: 1 } },
+        { $facet: {
+          daily: [{ $match: { created_at: { $gte: since14 } } }, { $group: { _id: { d: dayExpr, s: "$sender" }, n: { $sum: 1 } } }],
+          heat: [{ $match: { sender: "student" } }, { $group: { _id: hw, n: { $sum: 1 } } }],
+          top: [{ $match: { sender: "student" } }, { $group: { _id: "$device_id", n: { $sum: 1 }, last: { $max: "$created_at" } } }, { $sort: { n: -1 } }, { $limit: 5 }],
+        } },
+      ]).toArray(),
+      messages.countDocuments({ sender: "student", read_by_admin: false }),
+      messages.countDocuments({ kind: "voice" }),
+      messages.estimatedDocumentCount(),
+      // (5) طلبات "لا يدخل حتى يرد" لحساب المحجوبين
+      messages.aggregate([
+        { $match: { sender: "admin", requires_reply: true } },
+        { $group: { _id: "$device_id", t: { $max: "$created_at" } } }, { $limit: 500 },
+      ]).toArray(),
+      reviews.aggregate([{ $group: { _id: "$status", n: { $sum: 1 } } }]).toArray(),
+      photos.estimatedDocumentCount(),
+      students.find({}, { projection: { name: 1, device_type: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(8).toArray(),
+      messages.find({ sender: "student" }, { projection: { device_id: 1, kind: 1, body: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(8).toArray(),
+      reviews.find({}, { projection: { name: 1, status: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(5).toArray(),
+    ]);
+
+    // المحجوبون: آخر طلب من المدير أحدث من آخر رد للطالب
+    let locked = 0;
+    if (reqs.length) {
+      const reps = await messages.aggregate([
+        { $match: { sender: "student", device_id: { $in: reqs.map((x) => x._id) } } },
+        { $group: { _id: "$device_id", t: { $max: "$created_at" } } },
+      ]).toArray();
+      const rep = new Map(reps.map((x) => [x._id, new Date(x.t).getTime()]));
+      locked = reqs.filter((x) => new Date(x.t).getTime() > (rep.get(x._id) || 0)).length;
+    }
+
+    const k = dev[0] || {};
+    const sf = (stuFacet[0] || { daily: [], heat: [] }), mf = (msgFacet[0] || { daily: [], heat: [], top: [] });
+    const dailyMap = new Map(sf.daily.map((x) => [x._id, x.n]));
+    const mS = new Map(), mA = new Map();
+    mf.daily.forEach((x) => (x._id.s === "student" ? mS : mA).set(x._id.d, x.n));
+    const heat = Array.from({ length: 7 }, () => new Array(24).fill(0));
+    [...sf.heat, ...mf.heat].forEach((x) => { if (x._id.w >= 1 && x._id.w <= 7 && x._id.h >= 0 && x._id.h < 24) heat[x._id.w - 1][x._id.h] += x.n; });
+
+    // أسماء الأجهزة المذكورة في الأكثر نشاطًا وآخر الرسائل
+    const devIds = [...new Set([...mf.top.map((x) => x._id), ...recentMsg.map((x) => x.device_id)])];
+    const nameRows = devIds.length
+      ? await students.find({ device_id: { $in: devIds } }, { projection: { device_id: 1, name: 1 } }).sort({ created_at: 1 }).toArray()
+      : [];
+    const names = {};
+    nameRows.forEach((x) => { names[x.device_id] = x.name; }); // الأحدث يكتب فوق الأقدم
+
+    const rv = { pending: 0, published: 0 };
+    revAgg.forEach((x) => { if (x._id === "pending" || x._id === "published") rv[x._id] = x.n; });
+
+    const feed = [
+      ...recentStu.map((s) => ({ t: s.created_at, type: "signup", who: s.name, text: s.device_type || "" })),
+      ...recentMsg.map((m) => ({ t: m.created_at, type: "msg", who: names[m.device_id] || "طالب", text: m.kind === "voice" ? "🎙 رسالة صوتية" : String(m.body || "").slice(0, 90) })),
+      ...recentRev.map((r) => ({ t: r.created_at, type: "review", who: r.name, text: r.status === "pending" ? "تقييم جديد بانتظار المراجعة" : "تقييم منشور" })),
+    ].sort((a, b) => new Date(b.t) - new Date(a.t)).slice(0, 14);
+
+    const data = {
+      generated: now, tz,
+      kpi: {
+        devices: k.devices || 0, approved: k.approved || 0, rejected: k.rejected || 0, online: k.online || 0,
+        active24: k.active24 || 0, active7: k.active7 || 0, new7: k.new7 || 0, prev7: k.prev7 || 0,
+        returning: k.returning || 0, unread, locked, messages: totalMsgs, voice,
+      },
+      days: keys30,
+      signups: keys30.map((d) => dailyMap.get(d) || 0),
+      msgDays: keys14,
+      msgStudent: keys14.map((d) => mS.get(d) || 0),
+      msgAdmin: keys14.map((d) => mA.get(d) || 0),
+      devices: { phone: k.phone || 0, tablet: k.tablet || 0, desktop: k.desktop || 0, unknown: k.unknown || 0, raw: rawTypes.map((x) => ({ type: x._id, n: x.n })) },
+      heat,
+      reviews: { ...rv, total: rv.pending + rv.published },
+      photos: photoCount,
+      top: mf.top.map((x) => ({ name: names[x._id] || "طالب", n: x.n, last: x.last })),
+      feed,
+    };
+    statsCache = { t: Date.now(), data };
+    return data;
+  }
+
+  /* ---------- عمليات جماعية على الأسماء ---------- */
+  async function adminBulk(ids, action) {
+    const list = (Array.isArray(ids) ? ids : []).slice(0, 200).map(toId).filter(Boolean);
+    if (!list.length) return { status: "invalid" };
+    statsCache = null;
+    if (action === "delete") return { status: "ok", n: (await students.deleteMany({ _id: { $in: list } })).deletedCount };
+    if (action === "approve" || action === "reject") {
+      const r = await students.updateMany({ _id: { $in: list } }, { $set: { status: action === "approve" ? "approved" : "rejected" } });
+      return { status: "ok", n: r.modifiedCount };
+    }
+    return { status: "invalid" };
+  }
+
+  /* ---------- إعلان جماعي نصي (بدون منع الدخول، حتى لا يُحجب الجميع بالخطأ) ---------- */
+  async function adminBroadcast({ body, audience }) {
+    const txt = String(body == null ? "" : body).trim();
+    if (txt.length < 1 || txt.length > 1000) return { status: "invalid" };
+    const pipe = [
+      { $sort: { created_at: -1 } },
+      { $group: { _id: "$device_id", status: { $first: "$status" }, seen: { $first: "$last_seen" } } },
+      { $match: { status: "approved" } },
+    ];
+    if (audience === "online") pipe.push({ $match: { seen: { $gt: new Date(Date.now() - 90 * 1000) } } });
+    else if (audience === "active24") pipe.push({ $match: { seen: { $gt: new Date(Date.now() - DAY) } } });
+    pipe.push({ $limit: 500 });
+    const devs = await students.aggregate(pipe).toArray();
+    if (!devs.length) return { status: "ok", n: 0 };
+    const now = new Date();
+    await messages.insertMany(
+      devs.map((x) => ({ device_id: x._id, sender: "admin", kind: "text", body: txt, requires_reply: false, read_by_admin: true, read_by_student: false, created_at: now })),
+      { ordered: false }
+    );
+    statsCache = null;
+    return { status: "ok", n: devs.length };
+  }
+
+  async function adminReviewsPublishAll() {
+    statsCache = null;
+    const r = await reviews.updateMany({ status: "pending" }, { $set: { status: "published", updated_at: new Date() } });
+    return { status: "ok", n: r.modifiedCount };
+  }
+
   async function ensureIndexes() {
     await students.createIndex({ device_id: 1, created_at: -1 });
     await messages.createIndex({ device_id: 1, created_at: 1 });
     await reviews.createIndex({ status: 1, order: 1, created_at: -1 });
     await reviews.createIndex({ device_id: 1, created_at: -1 });
     await photos.createIndex({ order: 1, created_at: -1 });
+    // فهارس لوحة القيادة (تجعل الإحصائيات سريعة وخفيفة)
+    await students.createIndex({ created_at: -1 });
+    await messages.createIndex({ created_at: -1, sender: 1 });
+    await messages.createIndex({ sender: 1, read_by_admin: 1 });
+    await messages.createIndex({ sender: 1, requires_reply: 1, created_at: -1 });
+    await messages.createIndex({ kind: 1 });
   }
 
   return {
@@ -376,6 +567,7 @@ function makeLogic({ db, ObjectId }) {
     adminList, adminSetStatus, adminDeleteStudent, adminMessages, adminAudio, adminSend, adminUnlock, adminClear,
     publicReviews, reviewSubmit, adminReviews, adminReviewSave, adminReviewDelete,
     publicPhotos, photoImage, adminPhotos, adminPhotoSave, adminPhotoDelete,
+    adminStats, adminBulk, adminBroadcast, adminReviewsPublishAll,
     ensureIndexes,
   };
 }

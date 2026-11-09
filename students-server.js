@@ -40,10 +40,6 @@ app.use(
     cb(null, { origin: !o || sameOrigin || !ALLOWED.length || ALLOWED.includes(o) });
   })
 );
-// رفع صور الطلاب (نسختان مضغوطتان) يحتاج حدًا أكبر من باقي المسارات
-app.use((req, res, next) =>
-  req.path.startsWith("/api/admin/solutions/photos") ? express.json({ limit: "3mb" })(req, res, next) : next()
-);
 app.use(express.json({ limit: "1mb" }));
 
 // حد بسيط للطلبات لكل IP (120 طلب في الدقيقة)
@@ -95,8 +91,9 @@ app.get("/api/health", async (_req, res) => {
 /* ---------- للطلاب: نفس أسماء الدوال القديمة وتنسيق الإجابات ---------- */
 const rpc = express.Router();
 rpc.use(limiter);
-rpc.post("/student_check", wrap((l, r) => l.check(r.body.p_device, r.body.p_type)));
-rpc.post("/student_register", wrap((l, r) => l.register(r.body.p_device, r.body.p_name, r.body.p_type)));
+const UA = (r) => r.headers["user-agent"] || "";
+rpc.post("/student_check", wrap((l, r) => l.check(r.body.p_device, r.body.p_type, UA(r))));
+rpc.post("/student_register", wrap((l, r) => l.register(r.body.p_device, r.body.p_name, r.body.p_type, UA(r))));
 rpc.post("/student_inbox", wrap((l, r) => l.inbox(r.body.p_device)));
 rpc.post("/student_audio", wrap((l, r) => l.audio(r.body.p_device, r.body.p_id)));
 rpc.post("/student_mark_read", wrap((l, r) => l.markRead(r.body.p_device)));
@@ -105,7 +102,7 @@ rpc.post("/student_send", wrap((l, r) =>
 rpc.post("/review_submit", wrap((l, r) => l.reviewSubmit(r.body.p_device, r.body.p_name, r.body.p_text, r.body.p_grade)));
 app.use("/api/rpc", rpc);
 
-/* ---------- عام (بدون تسجيل): التقييمات المنشورة وصور الطلاب لموقع الحلول ---------- */
+/* ---------- عام (بدون تسجيل): التقييمات المنشورة لموقع الحلول ---------- */
 const pub = express.Router();
 pub.use(limiter);
 // كاش قصير على CDN حتى لا تُحمَّل القاعدة مع كل زائر
@@ -120,24 +117,8 @@ const cacheJson = (fn) => async (req, res) => {
   }
 };
 pub.get("/reviews", cacheJson((l) => l.publicReviews()));
-pub.get("/photos", cacheJson((l) => l.publicPhotos()));
-// الصورة نفسها تُخدَّم كملف مع كاش سنة (الرابط يحمل ?v= فيتغير عند تعديل الصورة)
-pub.get("/photos/:id/:kind", async (req, res) => {
-  try {
-    const img = await (await getLogic()).photoImage(req.params.id, req.params.kind);
-    if (!img) return res.status(404).end();
-    res.set({
-      "Content-Type": img.type,
-      "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
-      "X-Content-Type-Options": "nosniff",
-      "Cross-Origin-Resource-Policy": "cross-origin",
-    });
-    res.send(img.buf);
-  } catch (e) {
-    console.error(e);
-    res.status(500).end();
-  }
-});
+// صور الطلاب أُزيلت نهائيًا؛ يبقى هذا المسار فارغًا فقط حتى لا يظهر خطأ في نسخة موقع الطلاب القديمة
+pub.get("/photos", (_req, res) => res.set("Cache-Control", "public, s-maxage=300").json({ photos: [] }));
 app.use("/api/public", pub);
 
 /* ---------- للمدير: يتطلب Bearer token من تسجيل دخول Supabase ---------- */
@@ -177,6 +158,8 @@ admin.get("/messages/:device", wrap((l, r) => l.adminMessages(r.params.device)))
 admin.get("/audio/:id", wrap(async (l, r) => ({ audio: await l.adminAudio(r.params.id) })));
 admin.post("/messages", wrap((l, r) => l.adminSend(r.body || {})));
 admin.post("/unlock/:device", wrap(async (l, r) => ({ ok: await l.adminUnlock(r.params.device) })));
+admin.post("/ban/:device", wrap(async (l, r) => ({ ok: await l.adminSetBan(r.params.device, true) })));
+admin.delete("/ban/:device", wrap(async (l, r) => ({ ok: await l.adminSetBan(r.params.device, false) })));
 admin.delete("/messages/:device", wrap(async (l, r) => ({ ok: await l.adminClear(r.params.device) })));
 
 /* لوحة القيادة + العمليات الجماعية + الإعلان الجماعي */
@@ -185,13 +168,10 @@ admin.post("/students/bulk", wrap((l, r) => l.adminBulk((r.body || {}).ids, (r.b
 admin.post("/broadcast", wrap((l, r) => l.adminBroadcast(r.body || {})));
 admin.post("/solutions/reviews/publish-all", wrap((l) => l.adminReviewsPublishAll()));
 
-/* أدوات موقع الحلول: التقييمات + صور الطلاب */
+/* أدوات موقع الحلول: التقييمات */
 admin.get("/solutions/reviews", wrap((l) => l.adminReviews()));
 admin.post("/solutions/reviews", wrap((l, r) => l.adminReviewSave(r.body || {})));
 admin.delete("/solutions/reviews/:id", wrap(async (l, r) => ({ ok: await l.adminReviewDelete(r.params.id) })));
-admin.get("/solutions/photos", wrap((l) => l.adminPhotos()));
-admin.post("/solutions/photos", wrap((l, r) => l.adminPhotoSave(r.body || {})));
-admin.delete("/solutions/photos/:id", wrap(async (l, r) => ({ ok: await l.adminPhotoDelete(r.params.id) })));
 app.use("/api/admin", admin);
 
 // أي خطأ غير متوقع يرجع JSON واضح بدل صفحة HTML

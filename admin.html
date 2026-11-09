@@ -196,7 +196,7 @@
       @media (max-width: 640px) { .tab-bar { width: 100%; } .tab-btn { flex: 1 1 auto; justify-content: center; padding: .6rem .8rem; } }
 
 
-      /* ---------- موقع الحلول: قائمة فرعية + التقييمات + الصور ---------- */
+      /* ---------- موقع الحلول: قائمة فرعية + التقييمات ---------- */
       .sol-nav { display: flex; gap: .45rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
       .sol-btn {
         display: inline-flex; align-items: center; gap: .5rem; padding: .55rem 1rem; border-radius: 14px; cursor: pointer;
@@ -425,16 +425,6 @@
       }
       .hx-bulk[hidden] { display: none; }
       .hx-bulk b { font-family: "JetBrains Mono", monospace; color: var(--cyan); }
-
-      /* معرض الصور */
-      .ph-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .8rem; }
-      .ph-card { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--panel2); content-visibility: auto; contain-intrinsic-size: auto 220px; }
-      .ph-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--panel); }
-      .ph-card .m { padding: .55rem .7rem; font-size: .75rem; }
-      .ph-card .m b { display: block; color: var(--fog); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .ph-card .m span { color: var(--muted); font-size: .68rem; }
-      .ph-card .a { display: flex; gap: .2rem; justify-content: flex-end; padding: 0 .4rem .4rem; }
-      .ph-prev { max-width: 100%; max-height: 160px; border-radius: 12px; margin-top: .7rem; border: 1px solid var(--line); }
 
       /* لوحة الأوامر Ctrl+K */
       .hx-pal { position: fixed; inset: 0; z-index: 250; display: grid; place-items: start center; padding: 12vh 1rem 1rem; background: rgba(5, 8, 20, .7); }
@@ -863,7 +853,6 @@
             <button class="sol-btn active" type="button" data-sol="dash"><i class="fas fa-chart-line"></i> لوحة القيادة</button>
             <button class="sol-btn" type="button" data-sol="students"><i class="fas fa-user-graduate"></i> الطلاب والرسائل <span id="sol-unread-badge" class="sol-badge" style="background:#f87171;color:#fff" hidden>0</span></button>
             <button class="sol-btn" type="button" data-sol="reviews"><i class="fas fa-star"></i> تقييمات الطلاب <span id="sol-pending-badge" class="sol-badge" hidden>0</span></button>
-            <button class="sol-btn" type="button" data-sol="photos"><i class="fas fa-images"></i> صور الطلاب</button>
             <button class="sol-btn" type="button" id="hx-open-pal" title="لوحة الأوامر (Ctrl+K)" style="margin-inline-start:auto"><i class="fas fa-terminal"></i> <span class="mono" style="font-size:.72rem">Ctrl+K</span></button>
           </div>
 
@@ -1035,36 +1024,6 @@
             </div>
           </div>
 
-          <!-- ===== (3) صور الطلاب ===== -->
-          <div class="sol-pane" id="sol-photos">
-            <div class="flex items-center gap-3 mb-8" style="flex-wrap:wrap">
-              <span class="stat-chip">عدد الصور: <b id="ph-count">0</b> / 60</span>
-              <button id="ph-refresh" class="admin-btn" type="button" style="width:auto;padding:.55rem 1rem;margin-inline-start:auto"><i class="fas fa-rotate"></i> تحديث</button>
-            </div>
-            <div class="bg-panel border border-line rounded-2xl p-7 mb-8" id="ph-form-card">
-              <h2 class="text-lg font-bold text-white mb-1" id="ph-form-title">إضافة صورة طالب</h2>
-              <p class="text-xs text-muted mb-5">تُضغط الصورة تلقائيًا في متصفحك (نسخة مصغّرة + نسخة للتكبير) قبل الرفع، فلا تثقل الموقع.</p>
-              <div class="mb-5">
-                <label class="admin-label" id="ph-file-label">الصورة</label>
-                <input id="ph-file" type="file" accept="image/*" class="admin-input" />
-                <div id="ph-note" class="text-xs text-muted" style="margin-top:.4rem"></div>
-                <img id="ph-prev" class="ph-prev" alt="" hidden />
-              </div>
-              <div class="mb-5" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-                <div><label class="admin-label">اسم الطالب (اختياري)</label><input id="ph-name" type="text" maxlength="40" class="admin-input" /></div>
-                <div><label class="admin-label">الترتيب (الأصغر أولًا)</label><input id="ph-order" type="number" class="admin-input" value="0" /></div>
-              </div>
-              <div class="mb-2"><label class="admin-label">تعليق (اختياري)</label><input id="ph-caption" type="text" maxlength="120" class="admin-input" /></div>
-              <div class="flex items-center gap-3 mt-5" style="flex-wrap:wrap">
-                <button id="ph-save" class="admin-btn" type="button" style="width:auto"><i class="fas fa-cloud-arrow-up"></i> <span id="ph-save-label">رفع الصورة</span></button>
-                <button id="ph-cancel" class="admin-btn admin-btn-ghost" type="button" style="width:auto" hidden>إلغاء التعديل</button>
-              </div>
-            </div>
-            <div class="bg-panel border border-line rounded-2xl p-7">
-              <h2 class="text-lg font-bold text-white mb-4">المعرض</h2>
-              <div id="ph-list" class="ph-grid"></div>
-            </div>
-          </div>
 
         </div>
       </main>
@@ -1083,6 +1042,7 @@
         <div class="stc-tools">
           <label><input type="checkbox" id="stc-lock" /> منع الطالب من دخول الحلول حتى يرد</label>
           <button id="stc-unlock" type="button" hidden>رفع المنع الآن</button>
+          <button id="stc-ban" type="button" class="danger"><i class="fas fa-ban"></i> <span id="stc-ban-t">حظر الجهاز بالكامل</span></button>
           <button id="stc-clear" type="button" class="danger">حذف المحادثة</button>
         </div>
         <div id="stc-rec" class="stc-rec" hidden>
@@ -1837,6 +1797,7 @@
 
       let studentsCache = [];
       let studentsInfo = {}; // device_id -> { unread, locked }
+      let studentsBanned = new Set(); // أجهزة محظورة بالكامل
       const ONLINE_MS = 90 * 1000;
 
       function studentWhen(iso) {
@@ -1863,7 +1824,7 @@
 
       /* ---------- قائمة الطلاب: فلاتر + فرز + تحديد جماعي + تصفح تدريجي (خفيفة على المتصفح) ---------- */
       const ST_PAGE = 40;
-      const ST_FILTERS = [["all", "الكل"], ["online", "نشط الآن"], ["unread", "رسائل جديدة"], ["locked", "محجوب"], ["today", "جدد (24س)"], ["rejected", "مرفوض"]];
+      const ST_FILTERS = [["all", "الكل"], ["online", "نشط الآن"], ["unread", "رسائل جديدة"], ["locked", "محجوب"], ["banned", "محظور"], ["today", "جدد (24س)"], ["rejected", "مرفوض"]];
       let stFilter = "all", stSort = "recent", stShown = ST_PAGE;
       const stSel = new Set();
 
@@ -1872,6 +1833,7 @@
         if (f === "online") return isOnline(st);
         if (f === "unread") return st.isLatest && info.unread > 0;
         if (f === "locked") return st.isLatest && !!info.locked;
+        if (f === "banned") return st.isLatest && studentsBanned.has(st.device_id);
         if (f === "today") return Date.now() - new Date(st.created_at).getTime() < 864e5;
         if (f === "rejected") return st.status === "rejected";
         return true;
@@ -1907,7 +1869,13 @@
         const devLine = dt
           ? `<div class="text-xs text-muted" style="margin-top:2px"><i class="fas ${devIcon}" style="margin-inline-end:6px"></i>${escapeHtml(dt)}</div>`
           : '<div class="text-xs text-muted" style="margin-top:2px">نوع الجهاز: غير معروف</div>';
-        const lockLine = info.locked && st.isLatest ? '<div class="text-xs st-lock" style="margin-top:2px"><i class="fas fa-lock"></i> محجوب عن الحلول حتى يرد على رسالتك</div>' : "";
+        const isBan = st.isLatest && studentsBanned.has(st.device_id);
+        const lockLine = isBan
+          ? '<div class="text-xs st-lock" style="margin-top:2px"><i class="fas fa-ban"></i> جهاز محظور بالكامل — يرى المحادثة مع الإدارة فقط</div>'
+          : info.locked && st.isLatest ? '<div class="text-xs st-lock" style="margin-top:2px"><i class="fas fa-lock"></i> محجوب عن الحلول حتى يرد على رسالتك</div>' : "";
+        const banBtn = st.isLatest
+          ? `<button data-device="${escA(st.device_id)}" data-name="${escA(st.name)}" data-banned="${isBan ? "1" : "0"}" class="student-ban-btn" title="${isBan ? "رفع الحظر عن الجهاز" : "حظر الجهاز بالكامل"}" style="background:none;border:none;color:${isBan ? "#4ade9b" : "#fb923c"};cursor:pointer;font-size:.95rem"><i class="fas ${isBan ? "fa-unlock" : "fa-ban"}"></i></button>`
+          : "";
         const msgBtn = st.isLatest
           ? `<button class="st-msg-btn" data-device="${escA(st.device_id)}" data-name="${escA(st.name)}" title="الرسائل"><i class="fas fa-comments"></i>${info.unread ? `<span class="st-badge">${info.unread > 9 ? "9+" : info.unread}</span>` : ""}</button>`
           : "";
@@ -1925,6 +1893,7 @@
             </div>
             <div class="flex items-center gap-3">
               ${msgBtn}
+              ${banBtn}
               <button data-id="${st.id}" data-status="${rej ? "approved" : "rejected"}" class="student-status-btn" title="${rej ? "إلغاء الرفض" : "رفض الاسم"}" style="background:none;border:none;color:${rej ? "#4ade9b" : "#f87171"};cursor:pointer;font-size:.95rem"><i class="fas ${rej ? "fa-rotate-left" : "fa-ban"}"></i></button>
               <button data-id="${st.id}" class="student-del-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:.95rem"><i class="fas fa-trash"></i></button>
             </div>
@@ -1959,10 +1928,10 @@
           if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // حماية من حقن الصيغ في Excel
           return '"' + s.replace(/"/g, '""') + '"';
         };
-        const head = ["الاسم", "الحالة", "نوع الجهاز", "تاريخ التسجيل", "آخر ظهور", "رسائل غير مقروءة", "معرّف الجهاز"];
+        const head = ["الاسم", "الحالة", "نوع الجهاز", "محظور", "تاريخ التسجيل", "آخر ظهور", "رسائل غير مقروءة", "معرّف الجهاز"];
         const lines = studentsCache.map((st) => {
           const info = studentsInfo[st.device_id] || {};
-          return [st.name, st.status === "rejected" ? "مرفوض" : "مقبول", st.device_type || "", st.created_at, st.last_seen || "", info.unread || 0, st.device_id].map(cell).join(",");
+          return [st.name, st.status === "rejected" ? "مرفوض" : "مقبول", st.device_type || "", studentsBanned.has(st.device_id) ? "نعم" : "", st.created_at, st.last_seen || "", info.unread || 0, st.device_id].map(cell).join(",");
         });
         const blob = new Blob(["\ufeff" + [head.map(cell).join(","), ...lines].join("\r\n")], { type: "text/csv;charset=utf-8" });
         const a = document.createElement("a");
@@ -1985,6 +1954,18 @@
       document.getElementById("students-list").addEventListener("click", async (e) => {
         const msg = e.target.closest(".st-msg-btn");
         if (msg) return openStudentChat(msg.dataset.device, msg.dataset.name);
+        const ban = e.target.closest(".student-ban-btn");
+        if (ban) {
+          const on = ban.dataset.banned !== "1";
+          if (!confirm(on
+            ? "حظر جهاز «" + ban.dataset.name + "» بالكامل؟\nلن يرى سوى المحادثة مع الإدارة، ولن يتمكن من دخول الحلول حتى ترفع الحظر."
+            : "رفع الحظر عن جهاز «" + ban.dataset.name + "»؟")) return;
+          ban.disabled = true;
+          try { await sApi("/admin/ban/" + encodeURIComponent(ban.dataset.device), { method: on ? "POST" : "DELETE" }); }
+          catch (err) { ban.disabled = false; return toast("تعذر التنفيذ: " + err.message, false); }
+          toast(on ? "تم حظر الجهاز" : "تم رفع الحظر", true);
+          return loadStudents(true);
+        }
         const stat = e.target.closest(".student-status-btn");
         if (stat) {
           stat.disabled = true;
@@ -2055,6 +2036,7 @@
           return;
         }
         studentsInfo = payload.info || {};
+        studentsBanned = new Set(payload.banned || []);
         const info = studentsInfo;
         const stRes = { data: payload.students || [] };
 
@@ -2085,7 +2067,7 @@
       }, 15000);
 
       /* =========================================================
-         موقع الحلول — القائمة الفرعية + التقييمات + صور الطلاب
+         موقع الحلول — القائمة الفرعية + التقييمات
          (كلها تتصل بنفس الخادم /api وتتطلب تسجيل دخول المدير)
       ========================================================= */
       const $sv = (id) => document.getElementById(id);
@@ -2269,7 +2251,7 @@
         stc.ids = "";
         $stc("stc-name").textContent = name;
         const st = studentsCache.find((x) => x.device_id === device && x.isLatest);
-        $stc("stc-sub").textContent = st ? (st.device_type || "") : "";
+        $stc("stc-sub").textContent = st ? "الجهاز: " + (st.device_type || "غير معروف") : "";
         $stc("stc-lock").checked = false;
         $stc("st-chat").hidden = false;
         await loadStudentChat(true);
@@ -2299,10 +2281,14 @@
         }
         if (device !== stc.device) return;
         const msgs = res.messages || [];
-        const isLocked = !!res.locked;
+        const isBanned = !!res.banned;
+        const isLocked = !!res.locked && !isBanned;
+        stc.banned = isBanned;
         $stc("stc-unlock").hidden = !isLocked;
+        $stc("stc-ban-t").textContent = isBanned ? "رفع الحظر عن الجهاز" : "حظر الجهاز بالكامل";
+        $stc("stc-ban").classList.toggle("danger", !isBanned);
 
-        const ids = msgs.map((m) => m.id).join(",") + "|" + (isLocked ? "L" : "");
+        const ids = msgs.map((m) => m.id).join(",") + "|" + (isLocked ? "L" : "") + (isBanned ? "B" : "");
         if (!force && ids === stc.ids) return;
         stc.ids = ids;
 
@@ -2499,6 +2485,23 @@
       $stc("stc-rstop").addEventListener("click", () => stopAdminRec(false));
       $stc("stc-rcancel").addEventListener("click", () => stopAdminRec(true));
 
+      $stc("stc-ban").addEventListener("click", async () => {
+        if (!stc.device) return;
+        const on = !stc.banned;
+        if (!confirm(on
+          ? "حظر هذا الجهاز بالكامل؟\nلن يرى سوى المحادثة مع الإدارة، ولن يدخل الحلول حتى ترفع الحظر."
+          : "رفع الحظر عن هذا الجهاز؟")) return;
+        try {
+          await sApi("/admin/ban/" + encodeURIComponent(stc.device), { method: on ? "POST" : "DELETE" });
+        } catch (e) {
+          toast("تعذر التنفيذ: " + e.message, false);
+          return;
+        }
+        toast(on ? "تم حظر الجهاز" : "تم رفع الحظر", true);
+        await loadStudentChat(true);
+        loadStudents(true);
+      });
+
       $stc("stc-unlock").addEventListener("click", async () => {
         if (!stc.device) return;
         try {
@@ -2525,7 +2528,7 @@
       });
 
       /* =========================================================
-         مركز قيادة موقع الحلول: لوحة القيادة (SVG خفيف) + صور الطلاب
+         مركز قيادة موقع الحلول: لوحة القيادة (SVG خفيف)
          + لوحة الأوامر Ctrl+K + الإعلان الجماعي + ردود سريعة
       ========================================================= */
       const $h = (id) => document.getElementById(id);
@@ -2644,7 +2647,8 @@
           { l: "نشط خلال 24 ساعة", v: k.active24, cls: "vio", s: flat(pct(k.active24, k.approved) + "%") },
           { l: "جدد خلال 7 أيام", v: k.new7, s: delta(k.new7, k.prev7), sp },
           { l: "رسائل غير مقروءة", v: k.unread, cls: k.unread ? "warn" : "", s: flat(hxFmt(k.messages) + " رسالة") },
-          { l: "محجوب بانتظار الرد", v: k.locked, cls: k.locked ? "bad" : "", s: flat("حجب مؤقت") },
+          { l: "محجوب بانتظار الرد", v: Math.max(0, k.locked - (k.banned || 0)), cls: k.locked ? "bad" : "", s: flat("حجب مؤقت") },
+          { l: "أجهزة محظورة", v: k.banned || 0, cls: k.banned ? "bad" : "", s: flat("حظر كامل") },
           { l: "تقييمات معلّقة", v: r.pending, cls: r.pending ? "warn" : "", s: flat(r.published + " منشور") },
           { l: "معدل العودة", v: pct(k.returning, k.approved) + "%", cls: "vio", s: flat(k.active7 + " نشط/7 أيام") },
         ];
@@ -2689,7 +2693,7 @@
         const r = d.reviews, tot = r.total || 1;
         return `<div class="hx-pipe"><i style="width:${(r.published / tot) * 100}%;background:var(--hx)"></i><i style="width:${(r.pending / tot) * 100}%;background:var(--hx-warn)"></i></div>
           <div class="hx-legend"><span><i style="background:var(--hx)"></i>منشور ${r.published}</span><span><i style="background:var(--hx-warn)"></i>معلّق ${r.pending}</span></div>
-          <div class="hx-stat"><div><b>${r.total}</b>إجمالي التقييمات</div><div><b>${d.photos}</b>صور المعرض</div><div><b>${hxFmt(d.kpi.voice)}</b>رسائل صوتية</div></div>`;
+          <div class="hx-stat"><div><b>${r.total}</b>إجمالي التقييمات</div><div><b>${d.kpi.banned || 0}</b>أجهزة محظورة</div><div><b>${hxFmt(d.kpi.voice)}</b>رسائل صوتية</div></div>`;
       }
 
       function hxFeed(d) {
@@ -2781,7 +2785,6 @@
         if (name === "dash") loadSolDash();
         else if (name === "students") loadStudents(true);
         else if (name === "reviews") loadSolReviews();
-        else if (name === "photos") loadPhotos();
       }
       function openSol(name, after) {
         const b = document.querySelector('.tab-btn[data-tab="students"]');
@@ -2861,7 +2864,6 @@
         { k: "locked", t: "الطلاب: المحجوبون", i: "fa-lock", run: () => openStudentsFilter("locked") },
         { k: "reviews", t: "تقييمات الطلاب", i: "fa-star", run: () => openSol("reviews") },
         { k: "pending", t: "التقييمات قيد المراجعة", i: "fa-hourglass-half", run: () => openSol("reviews", () => { srvFilter = "pending"; renderSolReviews(); }) },
-        { k: "photos", t: "صور الطلاب", i: "fa-images", run: () => openSol("photos") },
         { k: "broadcast", t: "إرسال إعلان للجميع", i: "fa-bullhorn", run: () => openSol("students", bcOpen) },
         { k: "export", t: "تصدير الطلاب CSV", i: "fa-file-csv", run: () => openSol("students", stExport) },
         { k: "refresh", t: "تحديث كل البيانات", i: "fa-rotate", run: () => { loadSolDash(); loadStudents(true); loadSolReviews(true); } },
@@ -2903,136 +2905,6 @@
       document.addEventListener("keydown", (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); $h("hx-pal").hidden ? palOpen() : palClose(); }
         else if (e.key === "Escape") { if (!$h("hx-pal").hidden) palClose(); else if (!$h("bc-modal").hidden) bcClose(); }
-      });
-
-      /* ---------- صور الطلاب (ضغط داخل المتصفح قبل الرفع) ---------- */
-      let phCache = [], phEditId = null, phData = null;
-      const PH_TYPE = (() => { const c = document.createElement("canvas"); c.width = c.height = 1; return c.toDataURL("image/webp").startsWith("data:image/webp") ? "image/webp" : "image/jpeg"; })();
-      const phKB = (n) => Math.round(n / 1024) + "KB";
-
-      async function phLoadImage(file) {
-        if (!/^image\//.test(file.type)) throw new Error("الملف ليس صورة");
-        if (file.size > 25 * 1024 * 1024) throw new Error("الصورة كبيرة جدًا (الحد 25MB)");
-        if (window.createImageBitmap) { try { return await createImageBitmap(file, { imageOrientation: "from-image" }); } catch (_) {} }
-        return new Promise((res, rej) => {
-          const im = new Image(), u = URL.createObjectURL(file);
-          im.onload = () => { URL.revokeObjectURL(u); res(im); };
-          im.onerror = () => rej(new Error("تعذر قراءة الصورة"));
-          im.src = u;
-        });
-      }
-      async function phEncode(src, maxSide, maxBytes) {
-        const sw = src.width || src.naturalWidth, sh = src.height || src.naturalHeight;
-        let scale = Math.min(1, maxSide / Math.max(sw, sh));
-        for (let round = 0; round < 4; round++) {
-          const w = Math.max(1, Math.round(sw * scale)), h = Math.max(1, Math.round(sh * scale));
-          const cv = document.createElement("canvas");
-          cv.width = w; cv.height = h;
-          const ctx = cv.getContext("2d");
-          if (PH_TYPE === "image/jpeg") { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h); }
-          ctx.drawImage(src, 0, 0, w, h);
-          for (const q of [0.82, 0.7, 0.58, 0.46, 0.34]) {
-            const blob = await new Promise((r) => cv.toBlob(r, PH_TYPE, q));
-            if (blob && blob.size <= maxBytes) return { blob, w, h };
-          }
-          scale *= 0.8;
-        }
-        throw new Error("تعذر ضغط الصورة للحجم المطلوب");
-      }
-      const phDataUrl = (blob) => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result)); fr.onerror = () => rej(new Error("فشل قراءة الصورة")); fr.readAsDataURL(blob); });
-
-      function phReset() {
-        phEditId = null; phData = null;
-        $h("ph-file").value = ""; $h("ph-name").value = ""; $h("ph-caption").value = ""; $h("ph-order").value = "0";
-        $h("ph-prev").hidden = true; $h("ph-note").textContent = "";
-        $h("ph-form-title").textContent = "إضافة صورة طالب";
-        $h("ph-save-label").textContent = "رفع الصورة";
-        $h("ph-file-label").textContent = "الصورة";
-        $h("ph-cancel").hidden = true;
-        $h("ph-form-card").classList.remove("edit-mode-card");
-      }
-
-      $h("ph-file").addEventListener("change", async (e) => {
-        const f = e.target.files && e.target.files[0];
-        phData = null; $h("ph-prev").hidden = true;
-        if (!f) return;
-        $h("ph-note").textContent = "جاري ضغط الصورة...";
-        try {
-          const img = await phLoadImage(f);
-          const thumb = await phEncode(img, 480, 140 * 1024), full = await phEncode(img, 1600, 880 * 1024);
-          if (img.close) img.close();
-          phData = { thumb, full };
-          const pv = $h("ph-prev");
-          if (pv.__u) URL.revokeObjectURL(pv.__u);
-          pv.__u = URL.createObjectURL(thumb.blob); pv.src = pv.__u; pv.hidden = false;
-          $h("ph-note").textContent = `تم الضغط: مصغّرة ${phKB(thumb.blob.size)} · كاملة ${phKB(full.blob.size)} (${full.w}×${full.h})`;
-        } catch (err) { $h("ph-note").textContent = ""; e.target.value = ""; toast(err.message, false); }
-      });
-
-      function renderPhotos() {
-        $h("ph-count").textContent = phCache.length;
-        const list = $h("ph-list");
-        if (!phCache.length) { list.innerHTML = '<p class="text-muted text-sm">لا توجد صور بعد.</p>'; return; }
-        list.innerHTML = phCache.map((p) => `
-          <div class="ph-card">
-            <img loading="lazy" decoding="async" src="/api/public/photos/${p.id}/thumb?v=${p.v}" alt="${escA(p.caption || p.name || "صورة طالب")}" />
-            <div class="m"><b>${escapeHtml(p.name || "—")}</b><span>${escapeHtml(p.caption || "")} · #${p.order}</span></div>
-            <div class="a">
-              <button class="sol-icon-btn ph-edit" data-id="${p.id}" title="تعديل" style="color:var(--cyan)"><i class="fas fa-pen"></i></button>
-              <button class="sol-icon-btn ph-del" data-id="${p.id}" title="حذف" style="color:#f87171"><i class="fas fa-trash"></i></button>
-            </div>
-          </div>`).join("");
-      }
-
-      async function loadPhotos() {
-        try { phCache = (await sApi("/admin/solutions/photos")).photos || []; renderPhotos(); }
-        catch (e) { $h("ph-list").innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل الصور: ' + escapeHtml(e.message) + "</p>"; }
-      }
-
-      $h("ph-list").addEventListener("click", async (e) => {
-        const b = e.target.closest("button[data-id]");
-        if (!b) return;
-        const p = phCache.find((x) => x.id === b.dataset.id);
-        if (!p) return;
-        if (b.classList.contains("ph-edit")) {
-          phReset();
-          phEditId = p.id;
-          $h("ph-name").value = p.name; $h("ph-caption").value = p.caption; $h("ph-order").value = p.order;
-          $h("ph-form-title").textContent = "تعديل صورة" + (p.name ? ": " + p.name : "");
-          $h("ph-save-label").textContent = "حفظ التعديلات";
-          $h("ph-file-label").textContent = "استبدال الصورة (اختياري)";
-          $h("ph-cancel").hidden = false;
-          $h("ph-form-card").classList.add("edit-mode-card");
-          $h("ph-form-card").scrollIntoView({ behavior: "smooth", block: "start" });
-        } else if (b.classList.contains("ph-del")) {
-          if (!confirm("حذف هذه الصورة نهائيًا؟")) return;
-          try { await sApi("/admin/solutions/photos/" + encodeURIComponent(p.id), { method: "DELETE" }); }
-          catch (err) { return toast("تعذر الحذف: " + err.message, false); }
-          if (phEditId === p.id) phReset();
-          toast("تم الحذف", true);
-          loadPhotos();
-        }
-      });
-      $h("ph-cancel").addEventListener("click", phReset);
-      $h("ph-refresh").addEventListener("click", loadPhotos);
-      $h("ph-save").addEventListener("click", async () => {
-        if (!phEditId && !phData) return toast("اختر صورة أولًا", false);
-        const btn = $h("ph-save");
-        btn.disabled = true;
-        try {
-          const body = { id: phEditId || undefined, caption: $h("ph-caption").value, name: $h("ph-name").value, order: $h("ph-order").value };
-          if (phData) {
-            body.thumb = await phDataUrl(phData.thumb.blob);
-            body.full = await phDataUrl(phData.full.blob);
-            body.w = phData.full.w; body.h = phData.full.h;
-          }
-          const r = await sApi("/admin/solutions/photos", { method: "POST", body });
-          if (r.status !== "ok") throw new Error({ too_many: "وصلت للحد الأقصى (60 صورة)", invalid_image: "صورة غير صالحة", not_found: "الصورة لم تعد موجودة" }[r.status] || "بيانات غير صالحة");
-          toast(phEditId ? "تم حفظ التعديلات" : "تم رفع الصورة", true);
-          phReset();
-          loadPhotos();
-        } catch (e) { toast("تعذر الحفظ: " + e.message, false); }
-        btn.disabled = false;
       });
 
       /* ---------- Articles ---------- */

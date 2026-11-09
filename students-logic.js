@@ -13,18 +13,66 @@ function cleanType(raw) {
   return t || null;
 }
 
+/* تحديد نوع الجهاز من User-Agent المتصفح (الطالب يفتح الموقع من المتصفح).
+   الناتج يبدأ دائمًا بـ: هاتف | تابلت | كمبيوتر (تعتمد عليه إحصائيات لوحة القيادة). */
+function parseDevice(uaRaw) {
+  const ua = String(uaRaw || "").slice(0, 500);
+  if (!ua) return null;
+  let kind = "كمبيوتر", os = "", model = "";
+  if (/iPad/.test(ua)) { kind = "تابلت"; os = "iPadOS"; model = "iPad"; }
+  else if (/iPhone|iPod/.test(ua)) { kind = "هاتف"; os = "iOS"; model = "iPhone"; }
+  else if (/Android/.test(ua)) {
+    kind = /Mobile/i.test(ua) ? "هاتف" : "تابلت";
+    os = "Android";
+    const m = /Android[^;)]*;\s*([^;)]+?)(?:\s+Build\/[^;)]*)?\s*[;)]/.exec(ua);
+    const name = m ? m[1].trim() : "";
+    // Chrome الحديث يخفي الموديل ويكتب "K" فقط، فنتجاهل القيم العامة
+    if (name.length > 2 && !/^(wv|mobile|linux|u|generic android.*)$/i.test(name)) model = name;
+  }
+  else if (/CrOS/.test(ua)) os = "ChromeOS";
+  else if (/Windows/.test(ua)) os = "Windows";
+  else if (/Macintosh|Mac OS X/.test(ua)) os = "macOS";
+  else if (/Linux|X11/.test(ua)) os = "Linux";
+
+  let br = "";
+  if (/FBAN|FBAV/.test(ua)) br = "فيسبوك (متصفح داخلي)";
+  else if (/Instagram/.test(ua)) br = "إنستغرام (متصفح داخلي)";
+  else if (/EdgA?\/|Edg\//.test(ua)) br = "Edge";
+  else if (/OPR\/|Opera/.test(ua)) br = "Opera";
+  else if (/SamsungBrowser/.test(ua)) br = "Samsung Internet";
+  else if (/Firefox\/|FxiOS/.test(ua)) br = "Firefox";
+  else if (/CriOS|Chrome\//.test(ua)) br = "Chrome";
+  else if (/Safari\//.test(ua)) br = "Safari";
+
+  const parts = [kind, model, os, br].filter(Boolean);
+  return parts.join(" · ").slice(0, 100);
+}
+// الخادم هو المصدر الأوثق؛ نقبل نوع العميل فقط لو كان الخادم يرى "كمبيوتر" والعميل يقول هاتف/تابلت (مثل iPad بوضع سطح المكتب)
+function pickDeviceType(clientRaw, ua) {
+  const client = cleanType(clientRaw), server = parseDevice(ua);
+  if (!server) return client;
+  if (client && /^(هاتف|تابلت)/.test(client) && server.startsWith("كمبيوتر")) return client;
+  return server;
+}
+
 function makeLogic({ db, ObjectId }) {
   // أسماء خاصة بموقع الحلول حتى لا تتعارض أبدًا مع مجموعات الموقع الأول (مثل students)
   const students = db.collection("qureo_students");
   const messages = db.collection("qureo_messages");
   const reviews = db.collection("qureo_reviews"); // تقييمات الطلاب
-  const photos = db.collection("qureo_photos"); // صور الطلاب الذين أنهوا المنصة
+  const bans = db.collection("qureo_bans"); // أجهزة محظورة بالكامل (تظهر لها المحادثة مع الإدارة فقط)
 
   const toId = (id) => {
     try { return new ObjectId(String(id)); } catch (_) { return null; }
   };
 
+  async function isBanned(device) {
+    return !!(await bans.findOne({ device_id: device }, { projection: { _id: 1 } }));
+  }
+
+  // الحظر الكامل يُحسب كقفل دائم: الموقع الحالي للطالب يعرض له المحادثة مع الإدارة فقط ولا يرفعه الرد
   async function isLocked(device) {
+    if (await isBanned(device)) return true;
     const req = await messages.findOne(
       { device_id: device, sender: "admin", requires_reply: true },
       { sort: { created_at: -1 } }
@@ -39,25 +87,26 @@ function makeLogic({ db, ObjectId }) {
   }
 
   /* ---------- عام (للطلاب) ---------- */
-  async function check(device, type) {
+  async function check(device, type, ua) {
     if (!DEVICE_OK(device)) return { status: "none" };
     const r = await latestStudent(device);
-    if (!r) return { status: "none" };
+    if (!r) return (await isBanned(device)) ? { status: "none", banned: true, locked: true } : { status: "none" };
     if (r.status === "approved") {
       const set = { last_seen: new Date() };
-      const t = cleanType(type);
+      const t = pickDeviceType(type, ua);
       if (t) set.device_type = t;
       await students.updateOne({ _id: r._id }, { $set: set });
     }
     return {
       status: r.status,
       name: r.name,
+      banned: await isBanned(device),
       locked: await isLocked(device),
       unread: await messages.countDocuments({ device_id: device, sender: "admin", read_by_student: false }),
     };
   }
 
-  async function register(device, name, type) {
+  async function register(device, name, type, ua) {
     if (!DEVICE_OK(device)) return { status: "invalid" };
     const clean = cleanName(name);
     if (clean.length < 2 || clean.length > 40) return { status: "invalid" };
@@ -73,7 +122,7 @@ function makeLogic({ db, ObjectId }) {
     const now = new Date();
     await students.insertOne({
       device_id: device, name: clean, status: "approved",
-      device_type: cleanType(type), created_at: now, last_seen: now,
+      device_type: pickDeviceType(type, ua), created_at: now, last_seen: now,
     });
     return { status: "approved", name: clean };
   }
@@ -86,6 +135,7 @@ function makeLogic({ db, ObjectId }) {
     rows.reverse();
     return {
       locked: await isLocked(device),
+      banned: await isBanned(device),
       messages: rows.map((m) => ({
         id: String(m._id), sender: m.sender, kind: m.kind, body: m.body || null,
         duration: m.duration || null, requires_reply: !!m.requires_reply, created_at: m.created_at,
@@ -158,12 +208,16 @@ function makeLogic({ db, ObjectId }) {
     });
     Object.keys(lastReq).forEach((d) => { info[d].locked = lastReq[d] > (lastStu[d] || 0); });
 
+    const banned = (await bans.find({}, { projection: { device_id: 1 } }).limit(2000).toArray()).map((b) => b.device_id);
+    banned.forEach((d) => { (info[d] = info[d] || { unread: 0, locked: false }).locked = true; });
+
     return {
       students: rows.map((s) => ({
         id: String(s._id), device_id: s.device_id, name: s.name, status: s.status,
         created_at: s.created_at, last_seen: s.last_seen, device_type: s.device_type || null,
       })),
       info,
+      banned,
     };
   }
 
@@ -189,6 +243,7 @@ function makeLogic({ db, ObjectId }) {
     await messages.updateMany({ device_id: device, sender: "student", read_by_admin: false }, { $set: { read_by_admin: true } });
     return {
       locked: await isLocked(device),
+      banned: await isBanned(device),
       messages: rows.map((m) => ({
         id: String(m._id), sender: m.sender, kind: m.kind, body: m.body || null,
         duration: m.duration || null, requires_reply: !!m.requires_reply, created_at: m.created_at,
@@ -217,6 +272,18 @@ function makeLogic({ db, ObjectId }) {
   async function adminUnlock(device) {
     if (!DEVICE_OK(device)) return false;
     await messages.updateMany({ device_id: device, sender: "admin", requires_reply: true }, { $set: { requires_reply: false } });
+    return true;
+  }
+
+  // حظر/رفع حظر جهاز بالكامل (مرتبط بمعرّف الجهاز، فيبقى حتى لو حُذف اسم الطالب)
+  async function adminSetBan(device, banned) {
+    if (!DEVICE_OK(device)) return false;
+    statsCache = null;
+    if (banned) {
+      await bans.updateOne({ device_id: device }, { $setOnInsert: { device_id: device, banned_at: new Date() } }, { upsert: true });
+    } else {
+      await bans.deleteOne({ device_id: device });
+    }
     return true;
   }
 
@@ -290,80 +357,6 @@ function makeLogic({ db, ObjectId }) {
   }
 
   /* =========================================================
-     صور الطلاب الذين أنهوا المنصة (photos)
-     كل صورة تُخزَّن بنسختين: thumb صغيرة للمعرض + full للتكبير.
-     الصور تُخدَّم كملفات (وليس داخل JSON) مع كاش طويل، فلا تثقل الصفحة.
-  ========================================================= */
-  const MAX_PHOTOS = 60, MAX_THUMB = 150 * 1024, MAX_FULL = 900 * 1024;
-
-  function decodeImage(dataUrl, maxBytes) {
-    const m = /^data:image\/(?:webp|jpeg|png);base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl || ""));
-    if (!m) return null;
-    const buf = Buffer.from(m[1], "base64");
-    if (!buf.length || buf.length > maxBytes) return null;
-    // نتحقق من نوع الملف الحقيقي (وليس من الادعاء) قبل الحفظ
-    let type = null;
-    if (buf.slice(0, 4).toString("latin1") === "RIFF" && buf.slice(8, 12).toString("latin1") === "WEBP") type = "image/webp";
-    else if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) type = "image/jpeg";
-    else if (buf.slice(1, 4).toString("latin1") === "PNG") type = "image/png";
-    return type ? { buf, type } : null;
-  }
-
-  const photoOut = (p) => ({
-    id: String(p._id), caption: p.caption || "", name: p.name || "", w: p.w || 0, h: p.h || 0,
-    order: p.order || 0, v: new Date(p.updated_at || p.created_at).getTime(),
-  });
-
-  async function publicPhotos() {
-    const rows = await photos.find({}, { projection: { thumb: 0, full: 0 } }).sort({ order: 1, created_at: -1 }).limit(MAX_PHOTOS).toArray();
-    return { photos: rows.map(photoOut) };
-  }
-
-  async function photoImage(id, kind) {
-    const oid = toId(id);
-    if (!oid || (kind !== "thumb" && kind !== "full")) return null;
-    const p = await photos.findOne({ _id: oid }, { projection: { [kind]: 1, [kind + "_type"]: 1 } });
-    if (!p || !p[kind]) return null;
-    const raw = p[kind];
-    return { buf: Buffer.isBuffer(raw) ? raw : Buffer.from(raw.buffer), type: p[kind + "_type"] || "image/webp" };
-  }
-
-  const adminPhotos = publicPhotos;
-
-  // إضافة (بدون id: الصورتان مطلوبتان) أو تعديل (مع id: الصور اختيارية)
-  async function adminPhotoSave({ id, caption, name, order, thumb, full, w, h }) {
-    const set = {
-      caption: clip(caption, 120), name: clip(name, 40),
-      order: Math.max(-9999, Math.min(9999, Math.round(Number(order) || 0))), updated_at: new Date(),
-    };
-    let t = null, f = null;
-    if (thumb || full || !id) {
-      t = decodeImage(thumb, MAX_THUMB);
-      f = decodeImage(full, MAX_FULL);
-      if (!t || !f) return { status: "invalid_image" };
-      set.thumb = t.buf; set.thumb_type = t.type;
-      set.full = f.buf; set.full_type = f.type;
-      set.w = Math.max(1, Math.min(4000, Math.round(Number(w) || 0))) || 1;
-      set.h = Math.max(1, Math.min(4000, Math.round(Number(h) || 0))) || 1;
-    }
-    if (id) {
-      const oid = toId(id);
-      if (!oid) return { status: "invalid" };
-      const res = await photos.updateOne({ _id: oid }, { $set: set });
-      return { status: res.matchedCount ? "ok" : "not_found" };
-    }
-    if ((await photos.countDocuments({})) >= MAX_PHOTOS) return { status: "too_many" };
-    await photos.insertOne({ ...set, created_at: new Date() });
-    return { status: "ok" };
-  }
-
-  async function adminPhotoDelete(id) {
-    const oid = toId(id);
-    if (!oid) return false;
-    return (await photos.deleteOne({ _id: oid })).deletedCount > 0;
-  }
-
-  /* =========================================================
      لوحة القيادة: إحصائيات مجمّعة داخل MongoDB (بدون سحب البيانات الخام)
      - كل شيء في استدعاء واحد + كاش 15 ثانية حتى لا تُحمَّل القاعدة
      - لا تُقرأ حقول الصوت أبدًا
@@ -392,7 +385,7 @@ function makeLogic({ db, ObjectId }) {
     const cnt = (cond) => ({ $sum: { $cond: [cond, 1, 0] } });
     const typeIs = (re) => ({ $regexMatch: { input: { $ifNull: ["$type", ""] }, regex: re } });
 
-    const [dev, stuFacet, rawTypes, msgFacet, unread, voice, totalMsgs, reqs, revAgg, photoCount, recentStu, recentMsg, recentRev] = await Promise.all([
+    const [dev, stuFacet, rawTypes, msgFacet, unread, voice, totalMsgs, reqs, revAgg, bannedCount, recentStu, recentMsg, recentRev] = await Promise.all([
       // (1) آخر سجل لكل جهاز ثم عدّادات مجمّعة
       students.aggregate([
         { $sort: { created_at: -1 } },
@@ -441,7 +434,7 @@ function makeLogic({ db, ObjectId }) {
         { $group: { _id: "$device_id", t: { $max: "$created_at" } } }, { $limit: 500 },
       ]).toArray(),
       reviews.aggregate([{ $group: { _id: "$status", n: { $sum: 1 } } }]).toArray(),
-      photos.estimatedDocumentCount(),
+      bans.estimatedDocumentCount(),
       students.find({}, { projection: { name: 1, device_type: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(8).toArray(),
       messages.find({ sender: "student" }, { projection: { device_id: 1, kind: 1, body: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(8).toArray(),
       reviews.find({}, { projection: { name: 1, status: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(5).toArray(),
@@ -488,7 +481,7 @@ function makeLogic({ db, ObjectId }) {
       kpi: {
         devices: k.devices || 0, approved: k.approved || 0, rejected: k.rejected || 0, online: k.online || 0,
         active24: k.active24 || 0, active7: k.active7 || 0, new7: k.new7 || 0, prev7: k.prev7 || 0,
-        returning: k.returning || 0, unread, locked, messages: totalMsgs, voice,
+        returning: k.returning || 0, unread, locked, banned: bannedCount || 0, messages: totalMsgs, voice,
       },
       days: keys30,
       signups: keys30.map((d) => dailyMap.get(d) || 0),
@@ -498,7 +491,6 @@ function makeLogic({ db, ObjectId }) {
       devices: { phone: k.phone || 0, tablet: k.tablet || 0, desktop: k.desktop || 0, unknown: k.unknown || 0, raw: rawTypes.map((x) => ({ type: x._id, n: x.n })) },
       heat,
       reviews: { ...rv, total: rv.pending + rv.published },
-      photos: photoCount,
       top: mf.top.map((x) => ({ name: names[x._id] || "طالب", n: x.n, last: x.last })),
       feed,
     };
@@ -549,11 +541,13 @@ function makeLogic({ db, ObjectId }) {
   }
 
   async function ensureIndexes() {
+    // ميزة صور الطلاب أُزيلت نهائيًا: نحذف مجموعتها القديمة من القاعدة إن وُجدت
+    await db.collection("qureo_photos").drop().catch(() => {});
     await students.createIndex({ device_id: 1, created_at: -1 });
     await messages.createIndex({ device_id: 1, created_at: 1 });
     await reviews.createIndex({ status: 1, order: 1, created_at: -1 });
     await reviews.createIndex({ device_id: 1, created_at: -1 });
-    await photos.createIndex({ order: 1, created_at: -1 });
+    await bans.createIndex({ device_id: 1 }, { unique: true });
     // فهارس لوحة القيادة (تجعل الإحصائيات سريعة وخفيفة)
     await students.createIndex({ created_at: -1 });
     await messages.createIndex({ created_at: -1, sender: 1 });
@@ -564,9 +558,8 @@ function makeLogic({ db, ObjectId }) {
 
   return {
     check, register, inbox, audio, markRead, send,
-    adminList, adminSetStatus, adminDeleteStudent, adminMessages, adminAudio, adminSend, adminUnlock, adminClear,
+    adminList, adminSetStatus, adminDeleteStudent, adminMessages, adminAudio, adminSend, adminUnlock, adminSetBan, adminClear,
     publicReviews, reviewSubmit, adminReviews, adminReviewSave, adminReviewDelete,
-    publicPhotos, photoImage, adminPhotos, adminPhotoSave, adminPhotoDelete,
     adminStats, adminBulk, adminBroadcast, adminReviewsPublishAll,
     ensureIndexes,
   };
@@ -588,4 +581,4 @@ function explainError(e) {
   return "خطأ في الخادم: " + m.slice(0, 120);
 }
 
-module.exports = { makeLogic, explainError };
+module.exports = { makeLogic, explainError, parseDevice, pickDeviceType };

@@ -92,6 +92,12 @@ function cleanIp(raw) {
   return /^[0-9a-fA-F:.]+$/.test(v) ? v : null;
 }
 
+function deviceLabel(info) {
+  const modelLabel = info.model && info.brand && info.brand !== "Apple" && !info.model.toLowerCase().startsWith(info.brand.toLowerCase())
+    ? info.brand + " " + info.model : info.model;
+  return [info.kind, modelLabel, info.os, info.browser].filter(Boolean).join(" · ").slice(0, 100);
+}
+
 function analyzeDevice(clientTypeRaw, ua, rawInfo) {
   const u = parseUA(ua), c = cleanInfo(rawInfo), ct = cleanType(clientTypeRaw);
   if (!u && !c) return { type: ct, info: null };
@@ -112,10 +118,7 @@ function analyzeDevice(clientTypeRaw, ua, rawInfo) {
   if (/^(هاتف|تابلت)/.test(ct || "") && info.kind === "كمبيوتر" && !(c && c.touch === 0)) info.kind = ct.startsWith("هاتف") ? "هاتف" : "تابلت";
   info.brand = brandOf(info.model, info.os);
   if (info.os === "Windows" && /^\d+\.\d+$/.test(info.os_ver)) info.os_ver = "10/11";
-  const modelLabel = info.model && info.brand && info.brand !== "Apple" && !info.model.toLowerCase().startsWith(info.brand.toLowerCase())
-    ? info.brand + " " + info.model : info.model;
-  const type = [info.kind, modelLabel, info.os, info.browser].filter(Boolean).join(" · ").slice(0, 100);
-  return { type, info };
+  return { type: deviceLabel(info), info };
 }
 function parseDevice(ua) { return analyzeDevice(null, ua, null).type; }
 function pickDeviceType(clientRaw, ua, rawInfo) { return analyzeDevice(clientRaw, ua, rawInfo).type; }
@@ -185,7 +188,16 @@ function makeLogic({ db, ObjectId }) {
       const set = { last_seen: new Date() };
       const d = analyzeDevice(type, ua, info);
       if (d.type) set.device_type = d.type;
-      if (d.info) set.device_info = d.info;
+      if (d.info) {
+        // صفحة قديمة محفوظة عند الطالب لا ترسل p_info: لا نمسح البيانات الكاملة التي وصلتنا منه سابقًا
+        const prev = r.device_info || {};
+        set.device_info = cleanInfo(info) ? d.info : Object.assign({}, d.info, {
+          model: d.info.model || prev.model || "", os_ver: prev.os_ver || d.info.os_ver, browser_ver: prev.browser_ver || d.info.browser_ver,
+          w: prev.w, h: prev.h, dpr: prev.dpr, cores: prev.cores, mem: prev.mem, touch: prev.touch,
+          gpu: prev.gpu, tz: prev.tz, lang: prev.lang, net: prev.net, arch: prev.arch, fp: prev.fp, hw: prev.hw,
+        });
+        if (!cleanInfo(info)) { set.device_info.brand = brandOf(set.device_info.model, set.device_info.os); set.device_type = deviceLabel(set.device_info); }
+      }
       if (cleanIp(ip)) set.last_ip = cleanIp(ip);
       await students.updateOne({ _id: r._id }, { $set: set });
     }

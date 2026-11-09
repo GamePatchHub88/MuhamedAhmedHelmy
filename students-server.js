@@ -92,8 +92,8 @@ app.get("/api/health", async (_req, res) => {
 const rpc = express.Router();
 rpc.use(limiter);
 const UA = (r) => r.headers["user-agent"] || "";
-rpc.post("/student_check", wrap((l, r) => l.check(r.body.p_device, r.body.p_type, UA(r))));
-rpc.post("/student_register", wrap((l, r) => l.register(r.body.p_device, r.body.p_name, r.body.p_type, UA(r))));
+rpc.post("/student_check", wrap((l, r) => l.check(r.body.p_device, r.body.p_type, UA(r), r.body.p_info)));
+rpc.post("/student_register", wrap((l, r) => l.register(r.body.p_device, r.body.p_name, r.body.p_type, UA(r), r.body.p_info)));
 rpc.post("/student_inbox", wrap((l, r) => l.inbox(r.body.p_device)));
 rpc.post("/student_audio", wrap((l, r) => l.audio(r.body.p_device, r.body.p_id)));
 rpc.post("/student_mark_read", wrap((l, r) => l.markRead(r.body.p_device)));

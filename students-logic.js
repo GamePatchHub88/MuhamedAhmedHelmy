@@ -13,12 +13,31 @@ function cleanType(raw) {
   return t || null;
 }
 
-/* تحديد نوع الجهاز من User-Agent المتصفح (الطالب يفتح الموقع من المتصفح).
-   الناتج يبدأ دائمًا بـ: هاتف | تابلت | كمبيوتر (تعتمد عليه إحصائيات لوحة القيادة). */
-function parseDevice(uaRaw) {
+/* =========================================================
+   تحليل الجهاز: User-Agent من المتصفح + بيانات إضافية يرسلها موقع الطالب (اختيارية)
+   الناتج: { type: "هاتف · Samsung SM-S918B · Android · Chrome", info: {...} }
+   type يبدأ دائمًا بـ: هاتف | تابلت | كمبيوتر (تعتمد عليه إحصائيات لوحة القيادة).
+========================================================= */
+const BRANDS = [
+  [/^(iPhone|iPad|iPod|Mac)/i, "Apple"], [/^(SM-|GT-|SC-|Samsung)/i, "Samsung"],
+  [/(Redmi|POCO|Xiaomi|^Mi\s|^M\d{4}[A-Z]\d|^2\d{6,}[A-Z]{0,2}$)/i, "Xiaomi"],
+  [/^(CPH|PH[A-Z]\d|OPPO)/i, "OPPO"], [/^(RMX|realme)/i, "realme"], [/^(V\d{4}|vivo)/i, "vivo"],
+  [/(HUAWEI|HONOR|^[A-Z]{3}-[LAN]\d{2}|^[A-Z]{3}-AL\d{2})/i, "Huawei/Honor"], [/Pixel/i, "Google"],
+  [/(TECNO|^T[A-Z]\d{3,4}|^CK\d|^CL\d)/i, "TECNO"], [/(Infinix|^X\d{3,4}[A-Z]?$)/i, "Infinix"],
+  [/itel/i, "itel"], [/^(moto|XT\d{4})/i, "Motorola"], [/Nokia/i, "Nokia"], [/(OnePlus|^(IN|KB|LE|HD|GM)\d{4})/i, "OnePlus"],
+  [/Lenovo/i, "Lenovo"], [/^(Lenovo|TB-)/i, "Lenovo"],
+];
+function brandOf(model, os) {
+  const m = String(model || "");
+  if (os === "iOS" || os === "iPadOS" || os === "macOS") return "Apple";
+  for (const [re, name] of BRANDS) if (m && re.test(m)) return name;
+  return "";
+}
+
+function parseUA(uaRaw) {
   const ua = String(uaRaw || "").slice(0, 500);
   if (!ua) return null;
-  let kind = "كمبيوتر", os = "", model = "";
+  let kind = "كمبيوتر", os = "", os_ver = "", model = "";
   if (/iPad/.test(ua)) { kind = "تابلت"; os = "iPadOS"; model = "iPad"; }
   else if (/iPhone|iPod/.test(ua)) { kind = "هاتف"; os = "iOS"; model = "iPhone"; }
   else if (/Android/.test(ua)) {
@@ -34,26 +53,67 @@ function parseDevice(uaRaw) {
   else if (/Macintosh|Mac OS X/.test(ua)) os = "macOS";
   else if (/Linux|X11/.test(ua)) os = "Linux";
 
-  let br = "";
-  if (/FBAN|FBAV/.test(ua)) br = "فيسبوك (متصفح داخلي)";
-  else if (/Instagram/.test(ua)) br = "إنستغرام (متصفح داخلي)";
-  else if (/EdgA?\/|Edg\//.test(ua)) br = "Edge";
-  else if (/OPR\/|Opera/.test(ua)) br = "Opera";
-  else if (/SamsungBrowser/.test(ua)) br = "Samsung Internet";
-  else if (/Firefox\/|FxiOS/.test(ua)) br = "Firefox";
-  else if (/CriOS|Chrome\//.test(ua)) br = "Chrome";
-  else if (/Safari\//.test(ua)) br = "Safari";
+  if (os === "Android") os_ver = (/Android ([\d.]+)/.exec(ua) || [])[1] || "";
+  else if (os === "iOS" || os === "iPadOS") os_ver = ((/OS (\d+)[_.](\d+)/.exec(ua) || []).slice(1, 3)).join(".");
+  else if (os === "Windows") os_ver = (/Windows NT ([\d.]+)/.exec(ua) || [])[1] || "";
+  else if (os === "macOS") os_ver = ((/Mac OS X ([\d_.]+)/.exec(ua) || [])[1] || "").replace(/_/g, ".");
 
-  const parts = [kind, model, os, br].filter(Boolean);
-  return parts.join(" · ").slice(0, 100);
+  let browser = "", bv = "";
+  const ver = (re) => (re.exec(ua) || [])[1] || "";
+  if (/FBAN|FBAV/.test(ua)) browser = "فيسبوك (متصفح داخلي)";
+  else if (/Instagram/.test(ua)) browser = "إنستغرام (متصفح داخلي)";
+  else if (/EdgA?\/|Edg\//.test(ua)) { browser = "Edge"; bv = ver(/Edg[A]?\/(\d+)/); }
+  else if (/OPR\/|Opera/.test(ua)) { browser = "Opera"; bv = ver(/OPR\/(\d+)/); }
+  else if (/SamsungBrowser/.test(ua)) { browser = "Samsung Internet"; bv = ver(/SamsungBrowser\/(\d+)/); }
+  else if (/Firefox\/|FxiOS/.test(ua)) { browser = "Firefox"; bv = ver(/(?:Firefox|FxiOS)\/(\d+)/); }
+  else if (/CriOS|Chrome\//.test(ua)) { browser = "Chrome"; bv = ver(/(?:Chrome|CriOS)\/(\d+)/); }
+  else if (/Safari\//.test(ua)) { browser = "Safari"; bv = ver(/Version\/(\d+)/); }
+
+  return { kind, os, os_ver, model, browser, browser_ver: bv, brand: brandOf(model, os) };
 }
-// الخادم هو المصدر الأوثق؛ نقبل نوع العميل فقط لو كان الخادم يرى "كمبيوتر" والعميل يقول هاتف/تابلت (مثل iPad بوضع سطح المكتب)
-function pickDeviceType(clientRaw, ua) {
-  const client = cleanType(clientRaw), server = parseDevice(ua);
-  if (!server) return client;
-  if (client && /^(هاتف|تابلت)/.test(client) && server.startsWith("كمبيوتر")) return client;
-  return server;
+
+// تنقية البيانات التي يرسلها موقع الطالب (لا نثق بها: نقصّ الطول ونتحقق من الأنواع)
+function cleanInfo(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const str = (v, n) => String(v == null ? "" : v).replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, n);
+  const num = (v, a, b) => { v = Number(v); return Number.isFinite(v) && v >= a && v <= b ? Math.round(v * 100) / 100 : null; };
+  const hash = (v) => (/^[a-f0-9]{16,64}$/.test(String(v)) ? String(v) : null);
+  return {
+    model: str(raw.model, 60), pv: str(raw.pv, 30), bv: str(raw.bv, 30), arch: str(raw.arch, 12),
+    w: num(raw.w, 100, 10000), h: num(raw.h, 100, 10000), dpr: num(raw.dpr, 0.5, 10),
+    cores: num(raw.cores, 1, 256), mem: num(raw.mem, 0.25, 1024), touch: num(raw.touch, 0, 50),
+    gpu: str(raw.gpu, 90), tz: str(raw.tz, 50), lang: str(raw.lang, 20), net: str(raw.net, 12),
+    fp: hash(raw.fp), hw: hash(raw.hw),
+  };
 }
+
+function analyzeDevice(clientTypeRaw, ua, rawInfo) {
+  const u = parseUA(ua), c = cleanInfo(rawInfo), ct = cleanType(clientTypeRaw);
+  if (!u && !c) return { type: ct, info: null };
+  const info = Object.assign({ kind: "كمبيوتر", os: "", os_ver: "", model: "", browser: "", browser_ver: "" }, u || {});
+  if (c) {
+    if (c.model && c.model.length > 2) info.model = c.model;                 // الموديل الحقيقي من Client Hints
+    if (c.bv) info.browser_ver = c.bv;
+    if (c.pv) {
+      const major = parseInt(c.pv, 10);
+      if (info.os === "Windows") info.os_ver = major >= 13 ? "11" : "10";    // UA يقول 10 حتى على ويندوز 11
+      else if (info.os === "Android") info.os_ver = String(major || info.os_ver);
+      else if (info.os === "macOS" || info.os === "ChromeOS") info.os_ver = c.pv;
+    } else if (info.os === "Windows") info.os_ver = "10/11";
+    ["w", "h", "dpr", "cores", "mem", "touch", "gpu", "tz", "lang", "net", "arch", "fp", "hw"].forEach((k) => { if (c[k] != null && c[k] !== "") info[k] = c[k]; });
+    // iPad بوضع سطح المكتب يتنكر كـ Mac لكنه يملك شاشة لمس
+    if (info.os === "macOS" && c.touch > 1) { info.kind = "تابلت"; info.os = "iPadOS"; info.model = "iPad"; }
+  }
+  if (/^(هاتف|تابلت)/.test(ct || "") && info.kind === "كمبيوتر" && !(c && c.touch === 0)) info.kind = ct.startsWith("هاتف") ? "هاتف" : "تابلت";
+  info.brand = brandOf(info.model, info.os);
+  if (info.os === "Windows" && /^\d+\.\d+$/.test(info.os_ver)) info.os_ver = "10/11";
+  const modelLabel = info.model && info.brand && info.brand !== "Apple" && !info.model.toLowerCase().startsWith(info.brand.toLowerCase())
+    ? info.brand + " " + info.model : info.model;
+  const type = [info.kind, modelLabel, info.os, info.browser].filter(Boolean).join(" · ").slice(0, 100);
+  return { type, info };
+}
+function parseDevice(ua) { return analyzeDevice(null, ua, null).type; }
+function pickDeviceType(clientRaw, ua, rawInfo) { return analyzeDevice(clientRaw, ua, rawInfo).type; }
 
 function makeLogic({ db, ObjectId }) {
   // أسماء خاصة بموقع الحلول حتى لا تتعارض أبدًا مع مجموعات الموقع الأول (مثل students)
@@ -66,8 +126,30 @@ function makeLogic({ db, ObjectId }) {
     try { return new ObjectId(String(id)); } catch (_) { return null; }
   };
 
-  async function isBanned(device) {
-    return !!(await bans.findOne({ device_id: device }, { projection: { _id: 1 } }));
+  // هل الجهاز محظور؟ إما بمعرّفه، أو ببصمته القوية (تتجاوز مسح بيانات المتصفح وتغيير المعرّف).
+  // عند المطابقة بالبصمة ينتقل الحظر تلقائيًا إلى المعرّف الجديد أيضًا.
+  async function isBanned(device, fpHint) {
+    // وثيقة موجودة بـ released=true تعني أن المدير رفع الحظر التلقائي عن هذا الجهاز عمدًا (مثلًا طالب بريء يتشابه جهازه)
+    const direct = await bans.findOne({ device_id: device }, { projection: { released: 1 } });
+    if (direct) return !direct.released;
+    let fp = fpHint || null, hw = null;
+    if (!fp) {
+      const st = await latestStudent(device);
+      const di = st && st.device_info;
+      fp = di && di.fp; hw = di && di.hw;
+    }
+    if (!fp) return false;
+    const hit = await bans.findOne({ fp, released: { $ne: true } }, { projection: { device_id: 1 } });
+    if (!hit) return false;
+    if (!fpHint) {
+      statsCache = null;
+      await bans.updateOne(
+        { device_id: device },
+        { $setOnInsert: { device_id: device, banned_at: new Date(), fp, hw: hw || null, auto_from: hit.device_id } },
+        { upsert: true }
+      ).catch(() => {});
+    }
+    return true;
   }
 
   // الحظر الكامل يُحسب كقفل دائم: الموقع الحالي للطالب يعرض له المحادثة مع الإدارة فقط ولا يرفعه الرد
@@ -87,14 +169,18 @@ function makeLogic({ db, ObjectId }) {
   }
 
   /* ---------- عام (للطلاب) ---------- */
-  async function check(device, type, ua) {
+  async function check(device, type, ua, info) {
     if (!DEVICE_OK(device)) return { status: "none" };
     const r = await latestStudent(device);
-    if (!r) return (await isBanned(device)) ? { status: "none", banned: true, locked: true } : { status: "none" };
+    if (!r) {
+      const fp = (cleanInfo(info) || {}).fp;
+      return (await isBanned(device, fp)) ? { status: "none", banned: true, locked: true } : { status: "none" };
+    }
     if (r.status === "approved") {
       const set = { last_seen: new Date() };
-      const t = pickDeviceType(type, ua);
-      if (t) set.device_type = t;
+      const d = analyzeDevice(type, ua, info);
+      if (d.type) set.device_type = d.type;
+      if (d.info) set.device_info = d.info;
       await students.updateOne({ _id: r._id }, { $set: set });
     }
     return {
@@ -106,7 +192,7 @@ function makeLogic({ db, ObjectId }) {
     };
   }
 
-  async function register(device, name, type, ua) {
+  async function register(device, name, type, ua, info) {
     if (!DEVICE_OK(device)) return { status: "invalid" };
     const clean = cleanName(name);
     if (clean.length < 2 || clean.length > 40) return { status: "invalid" };
@@ -120,10 +206,12 @@ function makeLogic({ db, ObjectId }) {
     }
 
     const now = new Date();
+    const d = analyzeDevice(type, ua, info);
     await students.insertOne({
       device_id: device, name: clean, status: "approved",
-      device_type: pickDeviceType(type, ua), created_at: now, last_seen: now,
+      device_type: d.type, device_info: d.info, created_at: now, last_seen: now,
     });
+    await isBanned(device); // ينقل الحظر فورًا لو كانت البصمة مطابقة لجهاز محظور
     return { status: "approved", name: clean };
   }
 
@@ -208,16 +296,31 @@ function makeLogic({ db, ObjectId }) {
     });
     Object.keys(lastReq).forEach((d) => { info[d].locked = lastReq[d] > (lastStu[d] || 0); });
 
-    const banned = (await bans.find({}, { projection: { device_id: 1 } }).limit(2000).toArray()).map((b) => b.device_id);
+    const banDocs = (await bans.find({}).limit(2000).toArray()).filter((b) => !b.released);
+    const banned = banDocs.map((b) => b.device_id);
+    const autoBanned = banDocs.filter((b) => b.auto_from).map((b) => b.device_id);
+    const bannedSet = new Set(banned), hwBanned = new Set(banDocs.map((b) => b.hw).filter(Boolean));
     banned.forEach((d) => { (info[d] = info[d] || { unread: 0, locked: false }).locked = true; });
+
+    // أجهزة غير محظورة تشبه جهازًا محظورًا (نفس العتاد، متصفح مختلف): تنبيه للمدير فقط وليس حظرًا تلقائيًا
+    const similar = [], seenDev = new Set();
+    rows.forEach((s) => {
+      if (seenDev.has(s.device_id)) return;
+      seenDev.add(s.device_id);
+      const hw = s.device_info && s.device_info.hw;
+      if (hw && hwBanned.has(hw) && !bannedSet.has(s.device_id)) similar.push(s.device_id);
+    });
 
     return {
       students: rows.map((s) => ({
         id: String(s._id), device_id: s.device_id, name: s.name, status: s.status,
         created_at: s.created_at, last_seen: s.last_seen, device_type: s.device_type || null,
+        device_info: s.device_info ? { ...s.device_info, fp: undefined, hw: undefined } : null,
       })),
       info,
       banned,
+      autoBanned,
+      similar,
     };
   }
 
@@ -275,14 +378,25 @@ function makeLogic({ db, ObjectId }) {
     return true;
   }
 
-  // حظر/رفع حظر جهاز بالكامل (مرتبط بمعرّف الجهاز، فيبقى حتى لو حُذف اسم الطالب)
+  // حظر/رفع حظر جهاز بالكامل: يُربط بمعرّف الجهاز وببصمته، فيبقى حتى لو حُذف الاسم أو مُسحت بيانات المتصفح
   async function adminSetBan(device, banned) {
     if (!DEVICE_OK(device)) return false;
     statsCache = null;
+    const st = await latestStudent(device);
+    const di = (st && st.device_info) || {};
+    const cur = await bans.findOne({ device_id: device });
     if (banned) {
-      await bans.updateOne({ device_id: device }, { $setOnInsert: { device_id: device, banned_at: new Date() } }, { upsert: true });
+      await bans.updateOne(
+        { device_id: device },
+        { $set: { fp: di.fp || null, hw: di.hw || null, name: st ? st.name : null, released: false }, $unset: { auto_from: "" }, $setOnInsert: { device_id: device, banned_at: new Date() } },
+        { upsert: true }
+      );
+    } else if (cur && cur.auto_from) {
+      // حظر تلقائي بالبصمة: نرفعه عن هذا الجهاز فقط ونتذكر ذلك حتى لا يعود تلقائيًا، ويبقى الأصل محظورًا
+      await bans.updateOne({ device_id: device }, { $set: { released: true } });
     } else {
-      await bans.deleteOne({ device_id: device });
+      // رفع حظر الجهاز الأصلي يرفع معه كل ما انتقل منه تلقائيًا
+      await bans.deleteMany({ $or: [{ device_id: device }, { auto_from: device }] });
     }
     return true;
   }
@@ -434,7 +548,7 @@ function makeLogic({ db, ObjectId }) {
         { $group: { _id: "$device_id", t: { $max: "$created_at" } } }, { $limit: 500 },
       ]).toArray(),
       reviews.aggregate([{ $group: { _id: "$status", n: { $sum: 1 } } }]).toArray(),
-      bans.estimatedDocumentCount(),
+      bans.countDocuments({ released: { $ne: true } }),
       students.find({}, { projection: { name: 1, device_type: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(8).toArray(),
       messages.find({ sender: "student" }, { projection: { device_id: 1, kind: 1, body: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(8).toArray(),
       reviews.find({}, { projection: { name: 1, status: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(5).toArray(),
@@ -548,6 +662,8 @@ function makeLogic({ db, ObjectId }) {
     await reviews.createIndex({ status: 1, order: 1, created_at: -1 });
     await reviews.createIndex({ device_id: 1, created_at: -1 });
     await bans.createIndex({ device_id: 1 }, { unique: true });
+    await bans.createIndex({ fp: 1 }, { sparse: true });
+    await students.createIndex({ device_id: 1, "device_info.fp": 1 }, { sparse: true });
     // فهارس لوحة القيادة (تجعل الإحصائيات سريعة وخفيفة)
     await students.createIndex({ created_at: -1 });
     await messages.createIndex({ created_at: -1, sender: 1 });
@@ -581,4 +697,4 @@ function explainError(e) {
   return "خطأ في الخادم: " + m.slice(0, 120);
 }
 
-module.exports = { makeLogic, explainError, parseDevice, pickDeviceType };
+module.exports = { makeLogic, explainError, parseDevice, pickDeviceType, analyzeDevice };

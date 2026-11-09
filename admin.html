@@ -426,6 +426,22 @@
       .hx-bulk[hidden] { display: none; }
       .hx-bulk b { font-family: "JetBrains Mono", monospace; color: var(--cyan); }
 
+      /* بطاقة الجهاز */
+      .dv-art { position: relative; display: inline-block; width: 100%; height: 100%; color: var(--cyan); }
+      .dv-art svg { width: 100%; height: 100%; display: block; }
+      .dv-art i { position: absolute; left: 50%; transform: translate(-50%, -50%); color: var(--fog); opacity: .9; }
+      .item-icon.dv-mini { width: 40px; height: 46px; padding: 2px; background: none; border: 0; }
+      .dv-box { border-top: 1px solid var(--line); padding: .5rem .9rem; font-size: .78rem; color: var(--muted); }
+      .dv-box summary { cursor: pointer; color: var(--fog); font-weight: 700; list-style: none; }
+      .dv-box summary::-webkit-details-marker { display: none; }
+      .dv-body { display: flex; gap: 1rem; align-items: flex-start; margin-top: .6rem; max-height: 34vh; overflow: auto; }
+      .dv-big { flex: 0 0 84px; height: 98px; }
+      .dv-facts { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .45rem .9rem; min-width: 0; }
+      .dv-facts div { min-width: 0; }
+      .dv-facts small { display: block; font-size: .66rem; opacity: .7; }
+      .dv-facts b { display: block; color: var(--fog); font-weight: 700; overflow-wrap: anywhere; }
+      .dv-sim { color: #fb923c; font-weight: 700; }
+
       /* لوحة الأوامر Ctrl+K */
       .hx-pal { position: fixed; inset: 0; z-index: 250; display: grid; place-items: start center; padding: 12vh 1rem 1rem; background: rgba(5, 8, 20, .7); }
       .hx-pal[hidden] { display: none; }
@@ -1038,6 +1054,7 @@
           <div><b id="stc-name"></b><small id="stc-sub"></small></div>
           <button id="stc-close" class="stc-x" type="button" aria-label="إغلاق">×</button>
         </div>
+        <details id="stc-dev" class="dv-box" hidden></details>
         <div id="stc-list" class="stc-list"></div>
         <div class="stc-tools">
           <label><input type="checkbox" id="stc-lock" /> منع الطالب من دخول الحلول حتى يرد</label>
@@ -1798,6 +1815,8 @@
       let studentsCache = [];
       let studentsInfo = {}; // device_id -> { unread, locked }
       let studentsBanned = new Set(); // أجهزة محظورة بالكامل
+      let studentsAuto = new Set(); // حظر تلقائي بالبصمة
+      let studentsSimilar = new Set(); // أجهزة تشبه جهازًا محظورًا
       const ONLINE_MS = 90 * 1000;
 
       function studentWhen(iso) {
@@ -1824,7 +1843,7 @@
 
       /* ---------- قائمة الطلاب: فلاتر + فرز + تحديد جماعي + تصفح تدريجي (خفيفة على المتصفح) ---------- */
       const ST_PAGE = 40;
-      const ST_FILTERS = [["all", "الكل"], ["online", "نشط الآن"], ["unread", "رسائل جديدة"], ["locked", "محجوب"], ["banned", "محظور"], ["today", "جدد (24س)"], ["rejected", "مرفوض"]];
+      const ST_FILTERS = [["all", "الكل"], ["online", "نشط الآن"], ["unread", "رسائل جديدة"], ["locked", "محجوب"], ["banned", "محظور"], ["similar", "مشبوه"], ["today", "جدد (24س)"], ["rejected", "مرفوض"]];
       let stFilter = "all", stSort = "recent", stShown = ST_PAGE;
       const stSel = new Set();
 
@@ -1833,6 +1852,7 @@
         if (f === "online") return isOnline(st);
         if (f === "unread") return st.isLatest && info.unread > 0;
         if (f === "locked") return st.isLatest && !!info.locked;
+        if (f === "similar") return st.isLatest && studentsSimilar.has(st.device_id);
         if (f === "banned") return st.isLatest && studentsBanned.has(st.device_id);
         if (f === "today") return Date.now() - new Date(st.created_at).getTime() < 864e5;
         if (f === "rejected") return st.status === "rejected";
@@ -1855,6 +1875,50 @@
         document.getElementById("st-bulk-n").textContent = n;
       }
 
+      /* ---------- بطاقة الجهاز: رسم + بيانات تفصيلية ---------- */
+      const OS_ICON = { Android: "fab fa-android", iOS: "fab fa-apple", iPadOS: "fab fa-apple", macOS: "fab fa-apple", Windows: "fab fa-windows", Linux: "fab fa-linux", ChromeOS: "fab fa-chrome" };
+      const BR_ICON = [[/Edge/, "fab fa-edge"], [/Chrome/, "fab fa-chrome"], [/Firefox/, "fab fa-firefox-browser"], [/Safari/, "fab fa-safari"], [/Opera/, "fab fa-opera"]];
+      function devKind(st) {
+        const dt = st.device_type || "", i = st.device_info || {};
+        return i.kind || (dt.startsWith("هاتف") ? "هاتف" : dt.startsWith("تابلت") ? "تابلت" : dt ? "كمبيوتر" : "");
+      }
+      function devArt(st) {
+        const k = devKind(st), i = st.device_info || {};
+        if (!k) return '<i class="fas fa-user-graduate"></i>';
+        const shape = k === "هاتف"
+          ? '<rect x="19" y="4" width="22" height="62" rx="5"/><line x1="26" y1="9" x2="34" y2="9"/><line x1="26" y1="61" x2="34" y2="61"/>'
+          : k === "تابلت"
+            ? '<rect x="7" y="8" width="46" height="54" rx="5"/><circle cx="30" cy="56" r="1.6"/>'
+            : '<rect x="5" y="10" width="50" height="34" rx="3"/><path d="M22 58h16M30 44v14"/>';
+        const top = k === "كمبيوتر" ? "38%" : "50%";
+        const ic = OS_ICON[i.os] || "fas fa-microchip";
+        return `<span class="dv-art"><svg viewBox="0 0 60 70" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${shape}</svg><i class="${ic}" style="top:${top};font-size:${k === "هاتف" ? ".85rem" : "1.1rem"}"></i></span>`;
+      }
+      function devFacts(st) {
+        const i = st.device_info;
+        if (!i) {
+          return '<div class="dv-body"><div class="dv-big">' + devArt(st) + '</div><div class="dv-facts"><div><small>الجهاز</small><b>' + escapeHtml(st.device_type || "غير معروف") +
+            '</b></div><div style="grid-column:1/-1">التفاصيل الكاملة (الموديل، الشاشة، المعالج...) تظهر بعد دخول الطالب للموقع مرة أخرى.</div></div></div>';
+        }
+        const model = i.model ? ((i.brand && i.brand !== "Apple" && !i.model.toLowerCase().startsWith(i.brand.toLowerCase()) ? i.brand + " " : "") + i.model) : "";
+        const br = (BR_ICON.find(([re]) => re.test(i.browser || "")) || [])[1];
+        const rows = [
+          ["نوع الجهاز", i.kind], ["الموديل", model || (i.kind === "هاتف" || i.kind === "تابلت" ? "غير معلن من المتصفح" : "")],
+          ["الشركة", i.brand], ["النظام", [i.os, i.os_ver].filter(Boolean).join(" ")],
+          ["المتصفح", [i.browser, i.browser_ver].filter(Boolean).join(" ")],
+          ["الشاشة", i.w && i.h ? i.w + "×" + i.h + (i.dpr ? " @" + i.dpr + "x" : "") : ""],
+          ["المعالج", i.cores ? i.cores + " أنوية" + (i.arch ? " (" + i.arch + ")" : "") : ""],
+          ["الذاكرة", i.mem ? "≈ " + i.mem + " GB" : ""], ["كرت الشاشة", i.gpu],
+          ["اللمس", i.touch != null && i.w ? (i.touch ? i.touch + " نقاط" : "لا يوجد") : ""],
+          ["المنطقة الزمنية", i.tz], ["اللغة", i.lang], ["الشبكة", i.net],
+        ].filter((r) => r[1] !== "" && r[1] != null);
+        return '<div class="dv-body"><div class="dv-big">' + devArt(st) + '</div><div class="dv-facts">' +
+          rows.map((r) => `<div><small>${r[0]}</small><b>${escapeHtml(String(r[1]))}</b></div>`).join("") + "</div></div>";
+      }
+      function devSummaryText(st) {
+        return escapeHtml(st.device_type || "نوع الجهاز غير معروف");
+      }
+
       function stRow(st) {
         const rej = st.status === "rejected";
         const on = isOnline(st);
@@ -1871,8 +1935,10 @@
           : '<div class="text-xs text-muted" style="margin-top:2px">نوع الجهاز: غير معروف</div>';
         const isBan = st.isLatest && studentsBanned.has(st.device_id);
         const lockLine = isBan
-          ? '<div class="text-xs st-lock" style="margin-top:2px"><i class="fas fa-ban"></i> جهاز محظور بالكامل — يرى المحادثة مع الإدارة فقط</div>'
+          ? '<div class="text-xs st-lock" style="margin-top:2px"><i class="fas fa-ban"></i> جهاز محظور بالكامل — يرى المحادثة مع الإدارة فقط' + (studentsAuto.has(st.device_id) ? " (حظر تلقائي: بصمة مطابقة لجهاز محظور)" : "") + "</div>"
           : info.locked && st.isLatest ? '<div class="text-xs st-lock" style="margin-top:2px"><i class="fas fa-lock"></i> محجوب عن الحلول حتى يرد على رسالتك</div>' : "";
+        const simLine = st.isLatest && !isBan && studentsSimilar.has(st.device_id)
+          ? '<div class="text-xs dv-sim" style="margin-top:2px"><i class="fas fa-triangle-exclamation"></i> عتاده يشبه جهازًا محظورًا (قد يكون نفس الجهاز بمتصفح آخر)</div>' : "";
         const banBtn = st.isLatest
           ? `<button data-device="${escA(st.device_id)}" data-name="${escA(st.name)}" data-banned="${isBan ? "1" : "0"}" class="student-ban-btn" title="${isBan ? "رفع الحظر عن الجهاز" : "حظر الجهاز بالكامل"}" style="background:none;border:none;color:${isBan ? "#4ade9b" : "#fb923c"};cursor:pointer;font-size:.95rem"><i class="fas ${isBan ? "fa-unlock" : "fa-ban"}"></i></button>`
           : "";
@@ -1883,11 +1949,11 @@
           <div class="hx-row${sel ? " sel" : ""}" style="${rej ? "opacity:.75" : ""}">
             <div class="flex items-center gap-3" style="min-width:0">
               <input type="checkbox" class="st-ck" data-id="${st.id}" ${sel ? "checked" : ""} aria-label="تحديد" />
-              <div class="item-icon"><i class="fas ${rej ? "fa-user-slash" : "fa-user-graduate"}"></i></div>
+              <div class="item-icon dv-mini">${rej ? '<i class="fas fa-user-slash"></i>' : devArt(st)}</div>
               <div style="min-width:0">
                 <div class="text-sm font-bold text-white" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">${escapeHtml(st.name)}</div>
                 ${presence ? `<div class="text-xs" style="margin-top:2px">${presence}</div>` : ""}
-                ${devLine}${lockLine}
+                ${devLine}${lockLine}${simLine}
                 <div class="mono text-xs text-muted">${badge} · ${escapeHtml(studentWhen(st.created_at))}</div>
               </div>
             </div>
@@ -2037,6 +2103,8 @@
         }
         studentsInfo = payload.info || {};
         studentsBanned = new Set(payload.banned || []);
+        studentsAuto = new Set(payload.autoBanned || []);
+        studentsSimilar = new Set(payload.similar || []);
         const info = studentsInfo;
         const stRes = { data: payload.students || [] };
 
@@ -2253,6 +2321,12 @@
         const st = studentsCache.find((x) => x.device_id === device && x.isLatest);
         $stc("stc-sub").textContent = st ? "الجهاز: " + (st.device_type || "غير معروف") : "";
         $stc("stc-lock").checked = false;
+        const dv = $stc("stc-dev");
+        if (st) {
+          dv.innerHTML = '<summary><i class="fas fa-circle-info"></i> تفاصيل الجهاز — ' + devSummaryText(st) + "</summary>" + devFacts(st);
+          dv.open = false;
+          dv.hidden = false;
+        } else dv.hidden = true;
         $stc("st-chat").hidden = false;
         await loadStudentChat(true);
         clearInterval(stc.timer);

@@ -5,7 +5,8 @@ const { MongoClient, ObjectId } = require("mongodb");
 const { makeLogic } = require("./students-logic");
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const DB_NAME = process.env.MONGODB_DB || "hightech";
+// قاعدة بيانات مستقلة لموقع الحلول داخل نفس الـ cluster (الموقع الأول يبقى على قاعدته hightech كما هي)
+const DB_NAME = process.env.MONGODB_DB || "qureo_solutions";
 // للتحقق من أن الطلب جاء من المدير (نفس حساب تسجيل دخول لوحة البورتفوليو في Supabase)
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://wgcfajrwfmunwoqmneww.supabase.co";
 const SUPABASE_ANON_KEY =

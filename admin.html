@@ -697,6 +697,31 @@
 
     <div id="toast-wrap"></div>
 
+    <!-- محادثة الطالب -->
+    <div id="st-chat" class="stc-back" hidden>
+      <div class="stc-box" role="dialog" aria-modal="true" aria-labelledby="stc-name">
+        <div class="stc-head">
+          <div><b id="stc-name"></b><small id="stc-sub"></small></div>
+          <button id="stc-close" class="stc-x" type="button" aria-label="إغلاق">×</button>
+        </div>
+        <div id="stc-list" class="stc-list"></div>
+        <div class="stc-tools">
+          <label><input type="checkbox" id="stc-lock" /> منع الطالب من دخول الحلول حتى يرد</label>
+          <button id="stc-unlock" type="button" hidden>رفع المنع الآن</button>
+          <button id="stc-clear" type="button" class="danger">حذف المحادثة</button>
+        </div>
+        <div id="stc-rec" class="stc-rec" hidden>
+          <span class="rd"></span><span id="stc-rt" class="rt">0:00</span>
+          <button id="stc-rcancel" type="button" class="stc-mic" style="width:auto;padding:0 .8rem">إلغاء</button>
+          <button id="stc-rstop" type="button" class="admin-btn" style="width:auto;padding:.55rem 1rem">إرسال التسجيل</button>
+        </div>
+        <div id="stc-bar" class="stc-bar">
+          <textarea id="stc-text" rows="2" maxlength="1000" placeholder="اكتب رسالة للطالب..."></textarea>
+          <button id="stc-mic" type="button" class="stc-mic" aria-label="تسجيل صوتي"><i class="fas fa-microphone"></i></button>
+          <button id="stc-send" type="button" class="admin-btn" style="width:auto;padding:.6rem 1.1rem">إرسال</button>
+        </div>
+      </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="supabase-config.js"></script>
     <script>
@@ -2300,30 +2325,5 @@
       })();
     </script>
   
-    <!-- محادثة الطالب -->
-    <div id="st-chat" class="stc-back" hidden>
-      <div class="stc-box" role="dialog" aria-modal="true" aria-labelledby="stc-name">
-        <div class="stc-head">
-          <div><b id="stc-name"></b><small id="stc-sub"></small></div>
-          <button id="stc-close" class="stc-x" type="button" aria-label="إغلاق">×</button>
-        </div>
-        <div id="stc-list" class="stc-list"></div>
-        <div class="stc-tools">
-          <label><input type="checkbox" id="stc-lock" /> منع الطالب من دخول الحلول حتى يرد</label>
-          <button id="stc-unlock" type="button" hidden>رفع المنع الآن</button>
-          <button id="stc-clear" type="button" class="danger">حذف المحادثة</button>
-        </div>
-        <div id="stc-rec" class="stc-rec" hidden>
-          <span class="rd"></span><span id="stc-rt" class="rt">0:00</span>
-          <button id="stc-rcancel" type="button" class="stc-mic" style="width:auto;padding:0 .8rem">إلغاء</button>
-          <button id="stc-rstop" type="button" class="admin-btn" style="width:auto;padding:.55rem 1rem">إرسال التسجيل</button>
-        </div>
-        <div id="stc-bar" class="stc-bar">
-          <textarea id="stc-text" rows="2" maxlength="1000" placeholder="اكتب رسالة للطالب..."></textarea>
-          <button id="stc-mic" type="button" class="stc-mic" aria-label="تسجيل صوتي"><i class="fas fa-microphone"></i></button>
-          <button id="stc-send" type="button" class="admin-btn" style="width:auto;padding:.6rem 1.1rem">إرسال</button>
-        </div>
-      </div>
-    </div>
   </body>
 </html>

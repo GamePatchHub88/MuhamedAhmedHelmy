@@ -14,8 +14,9 @@ function cleanType(raw) {
 }
 
 function makeLogic({ db, ObjectId }) {
-  const students = db.collection("students");
-  const messages = db.collection("student_messages");
+  // أسماء خاصة بموقع الحلول حتى لا تتعارض أبدًا مع مجموعات الموقع الأول (مثل students)
+  const students = db.collection("qureo_students");
+  const messages = db.collection("qureo_messages");
 
   const toId = (id) => {
     try { return new ObjectId(String(id)); } catch (_) { return null; }

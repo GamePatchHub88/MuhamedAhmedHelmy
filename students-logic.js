@@ -129,6 +129,10 @@ function makeLogic({ db, ObjectId }) {
   const messages = db.collection("qureo_messages");
   const reviews = db.collection("qureo_reviews"); // تقييمات الطلاب
   const bans = db.collection("qureo_bans"); // أجهزة محظورة بالكامل (تظهر لها المحادثة مع الإدارة فقط)
+  const convmeta = db.collection("qureo_convmeta"); // تثبيت المحادثات وملاحظات المدير الخاصة
+  // كاش قصير جدًا لقائمة المحادثات (يُبطَل عند أي كتابة) حتى لا يضغط الاستطلاع الدوري على القاعدة
+  let convCache = null;
+  const bustConv = () => { convCache = null; };
 
   const toId = (id) => {
     try { return new ObjectId(String(id)); } catch (_) { return null; }
@@ -291,6 +295,7 @@ function makeLogic({ db, ObjectId }) {
       device_id: device, sender: "student", ...c,
       requires_reply: false, read_by_admin: false, read_by_student: true, created_at: new Date(),
     });
+    bustConv();
     return { status: "ok", locked: await isLocked(device) };
   }
 
@@ -357,18 +362,31 @@ function makeLogic({ db, ObjectId }) {
     return r.deletedCount > 0;
   }
 
-  async function adminMessages(device) {
-    if (!DEVICE_OK(device)) return { messages: [], locked: false };
+  // آخر N رسالة (الأحدث) مع إمكانية تحميل الأقدم عبر before؛ تُعلَّم رسائل الطالب كمقروءة عند الفتح العادي
+  async function adminMessages(device, opts) {
+    opts = opts || {};
+    if (!DEVICE_OK(device)) return { messages: [], locked: false, banned: false, more: false };
+    const lim = Math.min(200, Math.max(10, parseInt(opts.limit, 10) || 80));
+    const q = { device_id: device };
+    const before = opts.before ? new Date(opts.before) : null;
+    if (before && !isNaN(before.getTime())) q.created_at = { $lt: before };
     const rows = await messages
-      .find({ device_id: device }, { projection: { audio: 0 } })
-      .sort({ created_at: 1 }).limit(200).toArray();
-    await messages.updateMany({ device_id: device, sender: "student", read_by_admin: false }, { $set: { read_by_admin: true } });
+      .find(q, { projection: { audio: 0 } })
+      .sort({ created_at: -1 }).limit(lim + 1).toArray();
+    const more = rows.length > lim;
+    if (more) rows.pop();
+    rows.reverse();
+    if (!q.created_at) {
+      const r = await messages.updateMany({ device_id: device, sender: "student", read_by_admin: false }, { $set: { read_by_admin: true } });
+      if (r.modifiedCount) { statsCache = null; bustConv(); }
+    }
     return {
       locked: await isLocked(device),
       banned: await isBanned(device),
+      more,
       messages: rows.map((m) => ({
         id: String(m._id), sender: m.sender, kind: m.kind, body: m.body || null,
-        duration: m.duration || null, requires_reply: !!m.requires_reply, created_at: m.created_at,
+        duration: m.duration || null, requires_reply: !!m.requires_reply, read: !!m.read_by_student, created_at: m.created_at,
       })),
     };
   }
@@ -388,19 +406,21 @@ function makeLogic({ db, ObjectId }) {
       device_id, sender: "admin", ...c,
       requires_reply: requires_reply === true, read_by_admin: true, read_by_student: false, created_at: new Date(),
     });
+    bustConv();
     return { status: "ok" };
   }
 
   async function adminUnlock(device) {
     if (!DEVICE_OK(device)) return false;
     await messages.updateMany({ device_id: device, sender: "admin", requires_reply: true }, { $set: { requires_reply: false } });
+    bustConv();
     return true;
   }
 
   // حظر/رفع حظر جهاز بالكامل: يُربط بمعرّف الجهاز وببصمته، فيبقى حتى لو حُذف الاسم أو مُسحت بيانات المتصفح
   async function adminSetBan(device, banned) {
     if (!DEVICE_OK(device)) return false;
-    statsCache = null;
+    statsCache = null; bustConv();
     const st = await latestStudent(device);
     const di = (st && st.device_info) || {};
     const cur = await bans.findOne({ device_id: device });
@@ -423,7 +443,141 @@ function makeLogic({ db, ObjectId }) {
   async function adminClear(device) {
     if (!DEVICE_OK(device)) return false;
     await messages.deleteMany({ device_id: device });
+    statsCache = null; bustConv();
     return true;
+  }
+
+  /* =========================================================
+     صندوق الرسائل: قائمة المحادثات (آخر رسالة + غير المقروء + الحجب) في استدعاء واحد
+  ========================================================= */
+  const escRe = (t) => String(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const cut = (t, n) => String(t == null ? "" : t).replace(/\s+/g, " ").trim().slice(0, n);
+
+  async function adminConversations() {
+    if (convCache && Date.now() - convCache.t < 2500) return convCache.data;
+    const rows = await messages.aggregate([
+      { $sort: { created_at: -1 } },
+      { $group: {
+        _id: "$device_id",
+        last_sender: { $first: "$sender" }, last_kind: { $first: "$kind" }, last_body: { $first: "$body" },
+        last_duration: { $first: "$duration" }, last_at: { $first: "$created_at" }, last_read: { $first: "$read_by_student" },
+        total: { $sum: 1 },
+        unread: { $sum: { $cond: [{ $and: [{ $eq: ["$sender", "student"] }, { $eq: ["$read_by_admin", false] }] }, 1, 0] } },
+        voice: { $sum: { $cond: [{ $eq: ["$kind", "voice"] }, 1, 0] } },
+        from_student: { $sum: { $cond: [{ $eq: ["$sender", "student"] }, 1, 0] } },
+        req_at: { $max: { $cond: [{ $and: [{ $eq: ["$sender", "admin"] }, { $eq: ["$requires_reply", true] }] }, "$created_at", null] } },
+        stu_at: { $max: { $cond: [{ $eq: ["$sender", "student"] }, "$created_at", null] } },
+      } },
+      { $sort: { last_at: -1 } },
+      { $limit: 400 },
+    ], { allowDiskUse: true }).toArray();
+
+    const ids = rows.map((r) => r._id);
+    const [stuRows, metaRows, banRows] = await Promise.all([
+      ids.length ? students.find({ device_id: { $in: ids } }, { projection: { device_id: 1, name: 1, status: 1, last_seen: 1, device_type: 1 } }).sort({ created_at: 1 }).toArray() : [],
+      ids.length ? convmeta.find({ device_id: { $in: ids } }).toArray() : [],
+      bans.find({ released: { $ne: true } }, { projection: { device_id: 1 } }).limit(2000).toArray(),
+    ]);
+    const stu = new Map(), meta = new Map(), banned = new Set(banRows.map((b) => b.device_id));
+    stuRows.forEach((x) => stu.set(x.device_id, x)); // الأحدث يكتب فوق الأقدم
+    metaRows.forEach((x) => meta.set(x.device_id, x));
+
+    const data = {
+      generated: Date.now(),
+      conversations: rows.map((r) => {
+        const s = stu.get(r._id) || {}, m = meta.get(r._id) || {};
+        const isBan = banned.has(r._id);
+        const locked = !!r.req_at && new Date(r.req_at).getTime() > (r.stu_at ? new Date(r.stu_at).getTime() : 0);
+        return {
+          device_id: r._id, name: s.name || "طالب", deleted: !s.name, status: s.status || "approved",
+          device_type: s.device_type || null, last_seen: s.last_seen || null,
+          last_sender: r.last_sender, last_kind: r.last_kind, preview: r.last_kind === "voice" ? "" : cut(r.last_body, 140),
+          duration: r.last_duration || null, last_at: r.last_at, last_read: !!r.last_read,
+          total: r.total, unread: r.unread, voice: r.voice, from_student: r.from_student,
+          locked: locked && !isBan, banned: isBan, pinned: !!m.pinned, note: m.note || "",
+        };
+      }),
+    };
+    convCache = { t: Date.now(), data };
+    return data;
+  }
+
+  // بحث داخل نصوص الرسائل (نصية فقط) — آخر 30 نتيجة
+  async function adminSearchMessages(q) {
+    const t = cut(q, 60);
+    if (t.length < 2) return { hits: [] };
+    const rows = await messages
+      .find({ kind: "text", body: { $regex: escRe(t), $options: "i" } }, { projection: { audio: 0 } })
+      .sort({ created_at: -1 }).limit(30).toArray();
+    const devIds = [...new Set(rows.map((m) => m.device_id))];
+    const nameRows = devIds.length
+      ? await students.find({ device_id: { $in: devIds } }, { projection: { device_id: 1, name: 1 } }).sort({ created_at: 1 }).toArray() : [];
+    const names = {};
+    nameRows.forEach((x) => { names[x.device_id] = x.name; });
+    const low = t.toLowerCase();
+    return {
+      hits: rows.map((m) => {
+        const body = String(m.body || ""), i = Math.max(0, body.toLowerCase().indexOf(low));
+        return {
+          id: String(m._id), device_id: m.device_id, name: names[m.device_id] || "طالب", sender: m.sender,
+          snippet: (i > 40 ? "…" : "") + body.slice(Math.max(0, i - 40), i + t.length + 90).replace(/\s+/g, " "), created_at: m.created_at,
+        };
+      }),
+    };
+  }
+
+  async function adminMarkUnread(device) {
+    if (!DEVICE_OK(device)) return false;
+    const last = await messages.findOne({ device_id: device, sender: "student" }, { sort: { created_at: -1 }, projection: { _id: 1 } });
+    if (!last) return false;
+    await messages.updateOne({ _id: last._id }, { $set: { read_by_admin: false } });
+    statsCache = null; bustConv();
+    return true;
+  }
+
+  async function adminReadAll() {
+    const r = await messages.updateMany({ sender: "student", read_by_admin: false }, { $set: { read_by_admin: true } });
+    statsCache = null; bustConv();
+    return { status: "ok", n: r.modifiedCount };
+  }
+
+  async function adminDeleteMessage(id) {
+    const oid = toId(id);
+    if (!oid) return false;
+    const r = await messages.deleteOne({ _id: oid });
+    statsCache = null; bustConv();
+    return r.deletedCount > 0;
+  }
+
+  // تثبيت المحادثة وملاحظة المدير الخاصة (لا تظهر للطالب أبدًا)
+  async function adminConvMeta(device, body) {
+    if (!DEVICE_OK(device)) return { status: "invalid" };
+    body = body || {};
+    const set = { updated_at: new Date() };
+    if (typeof body.pinned === "boolean") set.pinned = body.pinned;
+    if (body.note !== undefined) set.note = String(body.note == null ? "" : body.note).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").trim().slice(0, 500);
+    await convmeta.updateOne({ device_id: device }, { $set: set }, { upsert: true });
+    bustConv();
+    return { status: "ok" };
+  }
+
+  // قائمة الأجهزة المحظورة (يدوي/تلقائي) مع بيانات الطالب
+  async function adminBans() {
+    const docs = await bans.find({}).sort({ banned_at: -1 }).limit(500).toArray();
+    const ids = docs.map((d) => d.device_id);
+    const rows = ids.length
+      ? await students.find({ device_id: { $in: ids } }, { projection: { device_id: 1, name: 1, device_type: 1, last_seen: 1, last_ip: 1 } }).sort({ created_at: 1 }).toArray() : [];
+    const st = {};
+    rows.forEach((x) => { st[x.device_id] = x; });
+    return {
+      bans: docs.filter((d) => !d.released).map((d) => {
+        const s = st[d.device_id] || {};
+        return {
+          device_id: d.device_id, name: d.name || s.name || "—", device_type: s.device_type || null,
+          banned_at: d.banned_at || null, auto: !!d.auto_from, last_seen: s.last_seen || null, last_ip: s.last_ip || null,
+        };
+      }),
+    };
   }
 
 
@@ -645,25 +799,38 @@ function makeLogic({ db, ObjectId }) {
   }
 
   /* ---------- إعلان جماعي نصي (بدون منع الدخول، حتى لا يُحجب الجميع بالخطأ) ---------- */
-  async function adminBroadcast({ body, audience }) {
+  async function adminBroadcast({ body, audience, device_ids }) {
     const txt = String(body == null ? "" : body).trim();
     if (txt.length < 1 || txt.length > 1000) return { status: "invalid" };
-    const pipe = [
-      { $sort: { created_at: -1 } },
-      { $group: { _id: "$device_id", status: { $first: "$status" }, seen: { $first: "$last_seen" } } },
-      { $match: { status: "approved" } },
-    ];
-    if (audience === "online") pipe.push({ $match: { seen: { $gt: new Date(Date.now() - 90 * 1000) } } });
-    else if (audience === "active24") pipe.push({ $match: { seen: { $gt: new Date(Date.now() - DAY) } } });
-    pipe.push({ $limit: 500 });
-    const devs = await students.aggregate(pipe).toArray();
+    let devs;
+    if (Array.isArray(device_ids) && device_ids.length) {
+      // إرسال لطلاب محددين (من تحديد الجدول): نقبل المقبولين فقط
+      const wanted = [...new Set(device_ids.filter(DEVICE_OK))].slice(0, 200);
+      if (!wanted.length) return { status: "invalid" };
+      devs = await students.aggregate([
+        { $match: { device_id: { $in: wanted } } },
+        { $sort: { created_at: -1 } },
+        { $group: { _id: "$device_id", status: { $first: "$status" } } },
+        { $match: { status: "approved" } },
+      ]).toArray();
+    } else {
+      const pipe = [
+        { $sort: { created_at: -1 } },
+        { $group: { _id: "$device_id", status: { $first: "$status" }, seen: { $first: "$last_seen" } } },
+        { $match: { status: "approved" } },
+      ];
+      if (audience === "online") pipe.push({ $match: { seen: { $gt: new Date(Date.now() - 90 * 1000) } } });
+      else if (audience === "active24") pipe.push({ $match: { seen: { $gt: new Date(Date.now() - DAY) } } });
+      pipe.push({ $limit: 500 });
+      devs = await students.aggregate(pipe).toArray();
+    }
     if (!devs.length) return { status: "ok", n: 0 };
     const now = new Date();
     await messages.insertMany(
       devs.map((x) => ({ device_id: x._id, sender: "admin", kind: "text", body: txt, requires_reply: false, read_by_admin: true, read_by_student: false, created_at: now })),
       { ordered: false }
     );
-    statsCache = null;
+    statsCache = null; bustConv();
     return { status: "ok", n: devs.length };
   }
 
@@ -689,6 +856,7 @@ function makeLogic({ db, ObjectId }) {
     await messages.createIndex({ sender: 1, read_by_admin: 1 });
     await messages.createIndex({ sender: 1, requires_reply: 1, created_at: -1 });
     await messages.createIndex({ kind: 1 });
+    await convmeta.createIndex({ device_id: 1 }, { unique: true });
   }
 
   return {
@@ -696,6 +864,7 @@ function makeLogic({ db, ObjectId }) {
     adminList, adminSetStatus, adminDeleteStudent, adminMessages, adminAudio, adminSend, adminUnlock, adminSetBan, adminClear,
     publicReviews, reviewSubmit, adminReviews, adminReviewSave, adminReviewDelete,
     adminStats, adminBulk, adminBroadcast, adminReviewsPublishAll,
+    adminConversations, adminSearchMessages, adminMarkUnread, adminReadAll, adminDeleteMessage, adminConvMeta, adminBans,
     ensureIndexes,
   };
 }

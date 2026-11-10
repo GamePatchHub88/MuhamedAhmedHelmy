@@ -160,13 +160,22 @@ admin.use(adminAuth);
 admin.get("/students", wrap((l) => l.adminList()));
 admin.patch("/students/:id", wrap(async (l, r) => ({ ok: await l.adminSetStatus(r.params.id, r.body.status) })));
 admin.delete("/students/:id", wrap(async (l, r) => ({ ok: await l.adminDeleteStudent(r.params.id) })));
-admin.get("/messages/:device", wrap((l, r) => l.adminMessages(r.params.device)));
+admin.get("/messages/:device", wrap((l, r) => l.adminMessages(r.params.device, { before: r.query.before, limit: r.query.limit })));
 admin.get("/audio/:id", wrap(async (l, r) => ({ audio: await l.adminAudio(r.params.id) })));
 admin.post("/messages", wrap((l, r) => l.adminSend(r.body || {})));
 admin.post("/unlock/:device", wrap(async (l, r) => ({ ok: await l.adminUnlock(r.params.device) })));
 admin.post("/ban/:device", wrap(async (l, r) => ({ ok: await l.adminSetBan(r.params.device, true) })));
 admin.delete("/ban/:device", wrap(async (l, r) => ({ ok: await l.adminSetBan(r.params.device, false) })));
 admin.delete("/messages/:device", wrap(async (l, r) => ({ ok: await l.adminClear(r.params.device) })));
+
+/* صندوق الرسائل: قائمة المحادثات + بحث + مقروء/غير مقروء + تثبيت وملاحظات + حذف رسالة + سجل الحظر */
+admin.get("/conversations", wrap((l) => l.adminConversations()));
+admin.get("/messages-search", wrap((l, r) => l.adminSearchMessages(r.query.q)));
+admin.post("/messages/read-all", wrap((l) => l.adminReadAll()));
+admin.post("/messages/:device/unread", wrap(async (l, r) => ({ ok: await l.adminMarkUnread(r.params.device) })));
+admin.delete("/message/:id", wrap(async (l, r) => ({ ok: await l.adminDeleteMessage(r.params.id) })));
+admin.put("/conv-meta/:device", wrap((l, r) => l.adminConvMeta(r.params.device, r.body || {})));
+admin.get("/bans", wrap((l) => l.adminBans()));
 
 /* لوحة القيادة + العمليات الجماعية + الإعلان الجماعي */
 admin.get("/solutions/stats", wrap((l) => l.adminStats()));

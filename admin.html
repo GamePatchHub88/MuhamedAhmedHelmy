@@ -462,6 +462,216 @@
       @media (prefers-reduced-motion: reduce) { .hx-live i, .blink { animation: none !important; } }
       @media (max-width: 640px) { .hx-row { flex-wrap: wrap; } .hx-k .v { font-size: 1.5rem; } }
       .hx-pipe i { display: block; height: 100%; }
+
+      /* =========================================================
+         صندوق الرسائل (Inbox) + صفحة الأمان + تحسينات التنقل
+      ========================================================= */
+      .sol-nav { position: sticky; top: 4.2rem; z-index: 30; padding: .45rem; border-radius: 20px; background: rgba(var(--panel-rgb), .86);
+        -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--line); margin-bottom: 1.3rem; }
+      .sol-btn { position: relative; }
+      .sol-btn.active::after { content: ""; position: absolute; inset-inline: 22%; bottom: -1px; height: 2px; border-radius: 2px; background: var(--grad); }
+      @media (max-width: 640px) { .sol-nav { top: 3.6rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; } .sol-nav::-webkit-scrollbar { display: none; } .sol-btn { flex: none; } }
+
+      .ib-top { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+      .ib-top .grow { flex: 1; }
+      .ib-live { display: inline-flex; align-items: center; gap: .4rem; font-size: .72rem; color: var(--muted); font-weight: 700; }
+      .ib-live i { width: 8px; height: 8px; border-radius: 50%; background: #4ade9b; box-shadow: 0 0 0 4px rgba(74,222,155,.16); }
+      .ib-live.off i { background: #f87171; box-shadow: none; }
+      .ib-tool { display: inline-flex; align-items: center; gap: .4rem; font: inherit; font-size: .78rem; font-weight: 700; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 12px; padding: .42rem .8rem; cursor: pointer; transition: all .2s; }
+      .ib-tool:hover { color: var(--cyan); border-color: rgba(var(--cyan-rgb), .55); background: rgba(var(--cyan-rgb), .06); }
+      .ib-tool.on { color: var(--cyan); border-color: rgba(var(--cyan-rgb), .5); }
+      .ib-tool:disabled { opacity: .5; cursor: not-allowed; }
+
+      .ib-shell { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); height: clamp(540px, calc(100vh - 15rem), 800px);
+        border: 1px solid var(--line); border-radius: 24px; overflow: hidden; background: var(--panel); box-shadow: 0 30px 60px -42px rgba(var(--violet-rgb), .55); }
+      .ib-list-col { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-inline-end: 1px solid var(--line); background: rgba(var(--panel-rgb), .55); }
+      .ib-search { position: relative; padding: .8rem .8rem .4rem; }
+      .ib-search i { position: absolute; top: 50%; margin-top: -2px; inset-inline-start: 1.5rem; transform: translateY(-50%); color: var(--muted); font-size: .8rem; pointer-events: none; }
+      .ib-search input { width: 100%; background: var(--panel2); border: 1px solid var(--line); border-radius: 14px; padding: .62rem .9rem .62rem .9rem; padding-inline-start: 2.3rem; color: var(--fog); font: inherit; font-size: .86rem; outline: none; transition: border-color .2s, box-shadow .2s; }
+      .ib-search input:focus { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(var(--violet-rgb), .16); }
+      .ib-filters { display: flex; gap: .35rem; padding: .35rem .8rem .7rem; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
+      .ib-filters::-webkit-scrollbar { display: none; }
+      .ib-filters .hx-chip { flex: none; font-size: .74rem; padding: .28rem .7rem; }
+      .ib-list { flex: 1; overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+      .ib-sec { padding: .55rem .9rem; font-size: .7rem; font-weight: 800; color: var(--muted); letter-spacing: .04em; background: rgba(var(--violet-rgb), .05); border-bottom: 1px solid var(--line); }
+      .ib-item { position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: .75rem; padding: .75rem .9rem; border-bottom: 1px solid var(--line); cursor: pointer; transition: background .15s; content-visibility: auto; contain-intrinsic-size: auto 76px; }
+      .ib-item:hover { background: rgba(var(--violet-rgb), .07); }
+      .ib-item.on { background: var(--grad-soft); }
+      .ib-item.on::before { content: ""; position: absolute; inset-block: 10px; inset-inline-start: 0; width: 3px; border-radius: 3px; background: var(--grad); }
+      .ib-av { position: relative; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 1.05rem; color: #fff; flex: none; user-select: none; }
+      .ib-av.sm { width: 34px; height: 34px; font-size: .85rem; }
+      .ib-av.lg { width: 42px; height: 42px; font-size: 1rem; }
+      .ib-av .dot { position: absolute; bottom: -1px; inset-inline-end: -1px; width: 12px; height: 12px; border-radius: 50%; background: #4ade9b; border: 2px solid var(--panel); }
+      .ib-bd { min-width: 0; }
+      .ib-r1, .ib-r2 { display: flex; align-items: center; justify-content: space-between; gap: .5rem; min-width: 0; }
+      .ib-nm { color: var(--fog); font-weight: 700; font-size: .92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .ib-item.unread .ib-nm { font-weight: 900; }
+      .ib-tm { flex: none; font-size: .68rem; color: var(--muted); font-family: "JetBrains Mono", monospace; }
+      .ib-item.unread .ib-tm { color: var(--cyan); font-weight: 700; }
+      .ib-pv { color: var(--muted); font-size: .8rem; margin-top: .12rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; unicode-bidi: plaintext; text-align: start; }
+      .ib-item.unread .ib-pv { color: var(--fog); }
+      .ib-pv .fa-microphone { color: var(--cyan); margin-inline-end: .25rem; }
+      .ib-cnt { flex: none; min-width: 1.3rem; height: 1.3rem; padding: 0 .38rem; border-radius: 99px; background: var(--cyan); color: #07101a; font-size: .7rem; font-weight: 800; display: inline-grid; place-items: center; }
+      [data-theme="light"] .ib-cnt { color: #fff; background: var(--violet); }
+      .ib-tick { font-size: .68rem; color: var(--muted); margin-inline-end: .3rem; }
+      .ib-tick.rd { color: #38bdf8; }
+      .ib-tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .3rem; }
+      .ib-tag { font-size: .62rem; font-weight: 800; padding: .08rem .5rem; border-radius: 99px; background: rgba(var(--violet-rgb), .14); color: var(--violet); white-space: nowrap; }
+      .ib-tag.bad { background: rgba(248,113,113,.16); color: #f87171; }
+      .ib-tag.warn { background: rgba(245,158,11,.16); color: #f59e0b; }
+      .ib-tag.pin { background: rgba(var(--cyan-rgb), .14); color: var(--cyan); }
+      .ib-hit-sn { color: var(--muted); font-size: .78rem; line-height: 1.7; margin-top: .1rem; overflow-wrap: anywhere; }
+      .ib-hit-sn mark { background: rgba(var(--cyan-rgb), .28); color: var(--fog); border-radius: 4px; padding: 0 .15rem; }
+      .ib-empty-list { padding: 2.4rem 1.2rem; text-align: center; color: var(--muted); font-size: .85rem; line-height: 1.9; }
+      .ib-empty-list i { display: block; font-size: 1.8rem; margin-bottom: .6rem; opacity: .5; }
+
+      .ib-thread-col { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+      .ib-welcome { margin: auto; text-align: center; padding: 2rem; max-width: 380px; color: var(--muted); }
+      .ib-welcome .ico { width: 84px; height: 84px; margin: 0 auto 1.2rem; border-radius: 28px; display: grid; place-items: center; font-size: 2rem; color: var(--cyan); background: var(--grad-soft); border: 1px solid rgba(var(--violet-rgb), .35); }
+      .ib-welcome h3 { color: var(--fog); font-weight: 800; font-size: 1.1rem; margin-bottom: .4rem; }
+      .ib-welcome p { font-size: .84rem; line-height: 1.9; }
+      .ib-kbd { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: .7rem; padding: .05rem .4rem; border: 1px solid var(--line); border-radius: 6px; background: var(--panel2); color: var(--fog); }
+      .ib-chat { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+      .ib-chat[hidden], .ib-welcome[hidden] { display: none; }
+      .ib-head { display: flex; align-items: center; gap: .7rem; padding: .7rem .9rem; border-bottom: 1px solid var(--line); background: rgba(var(--panel-rgb), .7); }
+      .ib-head .who { flex: 1; min-width: 0; }
+      .ib-head .who b { display: block; color: var(--fog); font-size: .98rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .ib-head .who small { display: block; color: var(--muted); font-size: .72rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .ib-head .who small .on { color: #4ade9b; font-weight: 700; }
+      .ib-icon { width: 2.2rem; height: 2.2rem; border-radius: 12px; display: inline-grid; place-items: center; background: transparent; border: 1px solid transparent; color: var(--muted); cursor: pointer; font-size: .92rem; transition: all .18s; flex: none; }
+      .ib-icon:hover { color: var(--cyan); background: rgba(var(--cyan-rgb), .08); border-color: rgba(var(--cyan-rgb), .35); }
+      .ib-icon.on { color: var(--cyan); }
+      .ib-back { display: none; }
+      .ib-menu-wrap { position: relative; }
+      .ib-menu { position: absolute; top: calc(100% + 6px); inset-inline-end: 0; z-index: 20; min-width: 220px; padding: .35rem; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 20px 40px -18px rgba(0,0,0,.65); }
+      .ib-menu[hidden] { display: none; }
+      .ib-menu button { display: flex; align-items: center; gap: .6rem; width: 100%; text-align: start; font: inherit; font-size: .82rem; color: var(--fog); background: none; border: 0; border-radius: 10px; padding: .55rem .7rem; cursor: pointer; }
+      .ib-menu button i { width: 1.1rem; text-align: center; color: var(--cyan); }
+      .ib-menu button:hover { background: rgba(var(--violet-rgb), .1); }
+      .ib-menu button.danger, .ib-menu button.danger i { color: #f87171; }
+      .ib-menu button[hidden] { display: none; }
+      .ib-menu hr { border: 0; border-top: 1px solid var(--line); margin: .25rem 0; }
+
+      .ib-banner { display: grid; gap: .4rem; padding: 0 .9rem; }
+      .ib-banner:not(:empty) { padding: .55rem .9rem 0; }
+      .ib-bn { display: flex; align-items: center; gap: .6rem; font-size: .78rem; border-radius: 12px; padding: .5rem .75rem; border: 1px solid var(--line); background: var(--panel2); color: var(--fog); }
+      .ib-bn i { flex: none; }
+      .ib-bn.bad { border-color: rgba(248,113,113,.45); background: rgba(248,113,113,.08); } .ib-bn.bad i { color: #f87171; }
+      .ib-bn.warn { border-color: rgba(245,158,11,.45); background: rgba(245,158,11,.08); } .ib-bn.warn i { color: #f59e0b; }
+      .ib-bn.note { border-color: rgba(var(--violet-rgb), .4); background: rgba(var(--violet-rgb), .07); white-space: pre-wrap; overflow-wrap: anywhere; align-items: flex-start; }
+      .ib-bn.note i { color: var(--violet); margin-top: .3rem; }
+      .ib-bn button { margin-inline-start: auto; font: inherit; font-size: .72rem; font-weight: 700; color: var(--cyan); background: none; border: 1px solid rgba(var(--cyan-rgb), .4); border-radius: 9px; padding: .2rem .6rem; cursor: pointer; flex: none; }
+      .ib-noteedit { display: grid; gap: .5rem; }
+      .ib-noteedit textarea { width: 100%; min-height: 70px; resize: vertical; background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: .55rem .8rem; color: var(--fog); font: inherit; font-size: .85rem; outline: none; }
+      .ib-noteedit .row { display: flex; gap: .5rem; }
+
+      .ib-msgs { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 1rem .9rem; display: flex; flex-direction: column; gap: .3rem;
+        background: radial-gradient(60% 40% at 100% 0%, rgba(var(--violet-rgb), .07), transparent 70%), radial-gradient(50% 40% at 0% 100%, rgba(var(--cyan-rgb), .05), transparent 70%); }
+      .ib-day { display: flex; justify-content: center; margin: .7rem 0 .4rem; }
+      .ib-day span { font-size: .68rem; font-weight: 700; color: var(--muted); background: var(--panel2); border: 1px solid var(--line); border-radius: 99px; padding: .15rem .8rem; }
+      .ib-older { align-self: center; font: inherit; font-size: .76rem; font-weight: 700; color: var(--cyan); background: transparent; border: 1px solid rgba(var(--cyan-rgb), .4); border-radius: 99px; padding: .3rem 1rem; cursor: pointer; margin-bottom: .6rem; }
+      .ib-m { position: relative; max-width: min(78%, 520px); padding: .5rem .8rem .35rem; border-radius: 18px; font-size: .92rem; line-height: 1.75; animation: ib-in .18s ease; }
+      @keyframes ib-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+      .ib-m.st { align-self: flex-start; background: var(--panel2); border: 1px solid var(--line); color: var(--fog); }
+      .ib-m.ad { align-self: flex-end; background: var(--grad); color: #07101a; }
+      .ib-m.first.st { border-end-start-radius: 5px; } .ib-m.first.ad { border-end-end-radius: 5px; }
+      .ib-m.first { margin-top: .35rem; }
+      .ib-m.pending { opacity: .6; }
+      .ib-t { white-space: pre-wrap; overflow-wrap: anywhere; }
+      .ib-t a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+      .ib-m.st .ib-t a { color: var(--cyan); }
+      .ib-mt { display: flex; align-items: center; justify-content: flex-end; gap: .35rem; font-size: .64rem; opacity: .72; margin-top: .1rem; font-family: "JetBrains Mono", monospace; direction: ltr; }
+      .ib-mt .ib-tick { margin: 0; color: inherit; opacity: .8; } .ib-m.ad .ib-tick.rd { color: #0a5c7a; opacity: 1; }
+      .ib-req { font-family: "Tajawal", sans-serif; font-weight: 800; direction: rtl; }
+      .ib-ma { position: absolute; top: -12px; inset-inline-end: 8px; display: none; gap: .2rem; padding: .15rem; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 8px 18px -10px rgba(0,0,0,.6); }
+      .ib-m:hover .ib-ma { display: flex; }
+      .ib-ma button { width: 1.7rem; height: 1.7rem; border: 0; border-radius: 8px; background: none; color: var(--muted); cursor: pointer; font-size: .75rem; }
+      .ib-ma button:hover { color: var(--cyan); background: rgba(var(--cyan-rgb), .1); } .ib-ma button.del:hover { color: #f87171; background: rgba(248,113,113,.1); }
+      @media (hover: none) { .ib-m .ib-ma { display: none !important; } }
+
+      .ib-vp { display: flex; align-items: center; gap: .6rem; min-width: 210px; background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: .15rem 0; }
+      .ib-vp .pl { width: 2.1rem; height: 2.1rem; border-radius: 50%; display: grid; place-items: center; flex: none; background: rgba(0,0,0,.16); font-size: .8rem; }
+      .ib-m.st .ib-vp .pl { background: rgba(var(--cyan-rgb), .16); color: var(--cyan); }
+      .ib-wave { display: flex; align-items: center; gap: 2px; height: 26px; flex: 1; direction: ltr; }
+      .ib-wave i { display: block; width: 3px; border-radius: 2px; background: currentColor; opacity: .35; transition: opacity .1s; }
+      .ib-wave i.on { opacity: 1; }
+      .ib-vp b { font-family: "JetBrains Mono", monospace; font-size: .7rem; font-weight: 700; direction: ltr; }
+
+      .ib-newpill { position: absolute; bottom: .8rem; inset-inline-start: 50%; transform: translateX(50%); z-index: 5; font: inherit; font-size: .76rem; font-weight: 800; color: #07101a; background: var(--grad); border: 0; border-radius: 99px; padding: .4rem 1rem; cursor: pointer; box-shadow: 0 12px 24px -12px rgba(var(--violet-rgb), .9); }
+      [dir="rtl"] .ib-newpill { transform: translateX(50%); }
+      .ib-newpill[hidden] { display: none; }
+      .ib-msgwrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+      .ib-quick { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; padding: .5rem .9rem 0; }
+      .ib-quick[hidden] { display: none; }
+      .ib-quick button { font: inherit; font-size: .74rem; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: .22rem .7rem; cursor: pointer; transition: all .15s; }
+      .ib-quick button:hover { color: var(--cyan); border-color: var(--cyan); }
+      .ib-quick button.x { color: #f87171; }
+      .ib-quick input { flex: 1; min-width: 140px; font: inherit; font-size: .78rem; background: var(--panel2); border: 1px solid var(--line); border-radius: 999px; padding: .25rem .8rem; color: var(--fog); outline: none; }
+      .ib-comp { display: flex; align-items: flex-end; gap: .5rem; padding: .7rem .9rem .8rem; }
+      .ib-comp[hidden], .ib-rec[hidden] { display: none; }
+      .ib-input { flex: 1; min-width: 0; display: flex; flex-direction: column; border-radius: 18px; background: var(--panel2); border: 1px solid var(--line); transition: border-color .2s, box-shadow .2s; }
+      .ib-input:focus-within { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(var(--violet-rgb), .16); }
+      .ib-input textarea { width: 100%; resize: none; border: 0; outline: none; background: transparent; color: var(--fog); font: inherit; font-size: .92rem; line-height: 1.7; padding: .6rem .9rem .2rem; min-height: 2.6rem; max-height: 140px; }
+      .ib-input .opts { display: flex; align-items: center; gap: .8rem; padding: 0 .9rem .45rem; font-size: .72rem; color: var(--muted); }
+      .ib-input .opts label { display: inline-flex; align-items: center; gap: .35rem; cursor: pointer; font-weight: 700; }
+      .ib-input .opts label:has(input:checked) { color: #f59e0b; }
+      .ib-input .opts input { accent-color: #f59e0b; }
+      .ib-input .opts .len { margin-inline-start: auto; font-family: "JetBrains Mono", monospace; direction: ltr; }
+      .ib-input .opts button { font: inherit; font-size: .72rem; font-weight: 700; color: var(--muted); background: none; border: 0; cursor: pointer; padding: 0; }
+      .ib-input .opts button:hover { color: var(--cyan); }
+      .ib-round { width: 2.7rem; height: 2.7rem; border-radius: 50%; border: 1px solid var(--line); background: var(--panel2); color: var(--cyan); cursor: pointer; font-size: .95rem; flex: none; transition: all .18s; }
+      .ib-round:hover { border-color: var(--cyan); }
+      .ib-round.send { border: 0; color: #07101a; background: var(--grad); box-shadow: 0 10px 20px -10px rgba(var(--violet-rgb), .9); }
+      [data-theme="light"] .ib-round.send { color: #fff; }
+      .ib-round:disabled { opacity: .5; cursor: not-allowed; }
+      .ib-rec { display: flex; align-items: center; gap: .7rem; padding: .8rem .9rem; border-top: 1px solid var(--line); }
+      .ib-rec .rd { width: 10px; height: 10px; border-radius: 50%; background: #f87171; animation: stcp 1s infinite; }
+      .ib-rec .rt { flex: 1; font-weight: 800; color: var(--fog); font-family: "JetBrains Mono", monospace; direction: ltr; text-align: start; }
+
+      @media (max-width: 860px) {
+        .ib-shell { grid-template-columns: minmax(0, 1fr); height: calc(100vh - 14rem); min-height: 480px; }
+        .ib-list-col { border-inline-end: 0; }
+        .ib-thread-col { display: none; }
+        .ib-shell.show-chat .ib-list-col { display: none; }
+        .ib-shell.show-chat .ib-thread-col { display: flex; }
+        .ib-back { display: inline-grid; }
+        .ib-m { max-width: 88%; }
+      }
+      .ib-menu button.mob { display: none; }
+      @media (max-width: 640px) {
+        .ib-shell { height: calc(100dvh - 9rem); }
+        #sol-inbox:has(.ib-shell.show-chat) .ib-top { display: none; }
+        .ib-head { gap: .5rem; padding: .6rem .6rem; }
+        #ib-info, #ib-pin, #ib-note-btn { display: none; }
+        .ib-menu button.mob { display: flex; }
+        .ib-comp { padding: .6rem .6rem .7rem; }
+      }
+      @media (prefers-reduced-motion: reduce) { .ib-m { animation: none; } }
+
+      /* ---------- صفحة الأمان + بطاقة الوارد في لوحة القيادة ---------- */
+      .sec-grid { display: grid; gap: 1rem; }
+      .sec-card { padding: 1.2rem 1.2rem 1rem; border-radius: 22px; border: 1px solid var(--line); background: var(--panel); }
+      .sec-card h3 { display: flex; align-items: center; gap: .55rem; color: var(--fog); font-weight: 800; font-size: .98rem; margin-bottom: .2rem; }
+      .sec-card h3 em { font-style: normal; font-family: "JetBrains Mono", monospace; font-size: .72rem; color: var(--muted); font-weight: 700; }
+      .sec-card > p { color: var(--muted); font-size: .76rem; margin-bottom: .9rem; line-height: 1.8; }
+      .sec-card.bad h3 i { color: #f87171; } .sec-card.warn h3 i { color: #f59e0b; } .sec-card.info h3 i { color: var(--cyan); }
+      .sec-row { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .65rem .8rem; border: 1px solid var(--line); border-radius: 16px; margin-bottom: .5rem; background: var(--panel2); flex-wrap: wrap; }
+      .sec-row .l { display: flex; align-items: center; gap: .7rem; min-width: 0; }
+      .sec-row .l b { display: block; color: var(--fog); font-size: .88rem; }
+      .sec-row .l small { display: block; color: var(--muted); font-size: .7rem; }
+      .sec-row .a { display: flex; gap: .4rem; flex-wrap: wrap; }
+      .sec-empty { color: var(--muted); font-size: .82rem; padding: .4rem 0; }
+      .hx-inb { display: grid; gap: .3rem; }
+      .hx-inb .r { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: .65rem; align-items: center; padding: .45rem .5rem; border-radius: 12px; cursor: pointer; border: 1px solid transparent; transition: all .15s; }
+      .hx-inb .r:hover { background: rgba(var(--hx-rgb), .07); border-color: rgba(var(--hx-rgb), .3); }
+      .hx-inb .nm { color: var(--fog); font-size: .82rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .hx-inb .pv { color: var(--muted); font-size: .74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; unicode-bidi: plaintext; text-align: start; }
+      .hx-inb .m { text-align: end; font-family: "JetBrains Mono", monospace; font-size: .66rem; color: var(--muted); }
+      .hx-inb .m b { display: inline-grid; place-items: center; min-width: 1.2rem; height: 1.2rem; border-radius: 99px; background: var(--hx-warn); color: #1a1200; font-size: .66rem; margin-top: .2rem; padding: 0 .3rem; }
+      .hx-k[data-go] { cursor: pointer; transition: transform .15s, border-color .15s; }
+      .hx-k[data-go]:hover { transform: translateY(-2px); border-color: rgba(var(--hx-rgb), .55); }
+      .hx-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     </style>
   </head>
   <body class="bg-ink text-fog antialiased">
@@ -871,8 +1081,10 @@
         <div class="tab-panel" id="tab-students">
           <div class="sol-nav" role="tablist" aria-label="أدوات موقع الحلول">
             <button class="sol-btn active" type="button" data-sol="dash"><i class="fas fa-chart-line"></i> لوحة القيادة</button>
-            <button class="sol-btn" type="button" data-sol="students"><i class="fas fa-user-graduate"></i> الطلاب والرسائل <span id="sol-unread-badge" class="sol-badge" style="background:#f87171;color:#fff" hidden>0</span></button>
+            <button class="sol-btn" type="button" data-sol="inbox"><i class="fas fa-inbox"></i> الرسائل <span id="sol-unread-badge" class="sol-badge" style="background:#f87171;color:#fff" hidden>0</span></button>
+            <button class="sol-btn" type="button" data-sol="students"><i class="fas fa-user-graduate"></i> الطلاب</button>
             <button class="sol-btn" type="button" data-sol="reviews"><i class="fas fa-star"></i> تقييمات الطلاب <span id="sol-pending-badge" class="sol-badge" hidden>0</span></button>
+            <button class="sol-btn" type="button" data-sol="security"><i class="fas fa-shield-halved"></i> الأمان والحظر <span id="sol-sec-badge" class="sol-badge" hidden>0</span></button>
             <button class="sol-btn" type="button" id="hx-open-pal" title="لوحة الأوامر (Ctrl+K)" style="margin-inline-start:auto"><i class="fas fa-terminal"></i> <span class="mono" style="font-size:.72rem">Ctrl+K</span></button>
           </div>
 
@@ -916,8 +1128,8 @@
 
             <div class="hx-grid hx-g12">
               <section class="hx-card">
-                <div class="hx-h"><h3><i class="fas fa-comments"></i> الرسائل (آخر 14 يومًا)</h3><span class="sub" id="hx-msgsub"></span></div>
-                <div id="hx-msgs" class="hx-chart"></div>
+                <div class="hx-h"><h3><i class="fas fa-inbox"></i> صندوق الوارد</h3><span class="sub" id="hx-inbox-n"></span><button id="hx-inbox-open" class="hx-btn" type="button">فتح الرسائل</button></div>
+                <div id="hx-inbox"><div class="hx-skel">$ loading inbox<span class="blink">_</span></div></div>
               </section>
               <section class="hx-card">
                 <div class="hx-h"><h3><i class="fas fa-ranking-star"></i> الأكثر تفاعلًا (30 يومًا)</h3></div>
@@ -927,14 +1139,19 @@
 
             <div class="hx-grid hx-g21">
               <section class="hx-card">
-                <div class="hx-h"><h3><i class="fas fa-fire"></i> خريطة النشاط الحرارية</h3><span class="sub">tz: Africa/Cairo · 30d</span></div>
-                <div id="hx-heat"></div>
+                <div class="hx-h"><h3><i class="fas fa-comments"></i> الرسائل (آخر 14 يومًا)</h3><span class="sub" id="hx-msgsub"></span></div>
+                <div id="hx-msgs" class="hx-chart"></div>
               </section>
               <section class="hx-card">
                 <div class="hx-h"><h3><i class="fas fa-star-half-stroke"></i> مسار التقييمات</h3></div>
                 <div id="hx-rev"></div>
               </section>
             </div>
+
+            <section class="hx-card" style="margin-bottom:1rem">
+              <div class="hx-h"><h3><i class="fas fa-fire"></i> خريطة النشاط الحرارية</h3><span class="sub">tz: Africa/Cairo · 30d</span></div>
+              <div id="hx-heat"></div>
+            </section>
 
             <section class="hx-card">
               <div class="hx-h"><h3><i class="fas fa-terminal"></i> سجل النشاط المباشر</h3><span class="sub">tail -f activity.log</span></div>
@@ -979,6 +1196,7 @@
             <div id="students-more" style="text-align:center"></div>
             <div id="st-bulk" class="hx-bulk" hidden>
               <span>محدد: <b id="st-bulk-n">0</b></span>
+              <button class="hx-chip" type="button" data-bulk="message" style="color:var(--cyan)"><i class="fas fa-paper-plane"></i> رسالة</button>
               <button class="hx-chip" type="button" data-bulk="approve" style="color:#4ade9b"><i class="fas fa-rotate-left"></i> قبول</button>
               <button class="hx-chip" type="button" data-bulk="reject" style="color:#f59e0b"><i class="fas fa-ban"></i> رفض</button>
               <button class="hx-chip" type="button" data-bulk="delete" style="color:#f87171"><i class="fas fa-trash"></i> حذف</button>
@@ -1043,7 +1261,110 @@
               <div id="srv-list"></div>
             </div>
           </div>
+          <!-- ===== (3) صندوق الرسائل ===== -->
+          <div class="sol-pane" id="sol-inbox">
+            <div class="ib-top">
+              <span class="stat-chip">المحادثات: <b id="ib-n-all">0</b></span>
+              <span class="stat-chip">غير مقروءة: <b id="ib-n-unread" style="color:#f87171">0</b></span>
+              <span class="stat-chip">بانتظار ردّك: <b id="ib-n-await" style="color:#f59e0b">0</b></span>
+              <span class="stat-chip">صوتية: <b id="ib-n-voice">0</b></span>
+              <span class="grow"></span>
+              <span id="ib-live" class="ib-live off"><i></i><span id="ib-live-t">غير متصل</span></span>
+              <button id="ib-new" class="ib-tool" type="button"><i class="fas fa-pen-to-square"></i> محادثة جديدة</button>
+              <button id="ib-readall" class="ib-tool" type="button"><i class="fas fa-check-double"></i> تعليم الكل كمقروء</button>
+              <button id="ib-sound" class="ib-tool on" type="button" title="صوت تنبيه عند وصول رسالة جديدة"><i class="fas fa-bell"></i> <span>صوت</span></button>
+              <button id="ib-refresh" class="ib-tool" type="button"><i class="fas fa-rotate"></i></button>
+            </div>
 
+            <div class="ib-shell" id="ib-shell">
+              <aside class="ib-list-col">
+                <div class="ib-search">
+                  <i class="fas fa-magnifying-glass"></i>
+                  <input id="ib-q" type="search" placeholder="ابحث بالاسم أو في نص الرسائل…" autocomplete="off" aria-label="بحث في المحادثات" />
+                </div>
+                <div class="ib-filters" id="ib-filters"></div>
+                <div class="ib-list" id="ib-list"></div>
+              </aside>
+
+              <section class="ib-thread-col">
+                <div class="ib-welcome" id="ib-welcome">
+                  <div class="ico"><i class="fas fa-comments"></i></div>
+                  <h3>صندوق رسائل الطلاب</h3>
+                  <p>اختر محادثة من القائمة لعرضها والرد عليها.<br />
+                    <span class="ib-kbd">/</span> للبحث · <span class="ib-kbd">Alt</span>+<span class="ib-kbd">↑↓</span> للتنقل بين المحادثات · <span class="ib-kbd">Esc</span> للإغلاق</p>
+                </div>
+
+                <div class="ib-chat" id="ib-chat" hidden>
+                  <header class="ib-head">
+                    <button id="ib-back" class="ib-icon ib-back" type="button" aria-label="رجوع للقائمة"><i class="fas fa-arrow-right"></i></button>
+                    <div id="ib-head-av"></div>
+                    <div class="who"><b id="ib-name"></b><small id="ib-sub"></small></div>
+                    <button id="ib-info" class="ib-icon" type="button" title="بيانات الجهاز والطالب"><i class="fas fa-circle-info"></i></button>
+                    <button id="ib-pin" class="ib-icon" type="button" title="تثبيت المحادثة"><i class="fas fa-thumbtack"></i></button>
+                    <button id="ib-note-btn" class="ib-icon" type="button" title="ملاحظة خاصة (لا يراها الطالب)"><i class="fas fa-note-sticky"></i></button>
+                    <div class="ib-menu-wrap">
+                      <button id="ib-more" class="ib-icon" type="button" aria-haspopup="true" aria-label="المزيد"><i class="fas fa-ellipsis-vertical"></i></button>
+                      <div id="ib-menu" class="ib-menu" hidden>
+                        <button type="button" data-m="info" class="mob"><i class="fas fa-circle-info"></i> بيانات الجهاز والطالب</button>
+                        <button type="button" data-m="pin" class="mob"><i class="fas fa-thumbtack"></i> تثبيت / إلغاء التثبيت</button>
+                        <button type="button" data-m="note" class="mob"><i class="fas fa-note-sticky"></i> ملاحظة خاصة</button>
+                        <button type="button" data-m="unread"><i class="fas fa-envelope"></i> تعليم كغير مقروءة</button>
+                        <button type="button" data-m="unlock" id="ib-m-unlock" hidden><i class="fas fa-lock-open"></i> رفع المنع الآن</button>
+                        <button type="button" data-m="copy"><i class="fas fa-copy"></i> نسخ معرّف الجهاز</button>
+                        <hr />
+                        <button type="button" data-m="ban" class="danger"><i class="fas fa-ban"></i> <span id="ib-m-ban-t">حظر الجهاز بالكامل</span></button>
+                        <button type="button" data-m="clear" class="danger"><i class="fas fa-trash"></i> حذف المحادثة</button>
+                      </div>
+                    </div>
+                  </header>
+                  <div id="ib-banner" class="ib-banner"></div>
+                  <div class="ib-msgwrap">
+                    <div id="ib-msgs" class="ib-msgs" aria-live="polite"></div>
+                    <button id="ib-newpill" class="ib-newpill" type="button" hidden><i class="fas fa-arrow-down"></i> رسائل جديدة</button>
+                  </div>
+                  <div id="ib-quick" class="ib-quick" hidden></div>
+                  <div id="ib-rec" class="ib-rec" hidden>
+                    <span class="rd"></span><span id="ib-rt" class="rt">0:00</span>
+                    <button id="ib-rcancel" type="button" class="ib-tool">إلغاء</button>
+                    <button id="ib-rstop" type="button" class="admin-btn" style="width:auto;padding:.55rem 1.1rem"><i class="fas fa-paper-plane"></i> إرسال التسجيل</button>
+                  </div>
+                  <div id="ib-comp" class="ib-comp">
+                    <div class="ib-input">
+                      <textarea id="ib-text" rows="1" maxlength="1000" placeholder="اكتب رسالة للطالب… (Enter للإرسال، Shift+Enter لسطر جديد)"></textarea>
+                      <div class="opts">
+                        <label title="الطالب لن يدخل الحلول حتى يرد على هذه الرسالة"><input type="checkbox" id="ib-lock" /> <i class="fas fa-lock"></i> منع الدخول حتى يرد</label>
+                        <button type="button" id="ib-qtoggle"><i class="fas fa-bolt"></i> ردود سريعة</button>
+                        <span class="len" id="ib-len">0/1000</span>
+                      </div>
+                    </div>
+                    <button id="ib-mic" type="button" class="ib-round" aria-label="تسجيل صوتي"><i class="fas fa-microphone"></i></button>
+                    <button id="ib-send" type="button" class="ib-round send" aria-label="إرسال"><i class="fas fa-paper-plane"></i></button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <!-- ===== (4) الأمان والحظر ===== -->
+          <div class="sol-pane" id="sol-security">
+            <div class="flex items-center gap-3 mb-6" style="flex-wrap:wrap">
+              <span class="stat-chip">أجهزة محظورة: <b id="sec-n-ban" style="color:#f87171">0</b></span>
+              <span class="stat-chip">مشبوهة: <b id="sec-n-sim" style="color:#f59e0b">0</b></span>
+              <span class="stat-chip">محجوبة بانتظار الرد: <b id="sec-n-lock">0</b></span>
+              <button id="sec-refresh" class="admin-btn" type="button" style="width:auto;padding:.55rem 1rem;margin-inline-start:auto"><i class="fas fa-rotate"></i> تحديث</button>
+            </div>
+            <div class="sec-grid">
+              <section class="sec-card bad"><h3><i class="fas fa-ban"></i> الأجهزة المحظورة <em id="sec-h-ban"></em></h3>
+                <p>الجهاز المحظور يرى المحادثة مع الإدارة فقط. الحظر مرتبط ببصمة الجهاز فيبقى حتى لو مُسحت بيانات المتصفح.</p>
+                <div id="sec-ban"></div></section>
+              <section class="sec-card warn"><h3><i class="fas fa-triangle-exclamation"></i> أجهزة تشبه جهازًا محظورًا <em id="sec-h-sim"></em></h3>
+                <p>نفس العتاد لكن بمتصفح مختلف. تنبيه فقط — لا يُحظر شيء تلقائيًا بدون قرارك.</p>
+                <div id="sec-sim"></div></section>
+              <section class="sec-card info"><h3><i class="fas fa-lock"></i> طلاب محجوبون حتى يردّوا <em id="sec-h-lock"></em></h3>
+                <p>أرسلت لهم رسالة بخيار «منع الدخول حتى يرد». يمكنك رفع المنع في أي وقت.</p>
+                <div id="sec-lock"></div></section>
+            </div>
+          </div>
 
         </div>
       </main>
@@ -1068,32 +1389,12 @@
       </div>
     </div>
 
-    <!-- محادثة الطالب -->
-    <div id="st-chat" class="stc-back" hidden>
-      <div class="stc-box" role="dialog" aria-modal="true" aria-labelledby="stc-name">
-        <div class="stc-head">
-          <div><b id="stc-name"></b><small id="stc-sub"></small></div>
-          <button id="stc-close" class="stc-x" type="button" aria-label="إغلاق">×</button>
-        </div>
-        <details id="stc-dev" class="dv-box" hidden></details>
-        <div id="stc-list" class="stc-list"></div>
-        <div class="stc-tools">
-          <label><input type="checkbox" id="stc-lock" /> منع الطالب من دخول الحلول حتى يرد</label>
-          <button id="stc-unlock" type="button" hidden>رفع المنع الآن</button>
-          <button id="stc-ban" type="button" class="danger"><i class="fas fa-ban"></i> <span id="stc-ban-t">حظر الجهاز بالكامل</span></button>
-          <button id="stc-clear" type="button" class="danger">حذف المحادثة</button>
-        </div>
-        <div id="stc-rec" class="stc-rec" hidden>
-          <span class="rd"></span><span id="stc-rt" class="rt">0:00</span>
-          <button id="stc-rcancel" type="button" class="stc-mic" style="width:auto;padding:0 .8rem">إلغاء</button>
-          <button id="stc-rstop" type="button" class="admin-btn" style="width:auto;padding:.55rem 1rem">إرسال التسجيل</button>
-        </div>
-        <div id="stc-quick" class="stc-quick"></div>
-        <div id="stc-bar" class="stc-bar">
-          <textarea id="stc-text" rows="2" maxlength="1000" placeholder="اكتب رسالة للطالب..."></textarea>
-          <button id="stc-mic" type="button" class="stc-mic" aria-label="تسجيل صوتي"><i class="fas fa-microphone"></i></button>
-          <button id="stc-send" type="button" class="admin-btn" style="width:auto;padding:.6rem 1.1rem">إرسال</button>
-        </div>
+    <!-- محادثة جديدة: اختيار طالب -->
+    <div id="nc-modal" class="stc-back" hidden>
+      <div class="stc-box" style="height:min(560px,calc(100vh - 2rem))" role="dialog" aria-modal="true" aria-labelledby="nc-title">
+        <div class="stc-head"><div><b id="nc-title">محادثة جديدة</b><small>اختر الطالب الذي تريد مراسلته</small></div><button id="nc-x" class="stc-x" type="button" aria-label="إغلاق">×</button></div>
+        <div style="padding:.8rem"><input id="nc-q" type="search" class="admin-input" placeholder="ابحث بالاسم أو نوع الجهاز…" autocomplete="off" /></div>
+        <div id="nc-list" style="flex:1;overflow:auto"></div>
       </div>
     </div>
     <!-- إعلان جماعي -->
@@ -1965,7 +2266,7 @@
         $stc("dvp-stu").innerHTML = rows.map((r) => /^(معرّف الجهاز)$/.test(r[0])
           ? `<div style="grid-column:1/-1"><small>${r[0]}</small><b dir="ltr" style="text-align:start;user-select:all;font-family:'JetBrains Mono',monospace;font-size:.72rem">${escapeHtml(String(r[1]))}</b></div>`
           : `<div><small>${r[0]}</small><b${/^IP/.test(r[0]) ? ' dir="ltr" style="text-align:start;user-select:all"' : ""}>${escapeHtml(String(r[1]))}</b></div>`).join("");
-        $stc("dvp-chat").onclick = () => { $stc("dv-pop").hidden = true; openStudentChat(st.device_id, st.name); };
+        $stc("dvp-chat").onclick = () => { $stc("dv-pop").hidden = true; openInbox(st.device_id, st.name); };
         $stc("dv-pop").hidden = false;
       }
 
@@ -2069,7 +2370,7 @@
       // مستمعات واحدة (event delegation) بدل مستمع لكل زر
       document.getElementById("students-list").addEventListener("click", async (e) => {
         const msg = e.target.closest(".st-msg-btn");
-        if (msg) return openStudentChat(msg.dataset.device, msg.dataset.name);
+        if (msg) return openInbox(msg.dataset.device, msg.dataset.name);
         const dvm = e.target.closest(".dv-mini[data-stid]");
         if (dvm) return openDevPop(dvm.dataset.stid);
         const ban = e.target.closest(".student-ban-btn");
@@ -2127,6 +2428,11 @@
         if (!b) return;
         const act = b.dataset.bulk;
         if (act === "clear") { stSel.clear(); document.getElementById("st-selall").checked = false; return renderStudents(); }
+        if (act === "message") {
+          const devs = [...new Set(studentsCache.filter((x) => stSel.has(x.id) && x.isLatest && x.status === "approved").map((x) => x.device_id))];
+          if (!devs.length) return toast("حدد طلابًا مقبولين أولًا", false);
+          return bcOpen(devs);
+        }
         const n = stSel.size;
         const txt = { approve: "قبول", reject: "رفض", delete: "حذف نهائي لـ" }[act];
         if (!confirm(txt + " " + n + " اسم؟")) return;
@@ -2174,6 +2480,7 @@
         document.getElementById("students-unread-count").textContent = unreadTotal;
         setUnreadUI(unreadTotal);
         renderStudents();
+        secBadge();
       }
 
       document.getElementById("students-refresh-btn").addEventListener("click", () => loadStudents());
@@ -2348,318 +2655,12 @@
       $sv("srv-cancel").addEventListener("click", srvReset);
       $sv("srv-refresh").addEventListener("click", () => loadSolReviews());
 
-      /* ---------- محادثة الطالب (نص / صوت) ---------- */
-      const stc = {
-        device: null,
-        name: "",
-        ids: "",
-        timer: null,
-        audios: {},
-        rec: null,
-        sending: false,
-      };
+      /* ---------- أدوات مشتركة ---------- */
       const $stc = (id) => document.getElementById(id);
-
       function stcFmtDur(s) {
         s = Math.max(0, s | 0);
         return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2);
       }
-
-      async function openStudentChat(device, name) {
-        stc.device = device;
-        stc.name = name;
-        stc.ids = "";
-        $stc("stc-name").textContent = name;
-        const st = studentsCache.find((x) => x.device_id === device && x.isLatest);
-        $stc("stc-sub").textContent = st ? "الجهاز: " + (st.device_type || "غير معروف") : "";
-        $stc("stc-lock").checked = false;
-        const dv = $stc("stc-dev");
-        if (st) {
-          dv.innerHTML = '<summary><i class="fas fa-circle-info"></i> تفاصيل الجهاز — ' + devSummaryText(st) + "</summary>" + devFacts(st);
-          dv.open = false;
-          dv.hidden = false;
-        } else dv.hidden = true;
-        $stc("st-chat").hidden = false;
-        await loadStudentChat(true);
-        clearInterval(stc.timer);
-        stc.timer = setInterval(() => {
-          if (!document.hidden) loadStudentChat(false);
-        }, 6000);
-      }
-
-      function closeStudentChat() {
-        if (stc.rec) stopAdminRec(true);
-        clearInterval(stc.timer);
-        $stc("st-chat").hidden = true;
-        stc.device = null;
-        loadStudents(true);
-      }
-
-      async function loadStudentChat(force) {
-        const device = stc.device;
-        if (!device) return;
-        let res;
-        try {
-          res = await sApi("/admin/messages/" + encodeURIComponent(device));
-        } catch (e) {
-          if (device === stc.device) toast("تعذر تحميل الرسائل: " + e.message, false);
-          return;
-        }
-        if (device !== stc.device) return;
-        const msgs = res.messages || [];
-        const isBanned = !!res.banned;
-        const isLocked = !!res.locked && !isBanned;
-        stc.banned = isBanned;
-        $stc("stc-unlock").hidden = !isLocked;
-        $stc("stc-ban-t").textContent = isBanned ? "رفع الحظر عن الجهاز" : "حظر الجهاز بالكامل";
-        $stc("stc-ban").classList.toggle("danger", !isBanned);
-
-        const ids = msgs.map((m) => m.id).join(",") + "|" + (isLocked ? "L" : "") + (isBanned ? "B" : "");
-        if (!force && ids === stc.ids) return;
-        stc.ids = ids;
-
-        const list = $stc("stc-list");
-        list.textContent = "";
-        if (!msgs.length) {
-          const p = document.createElement("p");
-          p.className = "stc-empty";
-          p.textContent = "لا توجد رسائل بعد. اكتب رسالة للطالب أو سجّل رسالة صوتية.";
-          list.appendChild(p);
-          return;
-        }
-        msgs.forEach((m) => {
-          const row = document.createElement("div");
-          row.className = "stc-m " + (m.sender === "admin" ? "stc-ad" : "stc-st");
-          if (m.kind === "voice") {
-            const b = document.createElement("button");
-            b.type = "button";
-            b.className = "stc-v";
-            b.textContent = "▶ رسالة صوتية · " + stcFmtDur(m.duration);
-            b.addEventListener("click", () => playAdminVoice(m, b));
-            row.appendChild(b);
-          } else {
-            const t = document.createElement("div");
-            t.className = "stc-t";
-            t.textContent = m.body || "";
-            row.appendChild(t);
-          }
-          const meta = document.createElement("small");
-          meta.textContent =
-            (m.sender === "admin" ? "أنت" : stc.name) + " · " + studentWhen(m.created_at) + (m.requires_reply ? " · يمنع الدخول حتى الرد" : "");
-          row.appendChild(meta);
-          list.appendChild(row);
-        });
-        list.scrollTop = list.scrollHeight;
-      }
-
-      async function playAdminVoice(m, b) {
-        const label = "▶ رسالة صوتية · " + stcFmtDur(m.duration);
-        const cached = stc.audios[m.id];
-        if (cached) {
-          if (cached.paused) {
-            cached.play();
-            b.textContent = "⏸ إيقاف مؤقت";
-          } else {
-            cached.pause();
-            b.textContent = label;
-          }
-          return;
-        }
-        b.textContent = "جاري التحميل...";
-        let data = null;
-        try {
-          data = await sApi("/admin/audio/" + encodeURIComponent(m.id));
-        } catch (_) {}
-        if (!data || !data.audio) {
-          b.textContent = label;
-          toast("تعذر تحميل التسجيل", false);
-          return;
-        }
-        const au = new Audio(data.audio);
-        stc.audios[m.id] = au;
-        au.onended = () => (b.textContent = label);
-        au.play().then(
-          () => (b.textContent = "⏸ إيقاف مؤقت"),
-          () => {
-            b.textContent = label;
-            toast("تعذر تشغيل التسجيل", false);
-          }
-        );
-      }
-
-      async function sendAdminMessage(fields) {
-        if (!stc.device || stc.sending) return;
-        stc.sending = true;
-        $stc("stc-send").disabled = true;
-        let error = null;
-        try {
-          await sApi("/admin/messages", {
-            method: "POST",
-            body: { device_id: stc.device, requires_reply: $stc("stc-lock").checked, ...fields },
-          });
-        } catch (e) {
-          error = e;
-        }
-        stc.sending = false;
-        $stc("stc-send").disabled = false;
-        if (error) {
-          toast("تعذر الإرسال: " + error.message, false);
-          return;
-        }
-        $stc("stc-text").value = "";
-        toast($stc("stc-lock").checked ? "أُرسلت الرسالة وحُجب الطالب حتى يرد" : "تم إرسال الرسالة", true);
-        $stc("stc-lock").checked = false;
-        await loadStudentChat(true);
-      }
-
-      function stcSendText() {
-        const t = $stc("stc-text").value.trim();
-        if (!t) return;
-        sendAdminMessage({ kind: "text", body: t });
-      }
-
-      function showAdminRec(on) {
-        $stc("stc-rec").hidden = !on;
-        $stc("stc-bar").hidden = on;
-      }
-
-      async function startAdminRec() {
-        if (stc.rec || stc.sending) return;
-        if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder)) {
-          toast("التسجيل الصوتي غير مدعوم في هذا المتصفح", false);
-          return;
-        }
-        let stream;
-        try {
-          stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        } catch (_) {
-          toast("لم يتم السماح باستخدام الميكروفون", false);
-          return;
-        }
-        const mime = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"].find((m) => {
-          try {
-            return MediaRecorder.isTypeSupported(m);
-          } catch (_) {
-            return false;
-          }
-        });
-        let mr;
-        try {
-          mr = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 24000 } : { audioBitsPerSecond: 24000 });
-        } catch (_) {
-          mr = new MediaRecorder(stream);
-        }
-        const chunks = [];
-        const r = { mr, stream, t0: Date.now(), cancel: false, timer: 0 };
-        stc.rec = r;
-        mr.ondataavailable = (e) => {
-          if (e.data && e.data.size) chunks.push(e.data);
-        };
-        mr.onstop = () => {
-          clearInterval(r.timer);
-          stream.getTracks().forEach((t) => t.stop());
-          stc.rec = null;
-          showAdminRec(false);
-          if (r.cancel) return;
-          const dur = Math.max(1, Math.round((Date.now() - r.t0) / 1000));
-          const blob = new Blob(chunks, { type: mr.mimeType || mime || "audio/webm" });
-          const fr = new FileReader();
-          fr.onload = () => {
-            const url = String(fr.result);
-            if (url.length > 590000) {
-              toast("التسجيل طويل جدًا، سجّل رسالة أقصر", false);
-              return;
-            }
-            sendAdminMessage({ kind: "voice", audio: url, duration: dur });
-          };
-          fr.readAsDataURL(blob);
-        };
-        mr.start();
-        showAdminRec(true);
-        $stc("stc-rt").textContent = "0:00";
-        r.timer = setInterval(() => {
-          const s = Math.round((Date.now() - r.t0) / 1000);
-          $stc("stc-rt").textContent = stcFmtDur(s);
-          if (s >= 60) stopAdminRec(false);
-        }, 250);
-      }
-
-      function stopAdminRec(cancel) {
-        if (!stc.rec) return;
-        stc.rec.cancel = !!cancel;
-        try {
-          stc.rec.mr.stop();
-        } catch (_) {
-          stc.rec.stream.getTracks().forEach((t) => t.stop());
-          stc.rec = null;
-          showAdminRec(false);
-        }
-      }
-
-      $stc("stc-close").addEventListener("click", closeStudentChat);
-      $stc("st-chat").addEventListener("click", (e) => {
-        if (e.target === $stc("st-chat")) closeStudentChat();
-      });
-      $stc("stc-send").addEventListener("click", stcSendText);
-      $stc("stc-text").addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-          stcSendText();
-        }
-      });
-      $stc("stc-mic").addEventListener("click", startAdminRec);
-      $stc("stc-rstop").addEventListener("click", () => stopAdminRec(false));
-      $stc("stc-rcancel").addEventListener("click", () => stopAdminRec(true));
-
-      $stc("dvp-close").addEventListener("click", () => { $stc("dv-pop").hidden = true; });
-      $stc("dv-pop").addEventListener("click", (e) => { if (e.target === $stc("dv-pop")) $stc("dv-pop").hidden = true; });
-      document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$stc("dv-pop").hidden) $stc("dv-pop").hidden = true; });
-      document.getElementById("students-list").addEventListener("keydown", (e) => {
-        const dvm = e.target.closest(".dv-mini[data-stid]");
-        if (dvm && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openDevPop(dvm.dataset.stid); }
-      });
-
-      $stc("stc-ban").addEventListener("click", async () => {
-        if (!stc.device) return;
-        const on = !stc.banned;
-        if (!confirm(on
-          ? "حظر هذا الجهاز بالكامل؟\nلن يرى سوى المحادثة مع الإدارة، ولن يدخل الحلول حتى ترفع الحظر."
-          : "رفع الحظر عن هذا الجهاز؟")) return;
-        try {
-          await sApi("/admin/ban/" + encodeURIComponent(stc.device), { method: on ? "POST" : "DELETE" });
-        } catch (e) {
-          toast("تعذر التنفيذ: " + e.message, false);
-          return;
-        }
-        toast(on ? "تم حظر الجهاز" : "تم رفع الحظر", true);
-        await loadStudentChat(true);
-        loadStudents(true);
-      });
-
-      $stc("stc-unlock").addEventListener("click", async () => {
-        if (!stc.device) return;
-        try {
-          await sApi("/admin/unlock/" + encodeURIComponent(stc.device), { method: "POST" });
-        } catch (e) {
-          toast("تعذر رفع المنع: " + e.message, false);
-          return;
-        }
-        toast("تم رفع المنع، يدخل الطالب الموقع في خلال لحظات", true);
-        await loadStudentChat(true);
-      });
-
-      $stc("stc-clear").addEventListener("click", async () => {
-        if (!stc.device) return;
-        if (!confirm("حذف كل رسائل هذه المحادثة نهائيًا؟")) return;
-        try {
-          await sApi("/admin/messages/" + encodeURIComponent(stc.device), { method: "DELETE" });
-        } catch (e) {
-          toast("تعذر الحذف: " + e.message, false);
-          return;
-        }
-        toast("تم حذف المحادثة", true);
-        await loadStudentChat(true);
-      });
 
       /* =========================================================
          مركز قيادة موقع الحلول: لوحة القيادة (SVG خفيف)
@@ -2767,7 +2768,7 @@
 
       /* ---------- أجزاء اللوحة ---------- */
       function hxKpis(d) {
-        const k = d.kpi, sp = d.signups.slice(-14), r = d.reviews;
+        const k = d.kpi, sp = d.signups.slice(-14), r = d.reviews, ix = ibStats();
         const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
         const delta = (a, b) => {
           if (!b) return a ? '<span class="d up">▲ new</span>' : '<span class="d flat">— 0%</span>';
@@ -2775,24 +2776,29 @@
           return `<span class="d ${p > 0 ? "up" : p < 0 ? "down" : "flat"}">${p > 0 ? "▲ +" : p < 0 ? "▼ " : "— "}${p}%</span>`;
         };
         const flat = (t) => `<span class="d flat">${t}</span>`;
+        const todayMsgs = (d.msgStudent[d.msgStudent.length - 1] || 0) + (d.msgAdmin[d.msgAdmin.length - 1] || 0);
         const items = [
           { l: "إجمالي الطلاب (أجهزة)", v: k.devices, s: flat(k.rejected + " مرفوض"), sp },
           { l: "متصل الآن", v: k.online, s: flat(pct(k.online, k.approved) + "% من المقبولين") },
           { l: "نشط خلال 24 ساعة", v: k.active24, cls: "vio", s: flat(pct(k.active24, k.approved) + "%") },
           { l: "جدد خلال 7 أيام", v: k.new7, s: delta(k.new7, k.prev7), sp },
-          { l: "رسائل غير مقروءة", v: k.unread, cls: k.unread ? "warn" : "", s: flat(hxFmt(k.messages) + " رسالة") },
-          { l: "محجوب بانتظار الرد", v: Math.max(0, k.locked - (k.banned || 0)), cls: k.locked ? "bad" : "", s: flat("حجب مؤقت") },
-          { l: "أجهزة محظورة", v: k.banned || 0, cls: k.banned ? "bad" : "", s: flat("حظر كامل") },
-          { l: "تقييمات معلّقة", v: r.pending, cls: r.pending ? "warn" : "", s: flat(r.published + " منشور") },
+          { l: "رسائل غير مقروءة", v: k.unread, cls: k.unread ? "warn" : "", go: "inbox-unread", s: flat(hxFmt(k.voice) + " صوتية إجمالًا") },
+          { l: "بانتظار ردّك", v: ib.loaded ? ix.await : "—", cls: ix.await ? "warn" : "", go: "inbox-await", s: flat(ib.loaded ? ix.today + " نشطة اليوم" : "…") },
+          { l: "رسائل اليوم", v: todayMsgs, cls: "vio", go: "inbox", s: flat(hxFmt(k.messages) + " إجمالًا") },
+          { l: "إجمالي المحادثات", v: ib.loaded ? ib.convs.length : "—", go: "inbox", s: flat("صندوق الرسائل") },
+          { l: "محجوب بانتظار الرد", v: Math.max(0, k.locked - (k.banned || 0)), cls: k.locked ? "bad" : "", go: "security", s: flat("حجب مؤقت") },
+          { l: "أجهزة محظورة", v: k.banned || 0, cls: k.banned ? "bad" : "", go: "security", s: flat("حظر كامل") },
+          { l: "تقييمات معلّقة", v: r.pending, cls: r.pending ? "warn" : "", go: "reviews", s: flat(r.published + " منشور") },
           { l: "معدل العودة", v: pct(k.returning, k.approved) + "%", cls: "vio", s: flat(k.active7 + " نشط/7 أيام") },
         ];
-        return items.map((i) => `<div class="hx-card hx-k ${i.cls || ""}"><div class="l">${i.l}</div><div class="v">${i.v}</div><div class="s">${i.s}${i.sp ? hxSpark(i.sp, "var(--hx)") : ""}</div></div>`).join("");
+        return items.map((i) => `<div class="hx-card hx-k ${i.cls || ""}"${i.go ? ` data-go="${i.go}" role="button" tabindex="0"` : ""}><div class="l">${i.l}</div><div class="v">${i.v}</div><div class="s">${i.s}${i.sp ? hxSpark(i.sp, "var(--hx)") : ""}</div></div>`).join("");
       }
 
       function hxInsights(d) {
         const k = d.kpi, out = [];
         if (d.reviews.pending) out.push(["warn", "fa-star", d.reviews.pending + " تقييم بانتظار مراجعتك", "راجِع", "reviews"]);
-        if (k.unread) out.push(["warn", "fa-envelope", k.unread + " رسالة جديدة من الطلاب لم تُقرأ", "افتح", "unread"]);
+        if (ib.loaded && ibStats().await) out.push(["warn", "fa-reply", ibStats().await + " محادثة بانتظار ردّك", "ردّ", "inbox-await"]);
+        if (k.unread) out.push(["warn", "fa-envelope", k.unread + " رسالة جديدة من الطلاب لم تُقرأ", "افتح", "inbox-unread"]);
         if (k.locked) out.push(["info", "fa-lock", k.locked + " طالب محجوب حتى يردّ على رسالتك", "عرض", "locked"]);
         if (k.prev7 || k.new7) {
           const p = k.prev7 ? Math.round(((k.new7 - k.prev7) / k.prev7) * 100) : 100;
@@ -2871,6 +2877,7 @@
         hxSet("hx-heat", hxHeat(d.heat));
         hxSet("hx-rev", hxRev(d));
         hxSet("hx-feed", hxFeed(d));
+        ibRenderInboxCard();
         setUnreadUI(d.kpi.unread);
       }
 
@@ -2885,6 +2892,7 @@
           hxLast = Date.now();
           hxStatus(true);
           renderDash();
+          if (!ib.loaded) ibLoadConvs(true);
         } catch (e) {
           hxStatus(false);
           if (!hxData) $h("hx-kpis").innerHTML = '<div class="hx-err">[ERR] ' + escapeHtml(e.message) + "</div>";
@@ -2919,6 +2927,8 @@
         if (name === "dash") loadSolDash();
         else if (name === "students") loadStudents(true);
         else if (name === "reviews") loadSolReviews();
+        else if (name === "inbox") { ibLoadConvs(true); if (!studentsCache.length) loadStudents(true); if (ib.sel) ibLoadThread(false); }
+        else if (name === "security") loadSecurity();
       }
       function openSol(name, after) {
         const b = document.querySelector('.tab-btn[data-tab="students"]');
@@ -2938,8 +2948,10 @@
       $h("hx-insights").addEventListener("click", (e) => {
         const b = e.target.closest("[data-go]");
         if (!b) return;
-        if (b.dataset.go === "reviews") openSol("reviews", () => { srvFilter = "pending"; renderSolReviews(); });
-        else openStudentsFilter(b.dataset.go);
+        const g = b.dataset.go;
+        if (g === "reviews") openSol("reviews", () => { srvFilter = "pending"; renderSolReviews(); });
+        else if (g === "inbox-unread" || g === "inbox-await") openSol("inbox", () => { ib.filter = g === "inbox-unread" ? "unread" : "await"; ibRenderList(); });
+        else openStudentsFilter(g);
       });
 
       /* ---------- تلميح الرسوم (عنصر واحد لكل اللوحة) ---------- */
@@ -2957,9 +2969,22 @@
       })();
 
       /* ---------- الإعلان الجماعي ---------- */
-      function bcOpen() { $h("bc-modal").hidden = false; $h("bc-text").focus(); }
+      let bcDevices = null; // أجهزة محددة من جدول الطلاب (بدلًا من فئة جاهزة)
+      function bcOpen(devices) {
+        const sel = $h("bc-aud"), old = sel.querySelector("option[value=sel]");
+        if (old) old.remove();
+        bcDevices = Array.isArray(devices) && devices.length ? devices : null;
+        if (bcDevices) {
+          const o = document.createElement("option");
+          o.value = "sel"; o.textContent = "الطلاب المحددون (" + bcDevices.length + ")";
+          sel.insertBefore(o, sel.firstChild);
+          sel.value = "sel";
+        } else if (sel.value === "sel") sel.value = "all";
+        $h("bc-title").textContent = bcDevices ? "رسالة للطلاب المحددين" : "إعلان لجميع الطلاب";
+        $h("bc-modal").hidden = false; $h("bc-text").focus();
+      }
       function bcClose() { $h("bc-modal").hidden = true; }
-      $h("st-broadcast").addEventListener("click", bcOpen);
+      $h("st-broadcast").addEventListener("click", () => bcOpen());
       $h("bc-x").addEventListener("click", bcClose);
       $h("bc-modal").addEventListener("click", (e) => { if (e.target === $h("bc-modal")) bcClose(); });
       $h("bc-text").addEventListener("input", () => ($h("bc-len").textContent = $h("bc-text").value.length + "/1000"));
@@ -2970,7 +2995,7 @@
         const btn = $h("bc-send");
         btn.disabled = true;
         try {
-          const r = await sApi("/admin/broadcast", { method: "POST", body: { body, audience: aud.value } });
+          const r = await sApi("/admin/broadcast", { method: "POST", body: bcDevices && aud.value === "sel" ? { body, device_ids: bcDevices } : { body, audience: aud.value === "sel" ? "all" : aud.value } });
           if (r.status !== "ok") throw new Error("بيانات غير صالحة");
           toast(r.n ? "أُرسل الإعلان إلى " + r.n + " طالب" : "لا يوجد طلاب مطابقون لهذه الفئة", !!r.n);
           if (r.n) { $h("bc-text").value = ""; $h("bc-len").textContent = "0/1000"; bcClose(); }
@@ -2978,29 +3003,23 @@
         btn.disabled = false;
       });
 
-      /* ---------- ردود سريعة داخل المحادثة ---------- */
-      const STC_QUICK = ["أحسنت 👏", "ما الخطوة التي توقفت عندها؟", "جرّب تحديث الصفحة ثم أخبرني", "أرسل لي صورة توضّح المشكلة", "تم حل المشكلة ✅"];
-      $h("stc-quick").innerHTML = STC_QUICK.map((t, i) => `<button type="button" data-q="${i}">${t}</button>`).join("");
-      $h("stc-quick").addEventListener("click", (e) => {
-        const b = e.target.closest("button[data-q]");
-        if (!b) return;
-        const ta = $h("stc-text");
-        ta.value = (ta.value ? ta.value + " " : "") + STC_QUICK[b.dataset.q];
-        ta.focus();
-      });
-
       /* ---------- لوحة الأوامر (Ctrl/⌘ + K) ---------- */
       const hxCmds = [
         { k: "dashboard", t: "لوحة القيادة", i: "fa-chart-line", run: () => openSol("dash") },
-        { k: "students", t: "الطلاب والرسائل", i: "fa-user-graduate", run: () => openSol("students") },
-        { k: "unread", t: "الطلاب: رسائل جديدة", i: "fa-envelope", run: () => openStudentsFilter("unread") },
+        { k: "inbox", t: "صندوق الرسائل", i: "fa-inbox", run: () => openSol("inbox") },
+        { k: "awaiting", t: "الرسائل: بانتظار ردّي", i: "fa-reply", run: () => openSol("inbox", () => { ib.filter = "await"; ibRenderList(); }) },
+        { k: "newchat", t: "بدء محادثة جديدة", i: "fa-pen-to-square", run: () => openSol("inbox", ncOpen) },
+        { k: "readall", t: "تعليم كل الرسائل كمقروءة", i: "fa-check-double", run: () => openSol("inbox", () => $h("ib-readall").click()) },
+        { k: "security", t: "الأمان والحظر", i: "fa-shield-halved", run: () => openSol("security") },
+        { k: "students", t: "الطلاب", i: "fa-user-graduate", run: () => openSol("students") },
+        { k: "unread", t: "الرسائل: غير المقروءة", i: "fa-envelope", run: () => openSol("inbox", () => { ib.filter = "unread"; ibRenderList(); }) },
         { k: "online", t: "الطلاب: المتصلون الآن", i: "fa-circle", run: () => openStudentsFilter("online") },
         { k: "locked", t: "الطلاب: المحجوبون", i: "fa-lock", run: () => openStudentsFilter("locked") },
         { k: "reviews", t: "تقييمات الطلاب", i: "fa-star", run: () => openSol("reviews") },
         { k: "pending", t: "التقييمات قيد المراجعة", i: "fa-hourglass-half", run: () => openSol("reviews", () => { srvFilter = "pending"; renderSolReviews(); }) },
-        { k: "broadcast", t: "إرسال إعلان للجميع", i: "fa-bullhorn", run: () => openSol("students", bcOpen) },
+        { k: "broadcast", t: "إرسال إعلان للجميع", i: "fa-bullhorn", run: () => openSol("students", () => bcOpen()) },
         { k: "export", t: "تصدير الطلاب CSV", i: "fa-file-csv", run: () => openSol("students", stExport) },
-        { k: "refresh", t: "تحديث كل البيانات", i: "fa-rotate", run: () => { loadSolDash(); loadStudents(true); loadSolReviews(true); } },
+        { k: "refresh", t: "تحديث كل البيانات", i: "fa-rotate", run: () => { loadSolDash(); loadStudents(true); loadSolReviews(true); ibLoadConvs(true); } },
         { k: "theme", t: "تبديل الثيم", i: "fa-circle-half-stroke", run: () => { const b = document.querySelector("[data-theme-toggle]"); if (b) b.click(); } },
       ];
       let palSel = 0, palList = [];
@@ -3040,6 +3059,757 @@
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); $h("hx-pal").hidden ? palOpen() : palClose(); }
         else if (e.key === "Escape") { if (!$h("hx-pal").hidden) palClose(); else if (!$h("bc-modal").hidden) bcClose(); }
       });
+
+      /* =========================================================
+         صندوق الرسائل (Inbox): قائمة المحادثات + المحادثة الحالية + الأمان
+         يعتمد على: sApi, studentsCache, loadStudents, openDevPop, solGo/openSol
+      ========================================================= */
+      const IB_FILTERS = [["all", "الكل"], ["unread", "غير مقروءة"], ["await", "بانتظار ردّك"], ["voice", "صوتية"], ["pinned", "مثبّتة"], ["online", "متصل الآن"], ["locked", "محجوبة"], ["banned", "محظورة"]];
+      const IB_QUICK_DEFAULT = ["أحسنت 👏", "ما الخطوة التي توقفت عندها؟", "جرّب تحديث الصفحة ثم أخبرني", "أرسل لي صورة توضّح المشكلة", "تم حل المشكلة ✅"];
+      const ib = {
+        convs: [], loaded: false, loading: false, live: false,
+        filter: "all", q: "", hits: [], hitsFor: "", hitsT: 0,
+        sel: null, selName: "", msgs: [], more: false, sig: "", locked: false, banned: false,
+        scroll: "bottom", lastId: "", sending: false, rec: null, audios: {}, drafts: new Map(), prevUnread: new Map(),
+        tConv: 0, tThread: 0, tmp: 0, quickEdit: false, noteOpen: false, ctx: null,
+        sound: true, quick: IB_QUICK_DEFAULT.slice(),
+      };
+      try {
+        if (localStorage.getItem("ib_sound") === "0") ib.sound = false;
+        const q = JSON.parse(localStorage.getItem("ib_quick") || "null");
+        if (Array.isArray(q) && q.every((x) => typeof x === "string")) ib.quick = q.slice(0, 20);
+      } catch (_) {}
+
+      /* ---------- أدوات صغيرة ---------- */
+      const ibHue = (s) => { let h = 0; String(s).split("").forEach((c) => { h = (h * 31 + c.charCodeAt(0)) % 360; }); return h; };
+      function ibAvatar(name, device, on, cls) {
+        const ch = (String(name || "ط").trim()[0] || "ط").toUpperCase();
+        return `<div class="ib-av ${cls || ""}" style="background:linear-gradient(135deg,hsl(${ibHue(device)} 60% 46%),hsl(${(ibHue(device) + 40) % 360} 62% 38%))">${escapeHtml(ch)}${on ? '<span class="dot"></span>' : ""}</div>`;
+      }
+      const ibOnline = (c) => c.status === "approved" && c.last_seen && Date.now() - new Date(c.last_seen).getTime() < ONLINE_MS;
+      function ibTime(iso) {
+        const d = new Date(iso), now = new Date();
+        if (isNaN(d)) return "";
+        const days = Math.floor((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5);
+        if (days <= 0) return d.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" });
+        if (days === 1) return "أمس";
+        if (days < 7) return d.toLocaleDateString("ar-EG", { weekday: "long" });
+        return d.toLocaleDateString("ar-EG", { day: "numeric", month: "numeric" });
+      }
+      function ibDay(iso) {
+        const d = new Date(iso), now = new Date();
+        const days = Math.floor((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5);
+        if (days <= 0) return "اليوم";
+        if (days === 1) return "أمس";
+        return d.toLocaleDateString("ar-EG", { weekday: "long", day: "numeric", month: "long" });
+      }
+      // نص الرسالة: تهريب كامل + روابط آمنة (بدون علامات اقتباس داخل الرابط)
+      function ibText(raw) {
+        return String(raw == null ? "" : raw).split(/(https?:\/\/[^\s<>"'`]+)/g)
+          .map((p, i) => (i % 2 ? `<a href="${escA(p)}" target="_blank" rel="noopener noreferrer nofollow">${escapeHtml(p)}</a>` : escapeHtml(p))).join("");
+      }
+      function ibMark(text, q) {
+        const t = String(text || "");
+        if (!q) return escapeHtml(t);
+        const i = t.toLowerCase().indexOf(q.toLowerCase());
+        if (i < 0) return escapeHtml(t);
+        return escapeHtml(t.slice(0, i)) + "<mark>" + escapeHtml(t.slice(i, i + q.length)) + "</mark>" + escapeHtml(t.slice(i + q.length));
+      }
+      function ibBeep() {
+        if (!ib.sound) return;
+        try {
+          const A = window.AudioContext || window.webkitAudioContext;
+          if (!A) return;
+          const ctx = ib.ctx || (ib.ctx = new A());
+          if (ctx.state === "suspended") ctx.resume();
+          const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime;
+          o.type = "sine"; o.frequency.setValueAtTime(880, t); o.frequency.exponentialRampToValueAtTime(1320, t + 0.12);
+          g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+          o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.4);
+        } catch (_) {}
+      }
+      const ibPaneActive = () => $h("tab-students").classList.contains("active") && $h("sol-inbox").classList.contains("active");
+      const ibLoggedIn = () => !$h("panel").classList.contains("hidden");
+      const ibConv = (device) => ib.convs.find((c) => c.device_id === device);
+      const ibStudent = (device) => studentsCache.find((x) => x.device_id === device && x.isLatest);
+
+      /* ---------- قائمة المحادثات ---------- */
+      function ibMatch(c, f) {
+        if (f === "unread") return c.unread > 0 && c.device_id !== ib.sel;
+        if (f === "await") return c.last_sender === "student";
+        if (f === "voice") return c.voice > 0;
+        if (f === "pinned") return c.pinned;
+        if (f === "online") return ibOnline(c);
+        if (f === "locked") return c.locked;
+        if (f === "banned") return c.banned;
+        return true;
+      }
+      function ibVisible() {
+        const q = ib.q.trim().toLowerCase();
+        return ib.convs
+          .filter((c) => ibMatch(c, ib.filter) && (!q || c.name.toLowerCase().includes(q) || (c.preview || "").toLowerCase().includes(q) || (c.device_type || "").toLowerCase().includes(q)))
+          .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || new Date(b.last_at) - new Date(a.last_at));
+      }
+      function ibItem(c) {
+        const unread = c.device_id === ib.sel ? 0 : c.unread;
+        const mine = c.last_sender === "admin";
+        const pv = c.last_kind === "voice"
+          ? `<i class="fas fa-microphone"></i>رسالة صوتية${c.duration ? " · " + stcFmtDur(c.duration) : ""}`
+          : escapeHtml(c.preview || "—");
+        const tick = mine ? `<i class="fas fa-check-double ib-tick ${c.last_read ? "rd" : ""}"></i>` : "";
+        const tags = [
+          c.pinned ? '<span class="ib-tag pin"><i class="fas fa-thumbtack"></i> مثبّتة</span>' : "",
+          c.banned ? '<span class="ib-tag bad">محظور</span>' : c.locked ? '<span class="ib-tag warn">محجوب حتى يرد</span>' : "",
+          c.status === "rejected" ? '<span class="ib-tag bad">اسم مرفوض</span>' : "",
+          c.deleted ? '<span class="ib-tag">اسم محذوف</span>' : "",
+          c.note ? '<span class="ib-tag"><i class="fas fa-note-sticky"></i> ملاحظة</span>' : "",
+        ].join("");
+        return `<div class="ib-item${c.device_id === ib.sel ? " on" : ""}${unread ? " unread" : ""}" data-d="${escA(c.device_id)}" role="button" tabindex="0">
+          ${ibAvatar(c.name, c.device_id, ibOnline(c))}
+          <div class="ib-bd">
+            <div class="ib-r1"><span class="ib-nm">${escapeHtml(c.name)}</span><span class="ib-tm">${escapeHtml(ibTime(c.last_at))}</span></div>
+            <div class="ib-r2"><span class="ib-pv">${tick}${pv}</span>${unread ? `<span class="ib-cnt">${unread > 99 ? "99+" : unread}</span>` : ""}</div>
+            ${tags ? `<div class="ib-tags">${tags}</div>` : ""}
+          </div></div>`;
+      }
+      function ibRenderStats() {
+        const cs = ib.convs;
+        $h("ib-n-all").textContent = cs.length;
+        $h("ib-n-unread").textContent = cs.reduce((n, c) => n + (c.device_id === ib.sel ? 0 : c.unread), 0);
+        $h("ib-n-await").textContent = cs.filter((c) => c.last_sender === "student").length;
+        $h("ib-n-voice").textContent = cs.filter((c) => c.voice > 0).length;
+      }
+      function ibRenderFilters() {
+        hxSet("ib-filters", IB_FILTERS.map(([k, t]) => {
+          const n = k === "all" ? ib.convs.length : ib.convs.filter((c) => ibMatch(c, k)).length;
+          return `<button class="hx-chip${ib.filter === k ? " on" : ""}" type="button" data-f="${k}">${t}<em>${n}</em></button>`;
+        }).join(""));
+      }
+      function ibRenderList() {
+        ibRenderFilters();
+        ibRenderStats();
+        const rows = ibVisible();
+        let html = "";
+        if (!ib.loaded) html = '<div class="ib-empty-list"><i class="fas fa-spinner fa-spin"></i>جاري تحميل المحادثات…</div>';
+        else if (!ib.convs.length) html = '<div class="ib-empty-list"><i class="fas fa-inbox"></i>لا توجد محادثات بعد.<br />عندما يراسلك طالب أو تبدأ أنت محادثة ستظهر هنا.</div>';
+        else if (!rows.length && !(ib.q.trim().length >= 2)) html = '<div class="ib-empty-list"><i class="fas fa-filter-circle-xmark"></i>لا توجد محادثات في هذا التصنيف.</div>';
+        else html = rows.map(ibItem).join("");
+        const q = ib.q.trim();
+        if (q.length >= 2) {
+          if (ib.hitsFor === q) {
+            html += `<div class="ib-sec">في نصوص الرسائل (${ib.hits.length})</div>` + (ib.hits.length
+              ? ib.hits.map((h) => `<div class="ib-item" data-d="${escA(h.device_id)}" data-n="${escA(h.name)}" role="button" tabindex="0">${ibAvatar(h.name, h.device_id, false, "sm")}<div class="ib-bd"><div class="ib-r1"><span class="ib-nm">${escapeHtml(h.name)}</span><span class="ib-tm">${escapeHtml(ibTime(h.created_at))}</span></div><div class="ib-hit-sn">${h.sender === "admin" ? "أنت: " : ""}${ibMark(h.snippet, q)}</div></div></div>`).join("")
+              : '<div class="ib-empty-list" style="padding:1rem">لا نتائج في نص الرسائل.</div>');
+          } else html += '<div class="ib-sec">جاري البحث في نصوص الرسائل…</div>';
+        }
+        hxSet("ib-list", html);
+      }
+
+      async function ibLoadConvs(silent) {
+        if (ib.loading) return;
+        ib.loading = true;
+        ib.tConv = Date.now();
+        try {
+          const res = await sApi("/admin/conversations");
+          const list = res.conversations || [];
+          if (ib.loaded) {
+            const fresh = list.filter((c) => c.unread > (ib.prevUnread.get(c.device_id) || 0) && c.device_id !== ib.sel);
+            if (fresh.length) {
+              ibBeep();
+              toast(fresh.length === 1 ? "رسالة جديدة من " + fresh[0].name + (fresh[0].preview ? ": " + fresh[0].preview.slice(0, 50) : "") : fresh.length + " محادثات بها رسائل جديدة", true);
+            }
+          }
+          ib.prevUnread = new Map(list.map((c) => [c.device_id, c.unread]));
+          ib.convs = list;
+          ib.loaded = true;
+          ibLive(true);
+          setUnreadUI(list.reduce((n, c) => n + (c.device_id === ib.sel ? 0 : c.unread), 0));
+          ibRenderList();
+          ibRenderHead();
+          ibRenderInboxCard();
+          if (hxData) { hxSet("hx-kpis", hxKpis(hxData)); hxSet("hx-insights", hxInsights(hxData)); }
+        } catch (e) {
+          ibLive(false);
+          if (!silent) toast("تعذر تحميل المحادثات: " + e.message, false);
+          if (!ib.loaded) $h("ib-list").innerHTML = '<div class="ib-empty-list"><i class="fas fa-triangle-exclamation"></i>تعذر تحميل المحادثات<br /><small>' + escapeHtml(e.message) + "</small></div>";
+        }
+        ib.loading = false;
+      }
+      function ibLive(ok) {
+        ib.live = ok;
+        $h("ib-live").classList.toggle("off", !ok);
+        $h("ib-live-t").textContent = ok ? "مباشر" : "غير متصل";
+      }
+
+      /* ---------- فتح/إغلاق محادثة ---------- */
+      function ibSaveDraft() { if (ib.sel) ib.drafts.set(ib.sel, $h("ib-text").value); }
+      async function ibOpen(device, name) {
+        if (!device) return;
+        if (ib.rec) ibStopRec(true);
+        ibSaveDraft();
+        ib.sel = device;
+        const c = ibConv(device), st = ibStudent(device);
+        ib.selName = name || (c && c.name) || (st && st.name) || "طالب";
+        ib.msgs = []; ib.more = false; ib.sig = ""; ib.scroll = "bottom"; ib.lastId = ""; ib.noteOpen = false; ib.quickEdit = false;
+        ib.locked = !!(c && c.locked); ib.banned = !!(c && c.banned);
+        $h("ib-shell").classList.add("show-chat");
+        $h("ib-welcome").hidden = true;
+        $h("ib-chat").hidden = false;
+        $h("ib-text").value = ib.drafts.get(device) || "";
+        $h("ib-lock").checked = false;
+        ibAutoSize();
+        $h("ib-quick").hidden = true;
+        $h("ib-newpill").hidden = true;
+        $h("ib-msgs").innerHTML = '<div class="ib-empty-list"><i class="fas fa-spinner fa-spin"></i>جاري التحميل…</div>';
+        ibRenderHead();
+        ibRenderList();
+        if (!studentsCache.length) loadStudents(true).then(ibRenderHead);
+        await ibLoadThread(true);
+        if (ib.sel === device && window.innerWidth > 860) $h("ib-text").focus();
+      }
+      function ibClose() {
+        if (ib.rec) ibStopRec(true);
+        ibSaveDraft();
+        ib.sel = null;
+        $h("ib-shell").classList.remove("show-chat");
+        $h("ib-chat").hidden = true;
+        $h("ib-welcome").hidden = false;
+        ibMenu(false);
+        ibRenderList();
+      }
+      // يفتح المحادثة من أي مكان في اللوحة
+      function openInbox(device, name) { openSol("inbox", () => ibOpen(device, name)); }
+
+      function ibRenderHead() {
+        if (!ib.sel) return;
+        const c = ibConv(ib.sel), st = ibStudent(ib.sel);
+        const on = c ? ibOnline(c) : st ? isOnline(st) : false;
+        const seen = (c && c.last_seen) || (st && st.last_seen);
+        const dev = (st && st.device_type) || (c && c.device_type) || "جهاز غير معروف";
+        $h("ib-head-av").innerHTML = ibAvatar(ib.selName, ib.sel, on, "lg");
+        $h("ib-name").textContent = ib.selName;
+        $h("ib-sub").innerHTML = (on ? '<span class="on">● نشط الآن</span>' : seen ? "آخر ظهور " + escapeHtml(agoText(seen)) : "لم يظهر بعد") + " · " + escapeHtml(dev);
+        const pinned = !!(c && c.pinned);
+        $h("ib-pin").classList.toggle("on", pinned);
+        $h("ib-pin").title = pinned ? "إلغاء التثبيت" : "تثبيت المحادثة";
+        const note = (c && c.note) || "";
+        $h("ib-note-btn").classList.toggle("on", !!note || ib.noteOpen);
+        $h("ib-m-unlock").hidden = !ib.locked;
+        $h("ib-m-ban-t").textContent = ib.banned ? "رفع الحظر عن الجهاز" : "حظر الجهاز بالكامل";
+        let b = "";
+        if (ib.banned) b += '<div class="ib-bn bad"><i class="fas fa-ban"></i><span>هذا الجهاز محظور بالكامل — يرى هذه المحادثة فقط ولا يدخل الحلول.</span><button type="button" data-b="unban">رفع الحظر</button></div>';
+        else if (ib.locked) b += '<div class="ib-bn warn"><i class="fas fa-lock"></i><span>الطالب محجوب عن الحلول حتى يردّ على رسالتك.</span><button type="button" data-b="unlock">رفع المنع</button></div>';
+        if (ib.noteOpen) {
+          b += `<div class="ib-bn note"><i class="fas fa-note-sticky"></i><div class="ib-noteedit" style="flex:1"><textarea id="ib-note-text" maxlength="500" placeholder="ملاحظة خاصة بك عن هذا الطالب (لا يراها أبدًا)…">${escapeHtml(note)}</textarea><div class="row"><button type="button" class="admin-btn" id="ib-note-save" style="width:auto;padding:.4rem 1rem">حفظ</button><button type="button" class="ib-tool" id="ib-note-cancel">إلغاء</button></div></div></div>`;
+        } else if (note) b += `<div class="ib-bn note"><i class="fas fa-note-sticky"></i><span style="flex:1">${escapeHtml(note)}</span><button type="button" data-b="note">تعديل</button></div>`;
+        hxSet("ib-banner", b);
+      }
+
+      /* ---------- رسائل المحادثة ---------- */
+      async function ibLoadThread(initial) {
+        const device = ib.sel;
+        if (!device) return;
+        ib.tThread = Date.now();
+        let res;
+        try { res = await sApi("/admin/messages/" + encodeURIComponent(device) + "?limit=80"); }
+        catch (e) { if (initial && device === ib.sel) { toast("تعذر تحميل الرسائل: " + e.message, false); $h("ib-msgs").innerHTML = ""; } return; }
+        if (device !== ib.sel) return;
+        const latest = res.messages || [];
+        if (initial || !ib.msgs.length || !latest.length) { ib.msgs = latest; ib.more = !!res.more; }
+        else {
+          const first = new Date(latest[0].created_at).getTime();
+          const keep = ib.msgs.filter((m) => !m.tmp && new Date(m.created_at).getTime() < first);
+          ib.msgs = keep.concat(latest);
+          if (!keep.length) ib.more = !!res.more;
+        }
+        ib.locked = !!res.locked && !res.banned;
+        ib.banned = !!res.banned;
+        const c = ibConv(device);
+        if (c && c.unread) { c.unread = 0; ibRenderList(); }
+        ibRenderHead();
+        ibRenderMsgs(initial);
+      }
+      async function ibLoadOlder() {
+        if (!ib.sel || !ib.msgs.length) return;
+        const device = ib.sel, oldest = ib.msgs.find((m) => !m.tmp);
+        if (!oldest) return;
+        try {
+          const res = await sApi("/admin/messages/" + encodeURIComponent(device) + "?limit=80&before=" + encodeURIComponent(oldest.created_at));
+          if (device !== ib.sel) return;
+          ib.msgs = (res.messages || []).concat(ib.msgs);
+          ib.more = !!res.more;
+          ib.scroll = "keep";
+          ibRenderMsgs(true);
+        } catch (e) { toast("تعذر تحميل الأقدم: " + e.message, false); }
+      }
+      function ibWave(id, dur) {
+        let h = ibHue(id) + 7, out = "";
+        for (let i = 0; i < 26; i++) { h = (h * 9301 + 49297) % 233280; out += `<i style="height:${6 + Math.round((h / 233280) * 18)}px"></i>`; }
+        return out;
+      }
+      function ibBubble(m, first) {
+        const mine = m.sender === "admin";
+        const t = new Date(m.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+        const tick = mine ? (m.tmp ? '<i class="fas fa-clock ib-tick"></i>' : `<i class="fas fa-check-double ib-tick ${m.read ? "rd" : ""}" title="${m.read ? "قرأها الطالب" : "أُرسلت ولم تُقرأ بعد"}"></i>`) : "";
+        const req = m.requires_reply ? '<span class="ib-req"><i class="fas fa-lock"></i> حجب</span>' : "";
+        const body = m.kind === "voice"
+          ? `<button type="button" class="ib-vp" data-v="${escA(m.id)}" data-dur="${m.duration || 0}"><span class="pl"><i class="fas fa-play"></i></span><span class="ib-wave">${ibWave(m.id)}</span><b>${stcFmtDur(m.duration)}</b></button>`
+          : `<div class="ib-t">${ibText(m.body)}</div>`;
+        const acts = m.tmp ? "" : `<div class="ib-ma">${m.kind === "voice" ? "" : `<button type="button" data-a="copy" data-id="${escA(m.id)}" title="نسخ"><i class="fas fa-copy"></i></button>`}<button type="button" class="del" data-a="del" data-id="${escA(m.id)}" title="حذف الرسالة"><i class="fas fa-trash"></i></button></div>`;
+        return `<div class="ib-m ${mine ? "ad" : "st"}${first ? " first" : ""}${m.tmp ? " pending" : ""}">${acts}${body}<div class="ib-mt">${req}<span>${t}</span>${tick}</div></div>`;
+      }
+      function ibRenderMsgs(force) {
+        const box = $h("ib-msgs");
+        const sig = ib.msgs.map((m) => m.id + (m.read ? "r" : "")).join(",") + "|" + ib.more;
+        if (!force && sig === ib.sig) return;
+        ib.sig = sig;
+        const near = box.scrollHeight - box.scrollTop - box.clientHeight < 140;
+        const prevH = box.scrollHeight, prevTop = box.scrollTop;
+        let html = ib.more ? '<button class="ib-older" id="ib-older" type="button"><i class="fas fa-clock-rotate-left"></i> عرض رسائل أقدم</button>' : "";
+        if (!ib.msgs.length) html = '<div class="ib-empty-list" style="margin:auto"><i class="fas fa-comment-dots"></i>لا توجد رسائل بعد.<br />اكتب رسالة للطالب أو سجّل رسالة صوتية.</div>';
+        let day = "", who = "";
+        ib.msgs.forEach((m) => {
+          const d = ibDay(m.created_at);
+          if (d !== day) { html += `<div class="ib-day"><span>${escapeHtml(d)}</span></div>`; day = d; who = ""; }
+          html += ibBubble(m, who !== m.sender);
+          who = m.sender;
+        });
+        box.innerHTML = html;
+        const last = ib.msgs[ib.msgs.length - 1], lastId = last ? last.id : "";
+        if (ib.scroll === "bottom") box.scrollTop = box.scrollHeight;
+        else if (ib.scroll === "keep") box.scrollTop = box.scrollHeight - prevH + prevTop;
+        else if (near || (last && last.sender === "admin")) box.scrollTop = box.scrollHeight;
+        else { box.scrollTop = prevTop; if (lastId !== ib.lastId && last && last.sender === "student") $h("ib-newpill").hidden = false; }
+        ib.lastId = lastId;
+        ib.scroll = "auto";
+        // استعادة حالة الصوت الجاري
+        Object.keys(ib.audios).forEach((id) => { const a = ib.audios[id]; if (a && !a.paused) ibVoiceUI(id, a); });
+      }
+
+      /* ---------- الرسائل الصوتية ---------- */
+      function ibVoiceBtn(id) { return $h("ib-msgs").querySelector('.ib-vp[data-v="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"]'); }
+      function ibVoiceUI(id, a, reset) {
+        const b = ibVoiceBtn(id);
+        if (!b) return;
+        const bars = b.querySelectorAll(".ib-wave i"), dur = a && a.duration && isFinite(a.duration) ? a.duration : +b.dataset.dur || 1;
+        const p = reset || !a ? 0 : a.currentTime / dur;
+        bars.forEach((x, i) => x.classList.toggle("on", i / bars.length < p));
+        b.querySelector(".pl i").className = "fas " + (a && !a.paused && !reset ? "fa-pause" : "fa-play");
+        b.querySelector("b").textContent = stcFmtDur(reset || !a || a.paused && !a.currentTime ? +b.dataset.dur : Math.ceil(dur - (a.currentTime || 0)));
+      }
+      async function ibPlay(id) {
+        Object.keys(ib.audios).forEach((k) => { if (k !== id && ib.audios[k] && !ib.audios[k].paused) { ib.audios[k].pause(); ibVoiceUI(k, ib.audios[k]); } });
+        let au = ib.audios[id];
+        if (au) { au.paused ? au.play() : au.pause(); return ibVoiceUI(id, au); }
+        const b = ibVoiceBtn(id);
+        if (b) b.querySelector(".pl i").className = "fas fa-spinner fa-spin";
+        let data = null;
+        try { data = await sApi("/admin/audio/" + encodeURIComponent(id)); } catch (_) {}
+        if (!data || !data.audio) { toast("تعذر تحميل التسجيل", false); return ibVoiceUI(id, null, true); }
+        au = ib.audios[id] = new Audio(data.audio);
+        au.ontimeupdate = () => ibVoiceUI(id, au);
+        au.onpause = () => ibVoiceUI(id, au);
+        au.onended = () => ibVoiceUI(id, au, true);
+        au.play().then(() => ibVoiceUI(id, au), () => { toast("تعذر تشغيل التسجيل", false); ibVoiceUI(id, null, true); });
+      }
+
+      /* ---------- الإرسال ---------- */
+      const ibAutoSize = () => { const t = $h("ib-text"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 140) + "px"; $h("ib-len").textContent = t.value.length + "/1000"; };
+      async function ibSend(fields, optimistic) {
+        if (!ib.sel || ib.sending) return false;
+        const device = ib.sel, lock = $h("ib-lock").checked;
+        ib.sending = true;
+        $h("ib-send").disabled = true;
+        let tmp = null;
+        if (optimistic) {
+          tmp = { id: "tmp" + ++ib.tmp, tmp: true, sender: "admin", kind: "text", body: fields.body, requires_reply: lock, read: false, created_at: new Date().toISOString() };
+          ib.msgs.push(tmp);
+          ib.scroll = "bottom";
+          ibRenderMsgs(true);
+        }
+        let ok = false;
+        try {
+          const r = await sApi("/admin/messages", { method: "POST", body: { device_id: device, requires_reply: lock, ...fields } });
+          if (r.status !== "ok") throw new Error("الطالب غير موجود أو البيانات غير صالحة");
+          ok = true;
+        } catch (e) {
+          toast("تعذر الإرسال: " + e.message, false);
+        }
+        ib.sending = false;
+        $h("ib-send").disabled = false;
+        if (device !== ib.sel) return ok;
+        if (tmp) ib.msgs = ib.msgs.filter((m) => m !== tmp);
+        if (ok) {
+          $h("ib-lock").checked = false;
+          if (lock) toast("أُرسلت الرسالة وحُجب الطالب حتى يرد", true);
+          ib.drafts.delete(device);
+          ib.scroll = "bottom";
+          await ibLoadThread(false);
+          ibLoadConvs(true);
+        } else {
+          ibRenderMsgs(true);
+          if (fields.kind === "text") { $h("ib-text").value = fields.body; ibAutoSize(); }
+        }
+        return ok;
+      }
+      function ibSendText() {
+        const body = $h("ib-text").value.trim();
+        if (!body) return;
+        $h("ib-text").value = "";
+        ibAutoSize();
+        ibSend({ kind: "text", body }, true);
+      }
+
+      /* ---------- التسجيل الصوتي ---------- */
+      function ibShowRec(on) { $h("ib-rec").hidden = !on; $h("ib-comp").hidden = on; }
+      async function ibStartRec() {
+        if (ib.rec || ib.sending || !ib.sel) return;
+        if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder)) return toast("التسجيل الصوتي غير مدعوم في هذا المتصفح", false);
+        let stream;
+        try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (_) { return toast("لم يتم السماح باستخدام الميكروفون", false); }
+        const mime = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"].find((m) => { try { return MediaRecorder.isTypeSupported(m); } catch (_) { return false; } });
+        let mr;
+        try { mr = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 24000 } : { audioBitsPerSecond: 24000 }); } catch (_) { mr = new MediaRecorder(stream); }
+        const chunks = [], r = { mr, stream, t0: Date.now(), cancel: false, timer: 0 };
+        ib.rec = r;
+        mr.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+        mr.onstop = () => {
+          clearInterval(r.timer);
+          stream.getTracks().forEach((t) => t.stop());
+          ib.rec = null;
+          ibShowRec(false);
+          if (r.cancel) return;
+          const dur = Math.max(1, Math.round((Date.now() - r.t0) / 1000));
+          const fr = new FileReader();
+          fr.onload = () => {
+            const url = String(fr.result);
+            if (url.length > 590000) return toast("التسجيل طويل جدًا، سجّل رسالة أقصر", false);
+            ibSend({ kind: "voice", audio: url, duration: dur }, false);
+          };
+          fr.readAsDataURL(new Blob(chunks, { type: mr.mimeType || mime || "audio/webm" }));
+        };
+        mr.start();
+        ibShowRec(true);
+        $h("ib-rt").textContent = "0:00";
+        r.timer = setInterval(() => { const s = Math.round((Date.now() - r.t0) / 1000); $h("ib-rt").textContent = stcFmtDur(s); if (s >= 60) ibStopRec(false); }, 250);
+      }
+      function ibStopRec(cancel) {
+        if (!ib.rec) return;
+        ib.rec.cancel = !!cancel;
+        try { ib.rec.mr.stop(); } catch (_) { ib.rec.stream.getTracks().forEach((t) => t.stop()); clearInterval(ib.rec.timer); ib.rec = null; ibShowRec(false); }
+      }
+
+      /* ---------- الردود السريعة (قابلة للتعديل ومحفوظة في المتصفح) ---------- */
+      function ibRenderQuick() {
+        const box = $h("ib-quick");
+        if (box.hidden) return;
+        box.innerHTML = ib.quick.map((t, i) => `<button type="button" data-q="${i}">${escapeHtml(t)}</button>${ib.quickEdit ? `<button type="button" class="x" data-x="${i}" title="حذف">×</button>` : ""}`).join("")
+          + (ib.quickEdit ? '<input id="ib-qnew" maxlength="120" placeholder="ردّ جديد ثم Enter" />' : "")
+          + `<button type="button" data-qedit="1" title="${ib.quickEdit ? "تم" : "تعديل القائمة"}"><i class="fas ${ib.quickEdit ? "fa-check" : "fa-pen"}"></i></button>`;
+        if (ib.quickEdit) $h("ib-qnew").focus();
+      }
+      const ibSaveQuick = () => { try { localStorage.setItem("ib_quick", JSON.stringify(ib.quick)); } catch (_) {} };
+
+      /* ---------- قائمة المزيد والإجراءات ---------- */
+      function ibMenu(open) { $h("ib-menu").hidden = !open; }
+      async function ibAct(act) {
+        const device = ib.sel;
+        if (!device) return;
+        ibMenu(false);
+        try {
+          if (act === "info" || act === "pin" || act === "note") return $h(act === "note" ? "ib-note-btn" : "ib-" + act).click();
+          if (act === "copy") { await navigator.clipboard.writeText(device); return toast("تم نسخ معرّف الجهاز", true); }
+          if (act === "unread") {
+            const r = await sApi("/admin/messages/" + encodeURIComponent(device) + "/unread", { method: "POST" });
+            if (!r.ok) return toast("لا توجد رسائل من الطالب لتعليمها", false);
+            toast("عُلّمت كغير مقروءة", true);
+            ibClose();
+            return ibLoadConvs(true);
+          }
+          if (act === "unlock") {
+            await sApi("/admin/unlock/" + encodeURIComponent(device), { method: "POST" });
+            toast("تم رفع المنع، يدخل الطالب الموقع خلال لحظات", true);
+          } else if (act === "ban") {
+            const on = !ib.banned;
+            if (!confirm(on ? "حظر هذا الجهاز بالكامل؟\nلن يرى سوى المحادثة مع الإدارة، ولن يدخل الحلول حتى ترفع الحظر." : "رفع الحظر عن هذا الجهاز؟")) return;
+            await sApi("/admin/ban/" + encodeURIComponent(device), { method: on ? "POST" : "DELETE" });
+            toast(on ? "تم حظر الجهاز" : "تم رفع الحظر", true);
+          } else if (act === "clear") {
+            if (!confirm("حذف كل رسائل هذه المحادثة نهائيًا؟")) return;
+            await sApi("/admin/messages/" + encodeURIComponent(device), { method: "DELETE" });
+            toast("تم حذف المحادثة", true);
+            ibClose();
+            return ibLoadConvs(true);
+          }
+        } catch (e) { return toast("تعذر التنفيذ: " + e.message, false); }
+        await ibLoadThread(false);
+        ibLoadConvs(true);
+        loadStudents(true);
+      }
+
+      /* ---------- محادثة جديدة ---------- */
+      function ncRender() {
+        const q = $h("nc-q").value.trim().toLowerCase();
+        const rows = studentsCache.filter((s) => s.isLatest && s.status === "approved" && (!q || s.name.toLowerCase().includes(q) || (s.device_type || "").toLowerCase().includes(q)))
+          .sort((a, b) => new Date(b.last_seen || 0) - new Date(a.last_seen || 0)).slice(0, 60);
+        $h("nc-list").innerHTML = rows.length
+          ? rows.map((s) => `<div class="ib-item" data-d="${escA(s.device_id)}" data-n="${escA(s.name)}" role="button" tabindex="0">${ibAvatar(s.name, s.device_id, isOnline(s), "")}<div class="ib-bd"><div class="ib-r1"><span class="ib-nm">${escapeHtml(s.name)}</span><span class="ib-tm">${s.last_seen ? escapeHtml(agoText(s.last_seen)) : ""}</span></div><div class="ib-pv">${escapeHtml(s.device_type || "جهاز غير معروف")}</div></div></div>`).join("")
+          : '<div class="ib-empty-list"><i class="fas fa-user-slash"></i>لا يوجد طلاب مطابقون.</div>';
+      }
+      async function ncOpen() {
+        $h("nc-modal").hidden = false;
+        $h("nc-q").value = "";
+        if (!studentsCache.length) { $h("nc-list").innerHTML = '<div class="ib-empty-list"><i class="fas fa-spinner fa-spin"></i>جاري التحميل…</div>'; await loadStudents(true); }
+        ncRender();
+        $h("nc-q").focus();
+      }
+      const ncClose = () => { $h("nc-modal").hidden = true; };
+
+      /* ---------- بطاقة الوارد في لوحة القيادة ---------- */
+      function ibRenderInboxCard() {
+        const el = $h("hx-inbox");
+        if (!el) return;
+        const rows = ib.convs.filter((c) => c.unread > 0 || c.last_sender === "student")
+          .sort((a, b) => (b.unread > 0) - (a.unread > 0) || new Date(b.last_at) - new Date(a.last_at)).slice(0, 5);
+        const total = ib.convs.filter((c) => c.last_sender === "student").length;
+        $h("hx-inbox-n").textContent = total ? total + " بانتظار ردّك" : "";
+        hxSet("hx-inbox", !ib.loaded ? '<div class="hx-skel">$ loading inbox<span class="blink">_</span></div>'
+          : rows.length ? '<div class="hx-inb">' + rows.map((c) => `<div class="r" data-open="${escA(c.device_id)}" data-n="${escA(c.name)}" role="button" tabindex="0">${ibAvatar(c.name, c.device_id, ibOnline(c), "sm")}<div style="min-width:0"><div class="nm">${escapeHtml(c.name)}</div><div class="pv">${c.last_kind === "voice" ? "🎙 رسالة صوتية" : escapeHtml(c.preview || "")}</div></div><div class="m">${escapeHtml(ibTime(c.last_at))}${c.unread ? `<br /><b>${c.unread}</b>` : ""}</div></div>`).join("") + "</div>"
+            : '<p class="text-muted text-sm">لا توجد رسائل تنتظر ردّك 🎉</p>');
+      }
+      const ibStats = () => ({
+        await: ib.convs.filter((c) => c.last_sender === "student").length,
+        today: ib.convs.filter((c) => new Date(c.last_at).toDateString() === new Date().toDateString()).length,
+      });
+
+      /* ---------- صفحة الأمان ---------- */
+      let secBans = [];
+      function secRow(c) {
+        return `<div class="sec-row"><div class="l">${ibAvatar(c.name, c.device_id, false, "sm")}<div style="min-width:0"><b>${escapeHtml(c.name)}</b><small>${escapeHtml(c.sub || "")}</small></div></div><div class="a">${c.actions}</div></div>`;
+      }
+      function renderSecurity() {
+        const bannedList = secBans;
+        const sim = studentsCache.filter((s) => s.isLatest && studentsSimilar.has(s.device_id) && !studentsBanned.has(s.device_id));
+        const lock = studentsCache.filter((s) => s.isLatest && (studentsInfo[s.device_id] || {}).locked && !studentsBanned.has(s.device_id));
+        $h("sec-n-ban").textContent = bannedList.length; $h("sec-n-sim").textContent = sim.length; $h("sec-n-lock").textContent = lock.length;
+        $h("sec-h-ban").textContent = bannedList.length ? "(" + bannedList.length + ")" : ""; $h("sec-h-sim").textContent = sim.length ? "(" + sim.length + ")" : ""; $h("sec-h-lock").textContent = lock.length ? "(" + lock.length + ")" : "";
+        const btn = (cls, act, d, n, label) => `<button type="button" class="hx-chip ${cls}" data-sec="${act}" data-d="${escA(d)}" data-n="${escA(n)}">${label}</button>`;
+        $h("sec-ban").innerHTML = bannedList.length ? bannedList.map((b) => secRow({
+          name: b.name, device_id: b.device_id,
+          sub: (b.auto ? "حظر تلقائي بالبصمة" : "حظر يدوي") + " · " + (b.banned_at ? studentWhen(b.banned_at) : "") + (b.device_type ? " · " + b.device_type : "") + (b.last_ip ? " · " + b.last_ip : ""),
+          actions: btn("", "chat", b.device_id, b.name, '<i class="fas fa-comments"></i> المحادثة') + btn("", "unban", b.device_id, b.name, '<i class="fas fa-unlock" style="color:#4ade9b"></i> رفع الحظر'),
+        })).join("") : '<div class="sec-empty">لا توجد أجهزة محظورة.</div>';
+        $h("sec-sim").innerHTML = sim.length ? sim.map((s) => secRow({
+          name: s.name, device_id: s.device_id, sub: (s.device_type || "جهاز غير معروف") + (s.last_ip ? " · " + s.last_ip : ""),
+          actions: btn("", "info", s.id, s.name, '<i class="fas fa-circle-info"></i> البيانات') + btn("", "chat", s.device_id, s.name, '<i class="fas fa-comments"></i> المحادثة') + btn("", "ban", s.device_id, s.name, '<i class="fas fa-ban" style="color:#f87171"></i> حظر'),
+        })).join("") : '<div class="sec-empty">لا توجد أجهزة مشبوهة حاليًا ✅</div>';
+        $h("sec-lock").innerHTML = lock.length ? lock.map((s) => secRow({
+          name: s.name, device_id: s.device_id, sub: (s.device_type || "") + (s.last_seen ? " · آخر ظهور " + agoText(s.last_seen) : ""),
+          actions: btn("", "chat", s.device_id, s.name, '<i class="fas fa-comments"></i> المحادثة') + btn("", "unlock", s.device_id, s.name, '<i class="fas fa-lock-open" style="color:#4ade9b"></i> رفع المنع'),
+        })).join("") : '<div class="sec-empty">لا يوجد طلاب محجوبون.</div>';
+        secBadge();
+      }
+      function secBadge() {
+        const n = studentsCache.filter((s) => s.isLatest && studentsSimilar.has(s.device_id) && !studentsBanned.has(s.device_id)).length;
+        const b = $h("sol-sec-badge");
+        b.textContent = n; b.hidden = !n;
+      }
+      async function loadSecurity() {
+        await loadStudents(true);
+        try { secBans = (await sApi("/admin/bans")).bans || []; } catch (e) { toast("تعذر تحميل سجل الحظر: " + e.message, false); }
+        renderSecurity();
+      }
+
+      /* ---------- ربط الأحداث ---------- */
+      $h("ib-list").addEventListener("click", (e) => {
+        const it = e.target.closest(".ib-item[data-d]");
+        if (it) ibOpen(it.dataset.d, it.dataset.n);
+      });
+      $h("ib-list").addEventListener("keydown", (e) => {
+        const it = e.target.closest(".ib-item[data-d]");
+        if (it && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); ibOpen(it.dataset.d, it.dataset.n); }
+      });
+      $h("ib-filters").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-f]");
+        if (b) { ib.filter = b.dataset.f; ibRenderList(); }
+      });
+      $h("ib-q").addEventListener("input", (e) => {
+        ib.q = e.target.value;
+        ibRenderList();
+        clearTimeout(ib.hitsT);
+        const q = ib.q.trim();
+        if (q.length < 2) { ib.hits = []; ib.hitsFor = ""; return; }
+        ib.hitsT = setTimeout(async () => {
+          try {
+            const r = await sApi("/admin/messages-search?q=" + encodeURIComponent(q));
+            if (ib.q.trim() !== q) return;
+            ib.hits = r.hits || []; ib.hitsFor = q;
+            ibRenderList();
+          } catch (_) { ib.hits = []; ib.hitsFor = q; ibRenderList(); }
+        }, 350);
+      });
+      $h("ib-refresh").addEventListener("click", () => { ibLoadConvs(); if (ib.sel) ibLoadThread(false); });
+      $h("ib-new").addEventListener("click", ncOpen);
+      $h("ib-sound").addEventListener("click", () => {
+        ib.sound = !ib.sound;
+        try { localStorage.setItem("ib_sound", ib.sound ? "1" : "0"); } catch (_) {}
+        $h("ib-sound").classList.toggle("on", ib.sound);
+        $h("ib-sound").querySelector("i").className = "fas " + (ib.sound ? "fa-bell" : "fa-bell-slash");
+        if (ib.sound) ibBeep();
+      });
+      $h("ib-sound").classList.toggle("on", ib.sound);
+      $h("ib-sound").querySelector("i").className = "fas " + (ib.sound ? "fa-bell" : "fa-bell-slash");
+      $h("ib-readall").addEventListener("click", async () => {
+        if (!ib.convs.some((c) => c.unread)) return toast("لا توجد رسائل غير مقروءة", true);
+        if (!confirm("تعليم كل الرسائل الجديدة كمقروءة؟")) return;
+        try { const r = await sApi("/admin/messages/read-all", { method: "POST" }); toast("عُلّمت " + r.n + " رسالة كمقروءة", true); }
+        catch (e) { return toast("تعذر التنفيذ: " + e.message, false); }
+        ibLoadConvs(true);
+      });
+      $h("ib-back").addEventListener("click", ibClose);
+      $h("ib-info").addEventListener("click", () => {
+        const st = ibStudent(ib.sel);
+        if (st) openDevPop(st.id); else toast("بيانات الطالب غير متاحة (قد يكون الاسم محذوفًا)", false);
+      });
+      $h("ib-pin").addEventListener("click", async () => {
+        const c = ibConv(ib.sel);
+        if (!c) return;
+        const pinned = !c.pinned;
+        try { await sApi("/admin/conv-meta/" + encodeURIComponent(c.device_id), { method: "PUT", body: { pinned } }); }
+        catch (e) { return toast("تعذر التثبيت: " + e.message, false); }
+        c.pinned = pinned; ibRenderHead(); ibRenderList();
+        toast(pinned ? "تم تثبيت المحادثة" : "أُلغي التثبيت", true);
+      });
+      $h("ib-note-btn").addEventListener("click", () => { ib.noteOpen = !ib.noteOpen; ibRenderHead(); if (ib.noteOpen) { const t = $h("ib-note-text"); if (t) t.focus(); } });
+      $h("ib-banner").addEventListener("click", async (e) => {
+        const b = e.target.closest("button");
+        if (!b) return;
+        if (b.dataset.b === "note") { ib.noteOpen = true; return ibRenderHead(); }
+        if (b.dataset.b === "unlock") return ibAct("unlock");
+        if (b.dataset.b === "unban") return ibAct("ban");
+        if (b.id === "ib-note-cancel") { ib.noteOpen = false; return ibRenderHead(); }
+        if (b.id === "ib-note-save") {
+          const note = $h("ib-note-text").value;
+          try { await sApi("/admin/conv-meta/" + encodeURIComponent(ib.sel), { method: "PUT", body: { note } }); }
+          catch (err) { return toast("تعذر الحفظ: " + err.message, false); }
+          const c = ibConv(ib.sel); if (c) c.note = note.trim();
+          ib.noteOpen = false; ibRenderHead(); ibRenderList(); toast("تم حفظ الملاحظة", true);
+        }
+      });
+      $h("ib-more").addEventListener("click", (e) => { e.stopPropagation(); ibMenu($h("ib-menu").hidden); });
+      $h("ib-menu").addEventListener("click", (e) => { const b = e.target.closest("button[data-m]"); if (b) ibAct(b.dataset.m); });
+      document.addEventListener("click", (e) => { if (!$h("ib-menu").hidden && !e.target.closest(".ib-menu-wrap")) ibMenu(false); });
+
+      $h("ib-msgs").addEventListener("click", async (e) => {
+        if (e.target.closest("#ib-older")) return ibLoadOlder();
+        const v = e.target.closest(".ib-vp[data-v]");
+        if (v) return ibPlay(v.dataset.v);
+        const a = e.target.closest("button[data-a]");
+        if (!a) return;
+        const m = ib.msgs.find((x) => x.id === a.dataset.id);
+        if (a.dataset.a === "copy" && m) { try { await navigator.clipboard.writeText(m.body || ""); toast("تم النسخ", true); } catch (_) { toast("تعذر النسخ", false); } return; }
+        if (a.dataset.a === "del") {
+          if (!confirm("حذف هذه الرسالة نهائيًا؟")) return;
+          try { await sApi("/admin/message/" + encodeURIComponent(a.dataset.id), { method: "DELETE" }); }
+          catch (err) { return toast("تعذر الحذف: " + err.message, false); }
+          ib.msgs = ib.msgs.filter((x) => x.id !== a.dataset.id);
+          ibRenderMsgs(true); ibLoadConvs(true);
+        }
+      });
+      $h("ib-msgs").addEventListener("scroll", () => { const b = $h("ib-msgs"); if (b.scrollHeight - b.scrollTop - b.clientHeight < 140) $h("ib-newpill").hidden = true; }, { passive: true });
+      $h("ib-newpill").addEventListener("click", () => { const b = $h("ib-msgs"); b.scrollTo({ top: b.scrollHeight, behavior: "smooth" }); $h("ib-newpill").hidden = true; });
+
+      $h("ib-text").addEventListener("input", ibAutoSize);
+      $h("ib-text").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); ibSendText(); } });
+      $h("ib-send").addEventListener("click", ibSendText);
+      $h("ib-mic").addEventListener("click", ibStartRec);
+      $h("ib-rstop").addEventListener("click", () => ibStopRec(false));
+      $h("ib-rcancel").addEventListener("click", () => ibStopRec(true));
+      $h("ib-qtoggle").addEventListener("click", () => { const q = $h("ib-quick"); q.hidden = !q.hidden; ib.quickEdit = false; ibRenderQuick(); });
+      $h("ib-quick").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (!b) return;
+        if (b.dataset.qedit) { ib.quickEdit = !ib.quickEdit; return ibRenderQuick(); }
+        if (b.dataset.x != null) { ib.quick.splice(+b.dataset.x, 1); ibSaveQuick(); return ibRenderQuick(); }
+        if (b.dataset.q != null && !ib.quickEdit) {
+          const ta = $h("ib-text");
+          ta.value = ((ta.value ? ta.value + " " : "") + ib.quick[+b.dataset.q]).slice(0, 1000);
+          ibAutoSize(); ta.focus();
+        }
+      });
+      $h("ib-quick").addEventListener("keydown", (e) => {
+        if (e.target.id === "ib-qnew" && e.key === "Enter") {
+          e.preventDefault();
+          const v = e.target.value.trim();
+          if (v && ib.quick.length < 20) { ib.quick.push(v); ibSaveQuick(); }
+          ibRenderQuick();
+        }
+      });
+
+      $h("nc-x").addEventListener("click", ncClose);
+      $h("nc-modal").addEventListener("click", (e) => { if (e.target === $h("nc-modal")) return ncClose(); const it = e.target.closest(".ib-item[data-d]"); if (it) { ncClose(); ibOpen(it.dataset.d, it.dataset.n); } });
+      $h("nc-q").addEventListener("input", ncRender);
+
+      $h("hx-inbox").addEventListener("click", (e) => { const r = e.target.closest("[data-open]"); if (r) openInbox(r.dataset.open, r.dataset.n); });
+      $h("hx-inbox-open").addEventListener("click", () => openSol("inbox"));
+      $h("hx-kpis").addEventListener("click", (e) => {
+        const k = e.target.closest("[data-go]");
+        if (!k) return;
+        const g = k.dataset.go;
+        if (g === "inbox-unread" || g === "inbox-await") openSol("inbox", () => { ib.filter = g === "inbox-unread" ? "unread" : "await"; ibRenderList(); });
+        else if (g === "inbox") openSol("inbox");
+        else if (g === "security") openSol("security");
+        else if (g === "reviews") openSol("reviews", () => { srvFilter = "pending"; renderSolReviews(); });
+      });
+      $h("hx-kpis").addEventListener("keydown", (e) => { const k = e.target.closest("[data-go]"); if (k && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); k.click(); } });
+
+      $h("sec-refresh").addEventListener("click", loadSecurity);
+      ["sec-ban", "sec-sim", "sec-lock"].forEach((id) => $h(id).addEventListener("click", async (e) => {
+        const b = e.target.closest("[data-sec]");
+        if (!b) return;
+        const { sec, d, n } = b.dataset;
+        if (sec === "chat") return openInbox(d, n);
+        if (sec === "info") return openDevPop(d);
+        try {
+          if (sec === "unban") { if (!confirm("رفع الحظر عن جهاز «" + n + "»؟")) return; await sApi("/admin/ban/" + encodeURIComponent(d), { method: "DELETE" }); toast("تم رفع الحظر", true); }
+          else if (sec === "ban") { if (!confirm("حظر جهاز «" + n + "» بالكامل؟")) return; await sApi("/admin/ban/" + encodeURIComponent(d), { method: "POST" }); toast("تم حظر الجهاز", true); }
+          else if (sec === "unlock") { await sApi("/admin/unlock/" + encodeURIComponent(d), { method: "POST" }); toast("تم رفع المنع", true); }
+        } catch (err) { return toast("تعذر التنفيذ: " + err.message, false); }
+        loadSecurity(); ibLoadConvs(true);
+      }));
+
+      // اختصارات لوحة المفاتيح داخل الصندوق
+      document.addEventListener("keydown", (e) => {
+        if (!ibLoggedIn() || !ibPaneActive()) return;
+        const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement && document.activeElement.tagName);
+        if (e.key === "/" && !typing && !e.ctrlKey && !e.metaKey) { e.preventDefault(); $h("ib-q").focus(); }
+        else if (e.key === "Escape") {
+          if (!$h("nc-modal").hidden) ncClose();
+          else if (!$h("ib-menu").hidden) ibMenu(false);
+          else if (typing && document.activeElement.id === "ib-q") { $h("ib-q").value = ""; ib.q = ""; ibRenderList(); document.activeElement.blur(); }
+          else if (ib.sel && $h("hx-pal").hidden && $h("dv-pop").hidden && $h("bc-modal").hidden) ibClose();
+        } else if (e.altKey && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+          e.preventDefault();
+          const rows = ibVisible();
+          if (!rows.length) return;
+          const i = rows.findIndex((c) => c.device_id === ib.sel);
+          const n = e.key === "ArrowDown" ? Math.min(rows.length - 1, i + 1) : Math.max(0, i < 0 ? 0 : i - 1);
+          ibOpen(rows[n].device_id, rows[n].name);
+          const el = $h("ib-list").querySelector(".ib-item.on");
+          if (el) el.scrollIntoView({ block: "nearest" });
+        }
+      });
+
+      // استطلاع دوري خفيف: سريع عند فتح الصندوق، وبطيء في الخلفية (للتنبيهات والشارة فقط)
+      setInterval(() => {
+        if (document.hidden || !ibLoggedIn()) return;
+        const now = Date.now();
+        if (ibPaneActive()) {
+          if (now - ib.tConv >= 8000) ibLoadConvs(true);
+          if (ib.sel && now - ib.tThread >= 5000 && !ib.sending) ibLoadThread(false);
+        } else if (now - ib.tConv >= 25000) ibLoadConvs(true);
+      }, 2500);
+      document.addEventListener("visibilitychange", () => { if (!document.hidden && ibLoggedIn()) { ibLoadConvs(true); if (ib.sel && ibPaneActive()) ibLoadThread(false); } });
 
       /* ---------- Articles ---------- */
       const articlesList = document.getElementById("articles-list");

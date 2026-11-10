@@ -40,7 +40,7 @@ app.use(
     cb(null, { origin: !o || sameOrigin || !ALLOWED.length || ALLOWED.includes(o) });
   })
 );
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "2mb" })); // صور المدير (≤ ~1MB base64) تحتاج أكثر من 1mb
 
 // حد بسيط للطلبات لكل IP (120 طلب في الدقيقة)
 const hits = new Map();
@@ -102,6 +102,7 @@ rpc.post("/student_check", wrap((l, r) => l.check(r.body.p_device, r.body.p_type
 rpc.post("/student_register", wrap((l, r) => l.register(r.body.p_device, r.body.p_name, r.body.p_type, UA(r), r.body.p_info, IP(r))));
 rpc.post("/student_inbox", wrap((l, r) => l.inbox(r.body.p_device)));
 rpc.post("/student_audio", wrap((l, r) => l.audio(r.body.p_device, r.body.p_id)));
+rpc.post("/student_image", wrap((l, r) => l.image(r.body.p_device, r.body.p_id)));
 rpc.post("/student_mark_read", wrap((l, r) => l.markRead(r.body.p_device)));
 rpc.post("/student_send", wrap((l, r) =>
   l.send(r.body.p_device, r.body.p_kind, r.body.p_body, r.body.p_audio, r.body.p_duration)));
@@ -161,6 +162,7 @@ admin.get("/students", wrap((l) => l.adminList()));
 admin.patch("/students/:id", wrap(async (l, r) => ({ ok: await l.adminSetStatus(r.params.id, r.body.status) })));
 admin.delete("/students/:id", wrap(async (l, r) => ({ ok: await l.adminDeleteStudent(r.params.id) })));
 admin.get("/messages/:device", wrap((l, r) => l.adminMessages(r.params.device, { before: r.query.before, limit: r.query.limit })));
+admin.get("/image/:id", wrap(async (l, r) => ({ image: await l.adminImage(r.params.id) })));
 admin.get("/audio/:id", wrap(async (l, r) => ({ audio: await l.adminAudio(r.params.id) })));
 admin.post("/messages", wrap((l, r) => l.adminSend(r.body || {})));
 admin.post("/unlock/:device", wrap(async (l, r) => ({ ok: await l.adminUnlock(r.params.device) })));

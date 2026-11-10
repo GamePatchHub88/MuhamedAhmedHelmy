@@ -123,6 +123,24 @@ function analyzeDevice(clientTypeRaw, ua, rawInfo) {
 function parseDevice(ua) { return analyzeDevice(null, ua, null).type; }
 function pickDeviceType(clientRaw, ua, rawInfo) { return analyzeDevice(clientRaw, ua, rawInfo).type; }
 
+/* يجمع الأسماء القديمة لجهاز واحد من سجلاته (الأقدم أولًا) مع أرشيف prev_names داخلها، بلا تكرار */
+function collectPrevNames(docs) {
+  const out = [], seen = new Set();
+  const push = (name, at, status) => {
+    const n = cleanName(name);
+    if (!n) return;
+    const k = n.toLowerCase() + "|" + status;
+    if (seen.has(k)) return;
+    seen.add(k);
+    out.push({ name: n, at: at || null, status: status === "rejected" ? "rejected" : "approved" });
+  };
+  docs.forEach((d) => {
+    (Array.isArray(d.prev_names) ? d.prev_names : []).forEach((p) => push(p && p.name, p && p.at, p && p.status));
+    push(d.name, d.created_at, d.status);
+  });
+  return out.slice(-30);
+}
+
 function makeLogic({ db, ObjectId }) {
   // أسماء خاصة بموقع الحلول حتى لا تتعارض أبدًا مع مجموعات الموقع الأول (مثل students)
   const students = db.collection("qureo_students");
@@ -222,17 +240,25 @@ function makeLogic({ db, ObjectId }) {
     const r = await latestStudent(device);
     if (r && r.status === "approved") return { status: "approved", name: r.name };
 
-    const rejected = await students.find({ device_id: device, status: "rejected" }).toArray();
-    if (rejected.some((x) => String(x.name).toLowerCase() === clean.toLowerCase())) {
+    // كل سجلات هذا الجهاز السابقة (مرفوضة هنا لأن المقبول يخرج مبكرًا) + أسماؤها القديمة المؤرشفة
+    const olds = await students.find({ device_id: device }).sort({ created_at: 1 }).toArray();
+    const prev = collectPrevNames(olds);
+    if (prev.some((x) => x.status === "rejected" && String(x.name).toLowerCase() === clean.toLowerCase())) {
       return { status: "same_rejected" };
     }
 
     const now = new Date();
     const d = analyzeDevice(type, ua, info);
-    await students.insertOne({
+    const ins = await students.insertOne({
       device_id: device, name: clean, status: "approved",
       device_type: d.type, device_info: d.info, first_ip: cleanIp(ip), last_ip: cleanIp(ip), created_at: now, last_seen: now,
+      ...(prev.length ? { prev_names: prev } : {}),
     });
+    // الاسم تغيّر على نفس الجهاز: نحذف السجلات القديمة نهائيًا (أسماؤها صارت محفوظة داخل سجل الطالب الجديد)
+    if (olds.length) {
+      await students.deleteMany({ _id: { $in: olds.map((o) => o._id) } });
+      statsCache = null; bustConv();
+    }
     await isBanned(device); // ينقل الحظر فورًا لو كانت البصمة مطابقة لجهاز محظور
     return { status: "approved", name: clean };
   }
@@ -240,7 +266,7 @@ function makeLogic({ db, ObjectId }) {
   async function inbox(device) {
     if (!DEVICE_OK(device)) return { messages: [], locked: false };
     const rows = await messages
-      .find({ device_id: device }, { projection: { audio: 0 } })
+      .find({ device_id: device }, { projection: { audio: 0, image: 0 } })
       .sort({ created_at: -1 }).limit(60).toArray();
     rows.reverse();
     return {
@@ -260,13 +286,28 @@ function makeLogic({ db, ObjectId }) {
     return m ? m.audio : null;
   }
 
+  // صورة أرسلها المدير لهذا الطالب (يتحقق من أنها تخص جهازه)
+  async function image(device, id) {
+    const oid = toId(id);
+    if (!DEVICE_OK(device) || !oid) return null;
+    const m = await messages.findOne({ _id: oid, device_id: device, kind: "image" });
+    return m ? m.image : null;
+  }
+
   async function markRead(device) {
     if (!DEVICE_OK(device)) return null;
     await messages.updateMany({ device_id: device, sender: "admin", read_by_student: false }, { $set: { read_by_student: true } });
     return null;
   }
 
-  function validateContent(kind, body, audioData, duration) {
+  function validateContent(kind, body, audioData, duration, imageData) {
+    if (kind === "image") {
+      // صور من المدير فقط (دالة send الخاصة بالطلاب لا تمرر imageData فتُرفض عندهم)
+      if (typeof imageData !== "string" || !/^data:image\/(jpeg|png|webp);base64,/.test(imageData) || imageData.length > 1000000) return null;
+      const cap = String(body == null ? "" : body).trim();
+      if (cap.length > 1000) return null;
+      return cap ? { kind: "image", image: imageData, body: cap } : { kind: "image", image: imageData };
+    }
     if (kind === "text") {
       const txt = String(body == null ? "" : body).trim();
       if (txt.length < 1 || txt.length > 1000) return null;
@@ -300,8 +341,27 @@ function makeLogic({ db, ObjectId }) {
   }
 
   /* ---------- المدير ---------- */
+  // أسماء مكررة على نفس الجهاز (من قبل هذه الميزة): نُبقي الأحدث ونحفظ أسماء الباقي في prev_names ثم نحذفها نهائيًا
+  async function mergeDuplicateDevices(rows) {
+    const by = new Map();
+    rows.forEach((r) => { (by.get(r.device_id) || by.set(r.device_id, []).get(r.device_id)).push(r); });
+    const drop = new Set();
+    for (const list of by.values()) {
+      if (list.length < 2) continue;
+      const keep = list[0]; // الأحدث (الترتيب تنازلي)
+      const olds = list.slice(1).reverse(); // الأقدم أولًا
+      keep.prev_names = collectPrevNames(olds.concat([{ prev_names: keep.prev_names }]));
+      await students.updateOne({ _id: keep._id }, { $set: { prev_names: keep.prev_names } });
+      await students.deleteMany({ _id: { $in: olds.map((o) => o._id) } });
+      olds.forEach((o) => drop.add(String(o._id)));
+    }
+    if (drop.size) { statsCache = null; bustConv(); }
+    return drop.size ? rows.filter((r) => !drop.has(String(r._id))) : rows;
+  }
+
   async function adminList() {
-    const rows = await students.find({}).sort({ created_at: -1 }).toArray();
+    let rows = await students.find({}).sort({ created_at: -1 }).toArray();
+    rows = await mergeDuplicateDevices(rows);
     const metas = await messages
       .find({}, { projection: { device_id: 1, sender: 1, requires_reply: 1, read_by_admin: 1, created_at: 1 } })
       .sort({ created_at: -1 }).limit(2000).toArray();
@@ -340,6 +400,7 @@ function makeLogic({ db, ObjectId }) {
         created_at: s.created_at, last_seen: s.last_seen, device_type: s.device_type || null,
         device_info: s.device_info ? { ...s.device_info, fp: undefined, hw: undefined } : null,
         last_ip: s.last_ip || null, first_ip: s.first_ip || null,
+        prev_names: (s.prev_names || []).map((p) => ({ name: p.name, at: p.at || null, status: p.status || "approved" })),
       })),
       info,
       banned,
@@ -371,7 +432,7 @@ function makeLogic({ db, ObjectId }) {
     const before = opts.before ? new Date(opts.before) : null;
     if (before && !isNaN(before.getTime())) q.created_at = { $lt: before };
     const rows = await messages
-      .find(q, { projection: { audio: 0 } })
+      .find(q, { projection: { audio: 0, image: 0 } })
       .sort({ created_at: -1 }).limit(lim + 1).toArray();
     const more = rows.length > lim;
     if (more) rows.pop();
@@ -391,6 +452,13 @@ function makeLogic({ db, ObjectId }) {
     };
   }
 
+  async function adminImage(id) {
+    const oid = toId(id);
+    if (!oid) return null;
+    const m = await messages.findOne({ _id: oid, kind: "image" });
+    return m ? m.image : null;
+  }
+
   async function adminAudio(id) {
     const oid = toId(id);
     if (!oid) return null;
@@ -398,9 +466,9 @@ function makeLogic({ db, ObjectId }) {
     return m ? m.audio : null;
   }
 
-  async function adminSend({ device_id, kind, body, audio: audioData, duration, requires_reply }) {
+  async function adminSend({ device_id, kind, body, audio: audioData, duration, requires_reply, image: imageData }) {
     if (!DEVICE_OK(device_id) || !(await students.findOne({ device_id }))) return { status: "invalid" };
-    const c = validateContent(kind, body, audioData, duration);
+    const c = validateContent(kind, body, audioData, duration, imageData);
     if (!c) return { status: "invalid" };
     await messages.insertOne({
       device_id, sender: "admin", ...c,
@@ -861,7 +929,7 @@ function makeLogic({ db, ObjectId }) {
 
   return {
     check, register, inbox, audio, markRead, send,
-    adminList, adminSetStatus, adminDeleteStudent, adminMessages, adminAudio, adminSend, adminUnlock, adminSetBan, adminClear,
+    image, adminImage, adminList, adminSetStatus, adminDeleteStudent, adminMessages, adminAudio, adminSend, adminUnlock, adminSetBan, adminClear,
     publicReviews, reviewSubmit, adminReviews, adminReviewSave, adminReviewDelete,
     adminStats, adminBulk, adminBroadcast, adminReviewsPublishAll,
     adminConversations, adminSearchMessages, adminMarkUnread, adminReadAll, adminDeleteMessage, adminConvMeta, adminBans,

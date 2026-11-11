@@ -160,6 +160,36 @@
         display: flex; align-items: center; justify-content: center; color: var(--cyan); font-size: 1rem;
       }
       .order-input { width: 56px; text-align: center; padding: 0.45rem 0.3rem; border-radius: 12px; }
+      .row-act {
+        width: 2rem; height: 2rem; display: inline-grid; place-items: center; border-radius: 10px; border: none; background: none;
+        cursor: pointer; font-size: .95rem; color: var(--muted); text-decoration: none;
+      }
+      .row-act:hover { background: rgba(var(--violet-rgb), .12); }
+      .row-act[disabled] { opacity: .25; cursor: default; pointer-events: none; }
+      .prj-rank {
+        width: 1.7rem; height: 1.7rem; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%;
+        font-family: "JetBrains Mono", monospace; font-size: .72rem; font-weight: 800; color: var(--cyan);
+        background: rgba(var(--cyan-rgb), .1); border: 1px solid rgba(var(--cyan-rgb), .3);
+      }
+      .prj-state { font-size: .65rem; font-weight: 800; padding: .08rem .5rem; border-radius: 99px; margin-inline-start: .4rem; }
+      .prj-state.on { background: rgba(74,222,155,.16); color: #4ade9b; }
+      .prj-state.off { background: rgba(124,138,163,.18); color: var(--muted); }
+      /* معاينة مباشرة لبطاقة المشروع */
+      .pv-wrap { max-width: 300px; }
+      .pv-card {
+        --sc: #8b7bff; border-radius: 22px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--sc) 35%, transparent);
+        background: radial-gradient(90% 55% at 100% 0%, color-mix(in srgb, var(--sc) 14%, transparent), transparent 70%), var(--panel2);
+      }
+      .pv-cover { position: relative; aspect-ratio: 16 / 10; display: grid; place-items: center; overflow: hidden; background: var(--panel); }
+      .pv-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .pv-cover i { font-size: 2.2rem; color: var(--sc); position: relative; }
+      .pv-cover .pv-ribbon { position: absolute; top: .6rem; inset-inline-start: .6rem; padding: .2rem .7rem; border-radius: 999px; font-size: .66rem; font-weight: 800; box-shadow: 0 8px 18px -8px rgba(0,0,0,.6); }
+      .pv-body { padding: 1rem 1.1rem 1.1rem; }
+      .pv-badge { display: inline-block; padding: .15rem .6rem; border-radius: 999px; font-size: .62rem; font-weight: 700; color: var(--sc); background: color-mix(in srgb, var(--sc) 14%, transparent); border: 1px solid color-mix(in srgb, var(--sc) 35%, transparent); font-family: "JetBrains Mono", monospace; }
+      .pv-body h4 { margin: .7rem 0 .35rem; color: var(--fog); font-size: .98rem; font-weight: 800; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .pv-body p { margin: 0 0 .9rem; color: var(--muted); font-size: .78rem; line-height: 1.8; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+      .pv-cta { display: block; text-align: center; padding: .55rem; border-radius: 12px; font-size: .78rem; font-weight: 800; color: var(--sc); background: color-mix(in srgb, var(--sc) 12%, transparent); border: 1px solid color-mix(in srgb, var(--sc) 35%, transparent); }
+      .pv-cta.soon { color: var(--muted); background: none; border-style: dashed; border-color: var(--line); }
       .stat-chip {
         display: inline-flex; align-items: center; gap: .5rem; padding: 0.55rem 1.1rem; border-radius: 999px;
         font-size: 0.82rem; font-weight: 700; color: var(--muted);
@@ -261,7 +291,8 @@
       .stc-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.9rem 1.1rem; border-bottom:1px solid var(--line); }
       .stc-head b { color:var(--fog); }
       .stc-head small { display:block; color:var(--muted); font-size:.72rem; margin-top:2px; }
-      .stc-x { background:none; border:none; color:var(--muted); font-size:1.6rem; line-height:1; cursor:pointer; }
+      .stc-x { background:none; border:none; color:var(--muted); font-size:1.6rem; line-height:1; cursor:pointer; width:2.4rem; height:2.4rem; border-radius:12px; flex-shrink:0; }
+      .stc-x:hover { color:var(--fog); background:rgba(var(--violet-rgb), .12); }
       .stc-list { flex:1; overflow:auto; padding:.9rem; display:flex; flex-direction:column; gap:.55rem; }
       .stc-empty { margin:auto; color:var(--muted); font-size:.85rem; text-align:center; }
       .stc-m { max-width:82%; padding:.5rem .8rem; border-radius:14px; font-size:.9rem; line-height:1.7; }
@@ -897,9 +928,24 @@
                 </button>
               </div>
             </div>
-            <div class="mb-2">
+            <div class="mb-5">
               <label class="admin-label">رابط الموقع — اختياري</label>
               <input id="project-link" type="url" class="admin-input" placeholder="https://example.com" />
+            </div>
+
+            <div class="mb-2">
+              <label class="admin-label">معاينة مباشرة — هكذا ستظهر البطاقة في الموقع</label>
+              <div class="pv-wrap">
+                <div id="pv-card" class="pv-card">
+                  <div id="pv-cover" class="pv-cover"></div>
+                  <div class="pv-body">
+                    <span id="pv-badge" class="pv-badge">WEB APP</span>
+                    <h4 id="pv-title">اسم المشروع</h4>
+                    <p id="pv-desc">وصف المشروع يظهر هنا...</p>
+                    <span id="pv-cta" class="pv-cta soon">قريبًا</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <button id="add-project-btn" class="admin-btn mt-5">
@@ -909,7 +955,8 @@
 
           <div class="bg-panel border border-line rounded-2xl p-7">
             <h2 class="text-lg font-bold text-white mb-1">الأعمال الحالية</h2>
-            <p class="text-xs text-muted mb-5">الرقم الأصغر يظهر أول في الموقع. عدّل الرقم ودوس أيقونة الحفظ، أو دوس القلم لتعديل بيانات المشروع كاملة.</p>
+            <p class="text-xs text-muted mb-4">استخدم السهمين <i class="fas fa-arrow-up"></i> <i class="fas fa-arrow-down"></i> لتغيير ترتيب المشروع في الموقع، أو القلم لتعديل بياناته كاملة.</p>
+            <input id="projects-search" type="search" class="admin-input mb-4" placeholder="ابحث في الأعمال بالاسم أو التصنيف..." />
             <div id="projects-list"></div>
           </div>
         </div>
@@ -1838,6 +1885,28 @@
       const SUBMIT_ADD_HTML = '<i class="fas fa-plus"></i> إضافة المشروع';
       const SUBMIT_EDIT_HTML = '<i class="fas fa-floppy-disk"></i> حفظ التعديلات';
 
+      function updateProjectPreview() {
+        const g = (id) => document.getElementById(id);
+        const imgSrc = projectFileChip.classList.contains("show") ? projectFilePreview.getAttribute("src") : "";
+        const icon = g("project-icon").value.trim() || "fas fa-globe";
+        const rText = ribbonTextInput.value.trim();
+        const rBg = safeHex(ribbonColorInput.value, "#ffb454");
+        const link = g("project-link").value.trim();
+        g("pv-cover").innerHTML =
+          (imgSrc ? `<img src="${escapeHtml(imgSrc)}" alt="" />` : `<i class="${escapeHtml(icon)}"></i>`) +
+          (rText ? `<span class="pv-ribbon" style="background:${rBg};color:${readableTextColor(rBg)}">${escapeHtml(rText)}</span>` : "");
+        g("pv-badge").textContent = g("project-badge").value.trim() || "WEB APP";
+        g("pv-title").textContent = g("project-title").value.trim() || "اسم المشروع";
+        g("pv-desc").textContent = g("project-description").value.trim() || "وصف المشروع يظهر هنا...";
+        const cta = g("pv-cta");
+        cta.textContent = link ? "زيارة الموقع" : "قريبًا";
+        cta.classList.toggle("soon", !link);
+      }
+      projectFormCard.addEventListener("input", updateProjectPreview);
+      projectFormCard.addEventListener("click", () => setTimeout(updateProjectPreview, 0));
+      new MutationObserver(updateProjectPreview).observe(projectFileChip, { attributes: true, attributeFilter: ["class"] });
+      new MutationObserver(updateProjectPreview).observe(projectFilePreview, { attributes: true, attributeFilter: ["src"] });
+
       function resetProjectForm() {
         editingProject = null;
         imageMarkedRemoved = false;
@@ -1858,6 +1927,7 @@
         cancelEditBtn.classList.add("force-hide");
         projectSubmitBtn.innerHTML = SUBMIT_ADD_HTML;
         document.querySelectorAll("#projects-list .item-row.is-editing").forEach((r) => r.classList.remove("is-editing"));
+        updateProjectPreview();
       }
 
       function startEditProject(id) {
@@ -1885,6 +1955,7 @@
 
         const row = document.querySelector(`#projects-list .item-row[data-project-id="${p.id}"]`);
         if (row) row.classList.add("is-editing");
+        updateProjectPreview();
         projectFormCard.scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
@@ -2004,37 +2075,52 @@
           return;
         }
 
-        projectsList.innerHTML = projectsCache
-          .map((p) => {
+        renderProjectsList();
+      }
+
+      function renderProjectsList() {
+        const q = (document.getElementById("projects-search").value || "").trim().toLowerCase();
+        const filtering = q.length > 0;
+        const rows = projectsCache
+          .map((p, idx) => ({ p, idx }))
+          .filter(({ p }) => !filtering || [p.title, p.badge, p.description].some((v) => String(v || "").toLowerCase().includes(q)));
+
+        if (rows.length === 0) {
+          projectsList.innerHTML = '<p class="text-muted text-sm">لا توجد نتائج مطابقة.</p>';
+          return;
+        }
+
+        projectsList.innerHTML = rows
+          .map(({ p, idx }) => {
             const rText = (p.ribbon_text || "").trim();
             const rBg = safeHex(p.ribbon_color, "#ffb454");
             const ribbonTag = rText
               ? `<span class="ribbon-tag" style="background:${rBg};color:${readableTextColor(rBg)}">${escapeHtml(rText)}</span>`
               : "";
+            const linkState = p.link_url
+              ? '<span class="prj-state on">له رابط</span>'
+              : '<span class="prj-state off">قريبًا</span>';
+            const first = idx === 0, last = idx === projectsCache.length - 1;
             return `
           <div class="item-row${editingProject && editingProject.id === p.id ? " is-editing" : ""}" data-project-id="${p.id}">
             <div class="flex items-center gap-3" style="min-width: 0">
+              <span class="prj-rank" title="ترتيبه في الموقع">${idx + 1}</span>
               ${
                 p.image_url
                   ? `<img src="${escapeHtml(p.image_url)}" class="item-thumb" alt="" />`
                   : `<div class="item-icon"><i class="${escapeHtml(p.icon)}"></i></div>`
               }
-              <input type="number" data-table="projects" data-id="${p.id}" class="order-input admin-input" value="${p.order_index}" />
               <div style="min-width: 0">
                 <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(p.title)}${ribbonTag}</div>
-                <div class="mono text-xs text-muted">${escapeHtml(p.badge)}</div>
+                <div class="mono text-xs text-muted">${escapeHtml(p.badge)}${linkState}</div>
               </div>
             </div>
-            <div class="flex items-center gap-3">
-              <button data-id="${p.id}" class="edit-project-btn" title="تعديل" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:0.95rem">
-                <i class="fas fa-pen"></i>
-              </button>
-              <button data-table="projects" data-id="${p.id}" class="save-order-btn" title="حفظ الترتيب" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:0.95rem">
-                <i class="fas fa-floppy-disk"></i>
-              </button>
-              <button data-table="projects" data-id="${p.id}" class="delete-btn" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem">
-                <i class="fas fa-trash"></i>
-              </button>
+            <div class="flex items-center gap-1">
+              <button type="button" class="row-act move-project-btn" data-id="${p.id}" data-dir="-1" title="تقديم في الترتيب" ${filtering || first ? "disabled" : ""}><i class="fas fa-arrow-up"></i></button>
+              <button type="button" class="row-act move-project-btn" data-id="${p.id}" data-dir="1" title="تأخير في الترتيب" ${filtering || last ? "disabled" : ""}><i class="fas fa-arrow-down"></i></button>
+              ${p.link_url ? `<a class="row-act" href="${escapeHtml(p.link_url)}" target="_blank" rel="noopener" title="فتح الموقع" style="color:var(--violet)"><i class="fas fa-arrow-up-right-from-square"></i></a>` : ""}
+              <button data-id="${p.id}" class="row-act edit-project-btn" title="تعديل" style="color:var(--amber)"><i class="fas fa-pen"></i></button>
+              <button data-table="projects" data-id="${p.id}" class="row-act delete-btn" title="حذف" style="color:#f87171"><i class="fas fa-trash"></i></button>
             </div>
           </div>`;
           })
@@ -2043,8 +2129,32 @@
         projectsList.querySelectorAll(".edit-project-btn").forEach((b) => {
           b.addEventListener("click", () => startEditProject(b.dataset.id));
         });
+        projectsList.querySelectorAll(".move-project-btn").forEach((b) => {
+          b.addEventListener("click", () => moveProject(b.dataset.id, parseInt(b.dataset.dir, 10)));
+        });
         wireRowActions("projects", loadProjects);
       }
+
+      // تغيير الترتيب بالسهمين: نبدّل مكان المشروع مع جاره ثم نعيد ترقيم المتغيّر فقط
+      async function moveProject(id, dir) {
+        const i = projectsCache.findIndex((x) => x.id === id);
+        const j = i + dir;
+        if (i < 0 || j < 0 || j >= projectsCache.length) return;
+        const arr = projectsCache.slice();
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+        const changes = arr.map((p, k) => ({ p, order: k + 1 })).filter(({ p, order }) => p.order_index !== order);
+        try {
+          const results = await Promise.all(
+            changes.map(({ p, order }) => supabaseClient.from("projects").update({ order_index: order }).eq("id", p.id)),
+          );
+          const failed = results.find((r) => r.error);
+          if (failed) throw failed.error;
+          loadProjects();
+        } catch (err) {
+          toast("تعذر تغيير الترتيب: " + (err && err.message ? err.message : err), false);
+        }
+      }
+      document.getElementById("projects-search").addEventListener("input", renderProjectsList);
 
       /* ---------- Reviews ---------- */
       const reviewsList = document.getElementById("reviews-list");
@@ -3888,6 +3998,17 @@
         } catch (err) { return toast("تعذر التنفيذ: " + err.message, false); }
         loadSecurity(); ibLoadConvs(true);
       }));
+
+      // نافذة بيانات الجهاز والطالب: كانت بلا أي مستمع إغلاق. الآن تُغلق بزر × وبالنقر خارجها وبمفتاح Escape
+      (function () {
+        const pop = document.getElementById("dv-pop");
+        const close = () => { pop.hidden = true; };
+        document.getElementById("dvp-close").addEventListener("click", close);
+        pop.addEventListener("click", (e) => { if (e.target === pop) close(); });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !pop.hidden) { e.stopImmediatePropagation(); e.preventDefault(); close(); }
+        }, true);
+      })();
 
       // اختصارات لوحة المفاتيح داخل الصندوق
       document.addEventListener("keydown", (e) => {

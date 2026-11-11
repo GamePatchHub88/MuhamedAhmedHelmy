@@ -73,29 +73,30 @@ function ribbonHtml(p) {
 let ALL_PROJECTS = [];
 let PROJECT_FILTER = "all";
 
-function projectCardHtml(p, i, featured) {
+function projectCardHtml(p, i) {
   const hues = ["#8b7bff", "#5eead4", "#f472b6", "#ffc46b", "#60a5fa", "#34d399"];
   const href = p.link_url ? escapeHtml(safeUrl(p.link_url)) : "";
+  const title = escapeHtml(p.title);
   const media = p.image_url
-    ? `<img src="${escapeHtml(safeUrl(p.image_url))}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async" />`
+    ? `<img src="${escapeHtml(safeUrl(p.image_url))}" alt="${title}" loading="lazy" decoding="async" />`
     : `<i class="${escapeHtml(p.icon || "fas fa-globe")}"></i>`;
-  const cover = `<div class="prj-cover${p.image_url ? "" : " ph"}">
-      ${ribbonHtml(p)}
-      ${media}
-      <span class="prj-no mono">${String(i + 1).padStart(2, "0")}</span>
-      ${href ? `<span class="prj-open" aria-hidden="true"><i class="fas fa-arrow-up-left"></i></span>` : ""}
-    </div>`;
+  const cta = href
+    ? `<a class="prj-cta" href="${href}" target="_blank" rel="noopener" aria-label="زيارة موقع ${title}">زيارة الموقع <i class="fas fa-arrow-up-right-from-square"></i></a>`
+    : `<span class="prj-soon mono">قريبًا</span>`;
   return `
-    <article class="prj-card${featured ? " is-featured" : ""}" style="--sc:${hues[i % hues.length]};--d:${Math.min(i, 8) * 70}ms">
-      ${href ? `<a class="prj-cover-link" href="${href}" target="_blank" rel="noopener" aria-label="${escapeHtml(p.title)}" tabindex="-1">${cover}</a>` : cover}
+    <article class="prj-card" style="--sc:${hues[i % hues.length]};--d:${Math.min(i, 8) * 70}ms">
+      <div class="prj-cover${p.image_url ? "" : " ph"}">
+        ${ribbonHtml(p)}
+        ${media}
+      </div>
       <div class="prj-body">
         <div class="prj-top">
           <span class="prj-badge mono">${escapeHtml(p.badge || "WEB APP")}</span>
-          ${featured ? `<span class="prj-star"><i class="fas fa-star"></i> مشروع مميز</span>` : ""}
+          <span class="prj-no mono">${String(i + 1).padStart(2, "0")}</span>
         </div>
-        <h3>${escapeHtml(p.title)}</h3>
+        <h3>${title}</h3>
         <p>${escapeHtml(p.description)}</p>
-        ${href ? `<a href="${href}" target="_blank" rel="noopener" class="svc-link">زيارة الموقع <i class="fas fa-arrow-up-left"></i></a>` : `<span class="prj-soon mono">قريبًا</span>`}
+        ${cta}
       </div>
     </article>`;
 }
@@ -122,8 +123,7 @@ function drawProjects() {
         : "";
   }
   const list = PROJECT_FILTER === "all" ? ALL_PROJECTS : ALL_PROJECTS.filter((p) => (p.badge || "WEB APP").trim() === PROJECT_FILTER);
-  const featuredOn = list.length >= 3;
-  grid.innerHTML = list.map((p, i) => projectCardHtml(p, i, featuredOn && i === 0)).join("");
+  grid.innerHTML = list.map((p, i) => projectCardHtml(p, i)).join("");
 }
 
 function renderProjects(data) {
@@ -217,7 +217,7 @@ function renderNews(data) {
       const icon = NEWS_ICONS[n.kind] || "fa-bullhorn";
       const external = /^https?:/i.test(n.link_url || "");
       const btn = n.link_url
-        ? `<a class="news-btn" href="${escapeHtml(safeUrl(n.link_url))}"${external ? ' target="_blank" rel="noopener"' : ""}>${escapeHtml(n.link_text || "اعرف أكثر")} <i class="fas fa-arrow-up-left"></i></a>`
+        ? `<a class="news-btn" href="${escapeHtml(safeUrl(n.link_url))}"${external ? ' target="_blank" rel="noopener"' : ""}>${escapeHtml(n.link_text || "اعرف أكثر")} <i class="fas fa-arrow-left"></i></a>`
         : "";
       const img = n.image_url
         ? `<div class="news-img"><img src="${escapeHtml(safeUrl(n.image_url))}" alt="${escapeHtml(n.title)}" decoding="async" /></div>`

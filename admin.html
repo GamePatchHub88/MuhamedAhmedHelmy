@@ -715,6 +715,43 @@
       .hx-k[data-go] { cursor: pointer; transition: transform .15s, border-color .15s; }
       .hx-k[data-go]:hover { transform: translateY(-2px); border-color: rgba(var(--hx-rgb), .55); }
       .hx-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+      /* ---------- محرر المقالات (شريط تنسيق + معاينة حية) ---------- */
+      .me { position: relative; border: 1px solid var(--line); border-radius: 18px; background: var(--panel2); overflow: visible; transition: border-color .2s, box-shadow .2s; }
+      .me:focus-within { border-color: var(--violet); box-shadow: 0 0 0 4px rgba(var(--violet-rgb), .14); }
+      .me-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .2rem; padding: .5rem; border-bottom: 1px solid var(--line); background: rgba(var(--panel-rgb), .55); border-radius: 18px 18px 0 0; }
+      .me-btn { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; min-width: 2.1rem; height: 2.1rem; padding: 0 .5rem; border-radius: 10px; border: 1px solid transparent; background: transparent; color: var(--muted); font: 800 .78rem "JetBrains Mono", monospace; cursor: pointer; transition: color .15s, background .15s, border-color .15s; }
+      .me-btn i { font-size: .85rem; }
+      .me-btn:hover, .me-btn.on { color: var(--cyan); background: rgba(var(--cyan-rgb), .09); border-color: rgba(var(--cyan-rgb), .3); }
+      .me-sep { width: 1px; height: 1.3rem; margin: 0 .25rem; background: var(--line); }
+      .me-sp { flex: 1; }
+      .me-menu { position: absolute; z-index: 30; min-width: 11rem; padding: .35rem; border-radius: 14px; background: var(--panel); border: 1px solid rgba(var(--violet-rgb), .4); box-shadow: 0 20px 40px -18px rgba(0, 0, 0, .7); }
+      .me-menu[hidden] { display: none; }
+      .me-menu button { display: flex; align-items: center; gap: .6rem; width: 100%; padding: .5rem .7rem; border: 0; border-radius: 9px; background: transparent; color: var(--fog); font: 700 .82rem "Tajawal", sans-serif; text-align: start; cursor: pointer; }
+      .me-menu button:hover { background: rgba(var(--violet-rgb), .14); }
+      .me-menu .dot { width: .7rem; height: .7rem; border-radius: 50%; flex: none; }
+      .me-panes { display: grid; grid-template-columns: minmax(0, 1fr); }
+      .me[data-view="write"] .me-preview, .me[data-view="preview"] .me-input { display: none; }
+      @media (min-width: 900px) { .me[data-view="split"] .me-panes { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+      .me .me-input { display: block; width: 100%; height: 440px; min-height: 240px; border: 0; border-radius: 0; background: transparent; box-shadow: none !important; resize: vertical; line-height: 1.9; font-size: .95rem; }
+      .me-preview { height: 440px; overflow: auto; padding: 1.1rem 1.3rem; font-size: .98rem; line-height: 2; border-inline-start: 1px solid var(--line); }
+      .me[data-view="preview"] .me-preview { border-inline-start: 0; }
+      .me-empty { color: var(--muted); }
+      .me-status { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1rem; padding: .45rem .8rem; border-top: 1px solid var(--line); font-size: .74rem; color: var(--muted); border-radius: 0 0 18px 18px; }
+      .me-draft { display: none; align-items: center; flex-wrap: wrap; gap: .6rem; padding: .55rem .9rem; font-size: .8rem; color: var(--amber); background: rgba(255, 196, 107, .08); border-bottom: 1px solid var(--line); }
+      .me-draft.show { display: flex; }
+      .me-draft button { font: 800 .78rem "Tajawal", sans-serif; padding: .2rem .8rem; border-radius: 999px; cursor: pointer; border: 1px solid var(--line); background: transparent; color: var(--fog); }
+      .me-draft button:hover { border-color: var(--cyan); color: var(--cyan); }
+      .me-guide { display: none; max-height: 16rem; overflow: auto; padding: .8rem; border-top: 1px solid var(--line); }
+      .me-guide.show { display: block; }
+      .me-guide-grid { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
+      .me-ex { display: flex; flex-direction: column; gap: .35rem; padding: .6rem .75rem; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fog); text-align: start; cursor: pointer; font: 700 .78rem "Tajawal", sans-serif; transition: border-color .15s; }
+      .me-ex:hover { border-color: var(--cyan); }
+      .me-ex code { display: block; direction: ltr; text-align: left; white-space: pre-wrap; font: 500 .72rem "JetBrains Mono", monospace; color: var(--amber); opacity: .9; }
+      .me.full { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; border-radius: 0; background: var(--ink); }
+      .me.full .me-panes { flex: 1; min-height: 0; }
+      .me.full .me-input, .me.full .me-preview { height: 100%; resize: none; }
+      .me.full[data-view="split"] .me-panes { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     </style>
   </head>
   <body class="bg-ink text-fog antialiased">
@@ -1014,7 +1051,7 @@
 
           <div class="bg-panel border border-line rounded-2xl p-7 mb-8" id="article-form-card">
             <h2 class="text-lg font-bold text-white mb-1" id="article-form-title">إضافة مقال جديد</h2>
-            <p class="text-xs text-muted mb-6">هيظهر في صفحة المقالات. المحتوى بيدعم: ## عنوان، ### عنوان فرعي، **غامق**، [نص](رابط)، - قائمة، 1. قائمة مرقمة، &gt; اقتباس، ``` كود ```</p>
+            <p class="text-xs text-muted mb-6">هيظهر في صفحة المقالات. استخدم شريط التنسيق فوق المحتوى (أو الاختصارات: Ctrl+B غامق، Ctrl+I مائل، Ctrl+K رابط، Ctrl+S حفظ). تقدر كمان تلصق أو تسحب صورة جوه المحتوى وتترفع تلقائيًا.</p>
 
             <div class="mb-5">
               <label class="admin-label">عنوان المقال</label>
@@ -1034,7 +1071,18 @@
             </div>
             <div class="mb-5">
               <label class="admin-label">المحتوى</label>
-              <textarea id="article-content" class="admin-textarea" style="min-height:280px" placeholder="اكتب المقال هنا..."></textarea>
+              <div class="me" id="md-editor" data-view="split">
+                <div class="me-draft" id="md-draft"><span>🕘 فيه مسودة محفوظة تلقائيًا من آخر مرة.</span><button type="button" id="md-draft-restore">استرجاع</button><button type="button" id="md-draft-drop">تجاهل</button></div>
+                <div class="me-bar" id="md-toolbar" role="toolbar" aria-label="أدوات التنسيق"></div>
+                <div class="me-panes">
+                  <textarea id="article-content" class="admin-textarea me-input" spellcheck="false" placeholder="اكتب المقال هنا... (Markdown)"></textarea>
+                  <div class="me-preview prose" id="md-preview" aria-label="معاينة حية"></div>
+                </div>
+                <div class="me-guide" id="md-guide"><div class="me-guide-grid" id="md-guide-grid"></div></div>
+                <div class="me-status"><span id="md-count">0 كلمة</span><span id="md-draftmsg"></span></div>
+                <input type="file" id="md-file" accept="image/*" multiple hidden />
+                <div class="me-menu" id="md-menu" hidden></div>
+              </div>
             </div>
             <div class="mb-5">
               <label class="admin-label">صورة الغلاف (اختياري)</label>
@@ -1482,6 +1530,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="supabase-config.js"></script>
+    <script src="markdown.js"></script>
     <script>
       function escapeHtml(str) {
         const div = document.createElement("div");
@@ -4088,6 +4137,8 @@
         artEls.heading.textContent = "إضافة مقال جديد";
         artEls.btn.innerHTML = '<i class="fas fa-plus"></i> إضافة المقال';
         artEls.cancel.classList.add("hidden");
+        if (window.meClearDraft) window.meClearDraft();
+        if (window.meRefresh) window.meRefresh();
       }
       artEls.cancel.addEventListener("click", resetArticleForm);
 
@@ -4107,6 +4158,7 @@
         artEls.heading.textContent = "تعديل المقال";
         artEls.btn.innerHTML = '<i class="fas fa-floppy-disk"></i> حفظ التعديلات';
         artEls.cancel.classList.remove("hidden");
+        if (window.meRefresh) window.meRefresh();
         document.getElementById("article-form-card").scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
@@ -4116,7 +4168,7 @@
         const title = artEls.title.value.trim();
         const content = artEls.content.value.trim();
         const slug = makeSlug(artEls.slug.value || title);
-        const excerpt = artEls.excerpt.value.trim() || content.replace(/[#*>`\-\[\]()]/g, "").slice(0, 160);
+        const excerpt = artEls.excerpt.value.trim() || mdPlain(content).slice(0, 160);
         const category = artEls.category.value.trim() || "عام";
         const file = artEls.file.files[0] || null;
 
@@ -4141,7 +4193,7 @@
             cover_url = supabaseClient.storage.from("project-images").getPublicUrl(path).data.publicUrl;
           }
 
-          const words = content.split(/\s+/).filter(Boolean).length;
+          const words = mdPlain(content).split(/\s+/).filter(Boolean).length;
           const payload = {
             title, slug, excerpt, content, category, cover_url,
             read_minutes: Math.max(1, Math.round(words / 200)),
@@ -4223,6 +4275,389 @@
         wireRowActions("articles", loadArticles);
       }
 
+
+      /* ---------- محرر المقالات: شريط تنسيق + معاينة حية + رفع صور + مسودة تلقائية ---------- */
+      (function () {
+        const ed = document.getElementById("md-editor");
+        const ta = artEls.content;
+        if (!ed || !ta || typeof renderMarkdown !== "function") return;
+        const bar = document.getElementById("md-toolbar");
+        const prev = document.getElementById("md-preview");
+        const countEl = document.getElementById("md-count");
+        const draftMsg = document.getElementById("md-draftmsg");
+        const menu = document.getElementById("md-menu");
+        const fileIn = document.getElementById("md-file");
+        const guide = document.getElementById("md-guide");
+
+        /* ----- أدوات التعديل على النص (مع الحفاظ على Undo/Redo) ----- */
+        function replace(start, end, text, selA, selB) {
+          ta.focus();
+          ta.setSelectionRange(start, end);
+          let ok = false;
+          try { ok = text === "" ? document.execCommand("delete") : document.execCommand("insertText", false, text); } catch (_) {}
+          if (!ok) {
+            ta.setRangeText(text, start, end, "end");
+            ta.dispatchEvent(new Event("input", { bubbles: true }));
+          }
+          ta.setSelectionRange(selA, selB == null ? selA : selB);
+        }
+
+        function wrap(pre, post, ph) {
+          const s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+          const sel = v.slice(s, e);
+          const doubled = pre === "*" && v[s - 2] === "*" && v[e + 1] === "*";
+          if (!doubled && v.slice(s - pre.length, s) === pre && v.slice(e, e + post.length) === post) {
+            replace(s - pre.length, e + post.length, sel, s - pre.length, e - pre.length);
+            return;
+          }
+          const text = sel || ph;
+          replace(s, e, pre + text + post, s + pre.length, s + pre.length + text.length);
+        }
+
+        function lineRange() {
+          const v = ta.value, s = ta.selectionStart, e = ta.selectionEnd;
+          const ls = v.lastIndexOf("\n", s - 1) + 1;
+          let le = v.indexOf("\n", e);
+          if (le < 0) le = v.length;
+          if (e > s && v[e - 1] === "\n") le = e - 1;
+          return [ls, le];
+        }
+        function mapLines(fn) {
+          const [ls, le] = lineRange();
+          const text = fn(ta.value.slice(ls, le).split("\n")).join("\n");
+          replace(ls, le, text, ls, ls + text.length);
+        }
+
+        function heading(n) {
+          const mark = "#".repeat(n) + " ";
+          const [ls] = lineRange();
+          const lineEnd = ta.value.indexOf("\n", ls);
+          const line = ta.value.slice(ls, lineEnd < 0 ? ta.value.length : lineEnd);
+          const has = line.match(/^#{1,4}\s+/);
+          const text = has && has[0] === mark ? line.slice(mark.length) : mark + line.replace(/^#{1,4}\s+/, "");
+          replace(ls, ls + line.length, text, ls + text.length);
+        }
+
+        function toggleList(kind) {
+          const re = { ol: /^\s*\d+[.)]\s+/, task: /^\s*[-*+]\s+\[[ xX]\]\s+/, quote: /^>\s?/, ul: /^\s*[-*+]\s+(?!\[[ xX]\]\s)/ }[kind];
+          mapLines((lines) => {
+            if (lines.every((l) => !l.trim() || re.test(l))) return lines.map((l) => l.replace(re, ""));
+            let n = 0;
+            return lines.map((l) => {
+              if (!l.trim()) return l;
+              l = l.replace(/^\s*(?:[-*+]\s+(?:\[[ xX]\]\s+)?|\d+[.)]\s+|>\s?)/, "");
+              n++;
+              return kind === "ol" ? n + ". " + l : kind === "task" ? "- [ ] " + l : kind === "quote" ? "> " + l : "- " + l;
+            });
+          });
+        }
+
+        /* إدراج بلوك مستقل (بسطر فاضي قبله وبعده) — build(sel) => {text, a, b} */
+        function block(build) {
+          const v = ta.value, s = ta.selectionStart, e = ta.selectionEnd;
+          const before = v.slice(0, s), after = v.slice(e);
+          const lead = !before || before.endsWith("\n\n") ? "" : before.endsWith("\n") ? "\n" : "\n\n";
+          const trail = !after || after.startsWith("\n\n") ? "" : after.startsWith("\n") ? "\n" : "\n\n";
+          const r = typeof build === "string" ? { text: build, a: build.length, b: build.length } : build(v.slice(s, e));
+          const base = s + lead.length;
+          replace(s, e, lead + r.text + trail, base + r.a, base + r.b);
+        }
+
+        function fenced(open, ph, close) {
+          return (sel) => {
+            const body = sel || ph;
+            return { text: open + "\n" + body + "\n" + close, a: open.length + 1, b: open.length + 1 + body.length };
+          };
+        }
+
+        /* ----- رفع الصور ----- */
+        async function uploadImage(file) {
+          if (!supabaseClient) throw new Error("Supabase غير متاح");
+          if (!/^image\//.test(file.type)) throw new Error("الملف ليس صورة");
+          if (file.size > 8 * 1024 * 1024) throw new Error("الصورة أكبر من 8MB");
+          const ext = ((file.name || "").includes(".") ? file.name.split(".").pop() : file.type.split("/")[1] || "png").toLowerCase().replace(/[^a-z0-9]/g, "") || "png";
+          const path = `article-img-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+          const { error } = await supabaseClient.storage.from("project-images").upload(path, file, { contentType: file.type });
+          if (error) throw error;
+          return supabaseClient.storage.from("project-images").getPublicUrl(path).data.publicUrl;
+        }
+        async function insertImages(files) {
+          const list = [...files].filter((f) => /^image\//.test(f.type));
+          if (!list.length) return;
+          toast("جاري رفع " + (list.length > 1 ? list.length + " صور" : "الصورة") + "...", true);
+          const out = [];
+          for (const f of list) {
+            try { out.push(`![وصف الصورة](${await uploadImage(f)})`); }
+            catch (err) { toast("تعذر رفع الصورة: " + (err && err.message ? err.message : err), false); }
+          }
+          if (out.length) { block(out.join("\n")); toast("تم رفع الصور ✅", true); }
+        }
+        fileIn.addEventListener("change", () => { insertImages(fileIn.files); fileIn.value = ""; });
+
+        /* ----- الأوامر ----- */
+        const CALLS = [["note", "ملاحظة", "#8b7bff"], ["info", "معلومة", "#60a5fa"], ["tip", "نصيحة", "#5eead4"], ["important", "مهم", "#f472b6"], ["warning", "تنبيه", "#ffc46b"], ["danger", "تحذير", "#f87171"], ["success", "نجاح", "#4ade80"]];
+        const LANGS = [["js", "JavaScript"], ["html", "HTML"], ["css", "CSS"], ["python", "Python"], ["bash", "Bash"], ["json", "JSON"], ["sql", "SQL"], ["php", "PHP"], ["diff", "Diff"], ["", "نص عادي"]];
+        const TABLES = [2, 3, 4];
+
+        const MENUS = {
+          callout: () => CALLS.map(([k, l, c]) => ({ label: l, dot: c, run: () => block(fenced(":::" + k, "اكتب النص هنا", ":::")) })),
+          codeblock: () => LANGS.map(([k, l]) => ({ label: l, run: () => block(fenced("```" + k, "// الكود هنا", "```")) })),
+          table: () => TABLES.map((n) => ({
+            label: "جدول " + n + " أعمدة",
+            run: () => {
+              const row = (c) => "| " + Array.from({ length: n }, (_, i) => c(i)).join(" | ") + " |";
+              block(["", row((i) => "عمود " + (i + 1)), row(() => "---"), row(() => "قيمة"), row(() => "قيمة")].slice(1).join("\n"));
+            },
+          })),
+        };
+
+        const ACT = {
+          h2: () => heading(2), h3: () => heading(3), h4: () => heading(4),
+          bold: () => wrap("**", "**", "نص غامق"),
+          italic: () => wrap("*", "*", "نص مائل"),
+          strike: () => wrap("~~", "~~", "نص مشطوب"),
+          mark: () => wrap("==", "==", "نص مظلل"),
+          code: () => wrap("`", "`", "كود"),
+          kbd: () => wrap("[[", "]]", "Ctrl"),
+          link: () => {
+            const s = ta.selectionStart, e = ta.selectionEnd, sel = ta.value.slice(s, e);
+            if (/^https?:\/\/\S+$/.test(sel)) { const t = "[نص الرابط](" + sel + ")"; replace(s, e, t, s + 1, s + 1 + 9); return; }
+            const label = sel || "نص الرابط";
+            const t = "[" + label + "](https://)";
+            const a = s + label.length + 3;
+            replace(s, e, t, a, a + 8);
+          },
+          ul: () => toggleList("ul"), ol: () => toggleList("ol"), task: () => toggleList("task"), quote: () => toggleList("quote"),
+          details: () => block(fenced(":::details عنوان الجزء المطوي", "المحتوى المخفي", ":::")),
+          steps: () => block(":::steps\n1. **الخطوة الأولى** — شرح\n2. **الخطوة الثانية** — شرح\n3. **الخطوة الثالثة** — شرح\n:::"),
+          image: () => fileIn.click(),
+          video: () => block((sel) => { const t = "@[youtube](" + (sel || "https://www.youtube.com/watch?v=") + ")"; return { text: t, a: 11, b: t.length - 1 }; }),
+          button: () => block((sel) => { const t = "@[button " + (sel || "نص الزر") + "](https://)"; return { text: t, a: t.length - 9, b: t.length - 1 }; }),
+          hr: () => block("---"),
+        };
+
+        const TOOLS = [
+          ["h2", "H2", "عنوان رئيسي"], ["h3", "H3", "عنوان فرعي"], ["h4", "H4", "عنوان صغير"], "|",
+          ["bold", "fas fa-bold", "غامق (Ctrl+B)"], ["italic", "fas fa-italic", "مائل (Ctrl+I)"], ["strike", "fas fa-strikethrough", "مشطوب"],
+          ["mark", "fas fa-highlighter", "تظليل"], ["code", "fas fa-code", "كود داخل السطر"], ["kbd", "fas fa-keyboard", "زر كيبورد"], ["link", "fas fa-link", "رابط (Ctrl+K)"], "|",
+          ["ul", "fas fa-list-ul", "قائمة نقطية"], ["ol", "fas fa-list-ol", "قائمة مرقمة"], ["task", "fas fa-list-check", "قائمة مهام"], ["quote", "fas fa-quote-right", "اقتباس"], "|",
+          ["callout", "fas fa-circle-info", "صندوق تنبيه", 1], ["details", "fas fa-square-caret-down", "جزء مطوي"], ["steps", "fas fa-stairs", "خطوات مرقمة"],
+          ["codeblock", "fas fa-file-code", "بلوك كود", 1], ["table", "fas fa-table", "جدول", 1], "|",
+          ["image", "fas fa-image", "رفع صورة"], ["video", "fab fa-youtube", "فيديو يوتيوب"], ["button", "fas fa-hand-pointer", "زر"], ["hr", "fas fa-minus", "فاصل"],
+        ];
+        const mkBtn = (id, label, title, cls) => {
+          const b = document.createElement("button");
+          b.type = "button"; b.className = "me-btn" + (cls ? " " + cls : ""); b.title = title; b.setAttribute("aria-label", title); b.dataset.act = id;
+          b.innerHTML = /^fa[sb] /.test(label) ? `<i class="${label}"></i>` : label;
+          return b;
+        };
+        TOOLS.forEach((t) => {
+          if (t === "|") { const s = document.createElement("span"); s.className = "me-sep"; bar.appendChild(s); return; }
+          const b = mkBtn(t[0], t[1], t[2]);
+          if (t[3]) b.dataset.menu = "1";
+          bar.appendChild(b);
+        });
+        const sp = document.createElement("span"); sp.className = "me-sp"; bar.appendChild(sp);
+        [["view-write", "fas fa-pen", "كتابة فقط"], ["view-split", "fas fa-table-columns", "كتابة + معاينة"], ["view-preview", "fas fa-eye", "معاينة فقط"], ["guide", "fas fa-circle-question", "دليل التنسيق"], ["full", "fas fa-expand", "ملء الشاشة"]]
+          .forEach((t) => bar.appendChild(mkBtn(t[0], t[1], t[2])));
+
+        function closeMenu() { menu.hidden = true; }
+        function openMenu(btn, items) {
+          menu.innerHTML = "";
+          items.forEach((it) => {
+            const b = document.createElement("button");
+            b.type = "button";
+            b.innerHTML = (it.dot ? `<span class="dot" style="background:${it.dot}"></span>` : "") + it.label;
+            b.addEventListener("click", () => { closeMenu(); it.run(); });
+            menu.appendChild(b);
+          });
+          const er = ed.getBoundingClientRect(), br = btn.getBoundingClientRect();
+          menu.style.top = br.bottom - er.top + 4 + "px";
+          menu.style.left = Math.max(4, Math.min(br.left - er.left, er.width - 190)) + "px";
+          menu.hidden = false;
+        }
+
+        function setView(v) {
+          ed.dataset.view = v;
+          bar.querySelectorAll('[data-act^="view-"]').forEach((b) => b.classList.toggle("on", b.dataset.act === "view-" + v));
+          draw();
+        }
+
+        bar.addEventListener("mousedown", (e) => { if (e.target.closest(".me-btn")) e.preventDefault(); });
+        bar.addEventListener("click", (e) => {
+          const b = e.target.closest(".me-btn");
+          if (!b) return;
+          const id = b.dataset.act;
+          if (id.startsWith("view-")) return setView(id.slice(5));
+          if (id === "guide") { guide.classList.toggle("show"); b.classList.toggle("on"); return; }
+          if (id === "full") {
+            const on = ed.classList.toggle("full");
+            document.body.style.overflow = on ? "hidden" : "";
+            b.classList.toggle("on", on);
+            b.firstChild.className = on ? "fas fa-compress" : "fas fa-expand";
+            return;
+          }
+          if (b.dataset.menu) {
+            if (!menu.hidden && menu.dataset.for === id) return closeMenu();
+            menu.dataset.for = id;
+            return openMenu(b, MENUS[id]());
+          }
+          closeMenu();
+          if (ACT[id]) ACT[id]();
+        });
+        document.addEventListener("click", (e) => { if (!menu.hidden && !e.target.closest("#md-menu") && !e.target.closest("[data-menu]")) closeMenu(); });
+
+        /* ----- دليل التنسيق (الضغط على مثال يدرجه) ----- */
+        const GUIDE = [
+          ["عناوين", "## عنوان رئيسي\n### عنوان فرعي\n#### عنوان صغير"],
+          ["غامق / مائل / مشطوب / تظليل", "**غامق** و *مائل* و ~~مشطوب~~ و ==مظلل=="],
+          ["كود وأزرار كيبورد", "اكتب `npm install` ثم اضغط [[Ctrl]] + [[S]]"],
+          ["رابط", "[نص الرابط](https://example.com)"],
+          ["صورة بتعليق", '![وصف الصورة](https://example.com/img.jpg "تعليق تحت الصورة")'],
+          ["قائمة متداخلة", "- عنصر\n  - عنصر فرعي\n- عنصر آخر"],
+          ["قائمة مهام", "- [x] خلصت\n- [ ] لسه"],
+          ["اقتباس بمصدر", "> الجودة تبدأ بالتفاصيل\n> — اسم القائل"],
+          ["صندوق نصيحة", ":::tip نصيحة\nنص النصيحة\n:::"],
+          ["تنبيه بأسلوب GitHub", "> [!WARNING]\n> انتبه لهذه النقطة"],
+          ["جزء مطوي", ":::details اضغط للتفاصيل\nالمحتوى المخفي\n:::"],
+          ["خطوات", ":::steps\n1. **الأولى** شرح\n2. **الثانية** شرح\n:::"],
+          ["جدول", "| الاسم | الدور |\n|:---|---:|\n| أحمد | مطوّر |"],
+          ["كود بلغة واسم ملف", "```js app.js\nconsole.log('hi');\n```"],
+          ["فيديو يوتيوب", "@[youtube](https://youtu.be/XXXXXXXXXXX)"],
+          ["زر", "@[button اطلب الآن](https://wa.me/201110742678)"],
+          ["إنجليزي / توسيط", ":::ltr\nEnglish paragraph\n:::\n\n:::center\nنص في المنتصف\n:::"],
+          ["أنواع الصناديق", "note · info · tip · important · warning · danger · success"],
+        ];
+        const gg = document.getElementById("md-guide-grid");
+        GUIDE.forEach(([label, sample]) => {
+          const b = document.createElement("button");
+          b.type = "button"; b.className = "me-ex";
+          const l = document.createElement("span"); l.textContent = label;
+          const c = document.createElement("code"); c.textContent = sample;
+          b.append(l, c);
+          b.addEventListener("click", () => { if (label !== "أنواع الصناديق") block(sample); });
+          gg.appendChild(b);
+        });
+
+        /* ----- اختصارات وسلوك الكتابة ----- */
+        function continueList() {
+          if (ta.selectionStart !== ta.selectionEnd) return false;
+          const v = ta.value, pos = ta.selectionStart;
+          const ls = v.lastIndexOf("\n", pos - 1) + 1;
+          const le = v.indexOf("\n", pos);
+          if (pos !== (le < 0 ? v.length : le)) return false;
+          const line = v.slice(ls, pos);
+          let m, marker;
+          if ((m = line.match(/^(\s*)([-*+])\s+(\[[ xX]\]\s+)?(.*)$/))) {
+            if (!m[4].trim()) { replace(ls, pos, "", ls); return true; }
+            marker = m[1] + m[2] + " " + (m[3] ? "[ ] " : "");
+          } else if ((m = line.match(/^(\s*)(\d+)([.)])\s+(.*)$/))) {
+            if (!m[4].trim()) { replace(ls, pos, "", ls); return true; }
+            marker = m[1] + (parseInt(m[2], 10) + 1) + m[3] + " ";
+          } else if ((m = line.match(/^(>\s?)(.*)$/))) {
+            if (!m[2].trim()) { replace(ls, pos, "", ls); return true; }
+            marker = "> ";
+          } else return false;
+          replace(pos, pos, "\n" + marker, pos + 1 + marker.length);
+          return true;
+        }
+
+        function handleTab(back) {
+          const v = ta.value, s = ta.selectionStart, e = ta.selectionEnd;
+          const ls = v.lastIndexOf("\n", s - 1) + 1;
+          const multi = v.slice(s, e).includes("\n");
+          const lineEnd = v.indexOf("\n", ls);
+          const line = v.slice(ls, lineEnd < 0 ? v.length : lineEnd);
+          if (!multi && !/^\s*(?:[-*+]|\d+[.)])\s/.test(line)) return false;
+          mapLines((lines) => lines.map((l) => (back ? l.replace(/^ {1,2}/, "") : "  " + l)));
+          return true;
+        }
+
+        ta.addEventListener("keydown", (e) => {
+          const mod = e.ctrlKey || e.metaKey;
+          if (mod && !e.shiftKey && !e.altKey) {
+            const map = { KeyB: "bold", KeyI: "italic", KeyK: "link" };
+            if (map[e.code]) { e.preventDefault(); ACT[map[e.code]](); return; }
+            if (e.code === "KeyS") { e.preventDefault(); artEls.btn.click(); return; }
+          }
+          if (e.key === "Enter" && !e.shiftKey && !mod && !e.altKey && !e.isComposing) { if (continueList()) e.preventDefault(); return; }
+          if (e.key === "Tab" && !mod && !e.altKey) { if (handleTab(e.shiftKey)) e.preventDefault(); }
+          if (e.key === "Escape" && ed.classList.contains("full")) bar.querySelector('[data-act="full"]').click();
+        });
+
+        ta.addEventListener("paste", (e) => {
+          const cd = e.clipboardData;
+          if (!cd) return;
+          const files = [...(cd.files || [])].filter((f) => f.type.startsWith("image/"));
+          if (files.length) { e.preventDefault(); insertImages(files); return; }
+          const txt = (cd.getData("text/plain") || "").trim();
+          const s = ta.selectionStart, en = ta.selectionEnd;
+          if (/^https?:\/\/\S+$/.test(txt) && s !== en) {
+            e.preventDefault();
+            const t = "[" + ta.value.slice(s, en) + "](" + txt + ")";
+            replace(s, en, t, s + t.length);
+          }
+        });
+        ta.addEventListener("dragover", (e) => { if (e.dataTransfer && [...e.dataTransfer.types].includes("Files")) e.preventDefault(); });
+        ta.addEventListener("drop", (e) => {
+          const files = [...((e.dataTransfer && e.dataTransfer.files) || [])].filter((f) => f.type.startsWith("image/"));
+          if (files.length) { e.preventDefault(); insertImages(files); }
+        });
+
+        /* ----- معاينة حية + عدّاد ----- */
+        let drawT;
+        function draw() {
+          const v = ta.value;
+          if (ed.dataset.view !== "write") prev.innerHTML = v.trim() ? renderMarkdown(v) : '<p class="me-empty">المعاينة هتظهر هنا وإنت بتكتب...</p>';
+          const words = mdPlain(v).split(/\s+/).filter(Boolean).length;
+          countEl.textContent = `${words} كلمة · ${Math.max(1, Math.round(words / 200))} د قراءة · ${v.length} حرف`;
+        }
+        ta.addEventListener("input", () => { clearTimeout(drawT); drawT = setTimeout(draw, 120); saveSoon(); });
+        ta.addEventListener("scroll", () => {
+          if (ed.dataset.view !== "split") return;
+          const r = ta.scrollTop / Math.max(1, ta.scrollHeight - ta.clientHeight);
+          prev.scrollTop = r * (prev.scrollHeight - prev.clientHeight);
+        }, { passive: true });
+        window.meRefresh = draw;
+
+        /* ----- مسودة تلقائية للمقال الجديد ----- */
+        const DK = "article-draft-v1";
+        const FIELDS = ["title", "slug", "category", "excerpt", "content"];
+        let saveT;
+        function save() {
+          if (editingArticle) return;
+          try {
+            const d = {};
+            FIELDS.forEach((k) => (d[k] = artEls[k].value));
+            if (!d.title.trim() && !d.content.trim()) { localStorage.removeItem(DK); draftMsg.textContent = ""; return; }
+            localStorage.setItem(DK, JSON.stringify(d));
+            draftMsg.textContent = "✓ حُفظت مسودة تلقائيًا";
+          } catch (_) {}
+        }
+        function saveSoon() { clearTimeout(saveT); saveT = setTimeout(save, 1200); }
+        FIELDS.filter((k) => k !== "content").forEach((k) => artEls[k].addEventListener("input", saveSoon));
+        window.meClearDraft = () => { clearTimeout(saveT); try { localStorage.removeItem(DK); } catch (_) {} draftMsg.textContent = ""; };
+
+        const dBox = document.getElementById("md-draft");
+        try {
+          const raw = localStorage.getItem(DK);
+          if (raw && !artEls.title.value && !artEls.content.value) {
+            const d = JSON.parse(raw);
+            if (d && (d.title || d.content)) {
+              dBox.classList.add("show");
+              document.getElementById("md-draft-restore").addEventListener("click", () => {
+                FIELDS.forEach((k) => { if (d[k] != null) artEls[k].value = d[k]; });
+                slugTouched = !!d.slug;
+                dBox.classList.remove("show");
+                draw();
+              });
+              document.getElementById("md-draft-drop").addEventListener("click", () => { dBox.classList.remove("show"); window.meClearDraft(); });
+            }
+          }
+        } catch (_) {}
+
+        setView("split");
+      })();
 
       /* ---------- News / Announcements ---------- */
       const newsListEl = document.getElementById("news-list");

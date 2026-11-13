@@ -1,79 +1,5 @@
-/* article.js — صفحة المقال الواحد + عارض Markdown آمن */
-
-/* ---------- Markdown بسيط وآمن (بيعمل escape لكل HTML) ---------- */
-function mdInline(s) {
-  const codes = [];
-  s = escapeHtml(s).replace(/`([^`]+)`/g, (_, c) => {
-    codes.push(c);
-    return "\u0002" + (codes.length - 1) + "\u0002";
-  });
-  s = s
-    .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_, alt, u) => `<img src="${safeUrl(u)}" alt="${alt}" loading="lazy" decoding="async" />`)
-    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, txt, u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener noreferrer">${txt}</a>`)
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  return s.replace(/\u0002(\d+)\u0002/g, (_, i) => `<code>${codes[i]}</code>`);
-}
-
-function renderMarkdown(src) {
-  const blocks = [];
-  src = String(src || "")
-    .replace(/\r\n?/g, "\n")
-    .replace(/```[^\n]*\n([\s\S]*?)```/g, (_, code) => {
-      blocks.push(`<pre><code>${escapeHtml(code.replace(/\n$/, ""))}</code></pre>`);
-      return `\n\u0001${blocks.length - 1}\u0001\n`;
-    });
-
-  const out = [];
-  const usedIds = {};
-  const hid = (txt) => {
-    let base = String(txt).replace(/[`*\[\]()!<>]/g, "").trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "section";
-    let id = base, n = 2;
-    while (usedIds[id]) id = base + "-" + n++;
-    usedIds[id] = 1;
-    return id;
-  };
-  let para = [], quote = [], list = null;
-  const br = (s) => mdInline(s).replace(/\n/g, "<br>");
-  const flushP = () => { if (para.length) { out.push(`<p>${br(para.join("\n"))}</p>`); para = []; } };
-  const flushQ = () => { if (quote.length) { out.push(`<blockquote>${br(quote.join("\n"))}</blockquote>`); quote = []; } };
-  const flushL = () => {
-    if (list) { out.push(`<${list.t}>${list.items.map((i) => `<li>${mdInline(i)}</li>`).join("")}</${list.t}>`); list = null; }
-  };
-  const flushAll = () => { flushP(); flushQ(); flushL(); };
-
-  for (const raw of src.split("\n")) {
-    const line = raw.trim();
-    let m;
-    if (!line) { flushAll(); continue; }
-    if ((m = line.match(/^\u0001(\d+)\u0001$/))) { flushAll(); out.push(blocks[m[1]]); continue; }
-    if (/^(-{3,}|\*{3,})$/.test(line)) { flushAll(); out.push("<hr>"); continue; }
-    if ((m = line.match(/^(#{1,3})\s+(.+)$/))) {
-      flushAll();
-      const l = m[1].length === 3 ? 3 : 2;
-      const id = hid(m[2]);
-      out.push(`<h${l} id="${id}">${mdInline(m[2])}<a class="anc" href="#${id}" aria-label="رابط القسم">#</a></h${l}>`);
-      continue;
-    }
-    if ((m = line.match(/^>\s?(.*)$/))) { flushP(); flushL(); quote.push(m[1]); continue; }
-    if ((m = line.match(/^[-*]\s+(.+)$/))) {
-      flushP(); flushQ();
-      if (!list || list.t !== "ul") { flushL(); list = { t: "ul", items: [] }; }
-      list.items.push(m[1]);
-      continue;
-    }
-    if ((m = line.match(/^\d+[.)]\s+(.+)$/))) {
-      flushP(); flushQ();
-      if (!list || list.t !== "ol") { flushL(); list = { t: "ol", items: [] }; }
-      list.items.push(m[1]);
-      continue;
-    }
-    if (/^!\[[^\]]*\]\([^)\s]+\)$/.test(line)) { flushAll(); out.push(mdInline(line)); continue; }
-    flushL(); flushQ();
-    para.push(line);
-  }
-  flushAll();
-  return out.join("\n");
-}
+/* article.js — صفحة المقال الواحد
+   عارض الـ Markdown نفسه في markdown.js (renderMarkdown / mdPlain) */
 
 /* ---------- الصفحة ---------- */
 const root = document.getElementById("article-root");
@@ -123,8 +49,82 @@ function notFound(msg) {
 }
 
 function estMinutes(text) {
-  const words = String(text || "").trim().split(/\s+/).length;
+  const words = mdPlain(text).split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 180));
+}
+
+/* ---------- أدوات مساعدة ---------- */
+let toastTimer;
+function artToast(msg) {
+  let t = document.getElementById("art-toast");
+  if (!t) {
+    t = document.createElement("div");
+    t.id = "art-toast";
+    t.className = "art-toast";
+    t.setAttribute("role", "status");
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (_) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.cssText = "position:fixed;opacity:0;top:0;left:0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      ta.remove();
+      return ok;
+    } catch (_) {
+      return false;
+    }
+  }
+}
+
+/* حجم الخط المفضّل للقراءة */
+const FS_MIN = 0.94, FS_MAX = 1.42, FS_DEF = 1.08;
+function getFs() {
+  try { const v = parseFloat(localStorage.getItem("prose-fs")); if (v >= FS_MIN && v <= FS_MAX) return v; } catch (_) {}
+  return FS_DEF;
+}
+function setFs(prose, v) {
+  v = Math.min(FS_MAX, Math.max(FS_MIN, Math.round(v * 100) / 100));
+  prose.style.setProperty("--prose-fs", v + "rem");
+  try { localStorage.setItem("prose-fs", String(v)); } catch (_) {}
+  return v;
+}
+
+/* عرض الصور بحجم كبير */
+function openLightbox(img) {
+  let lb = document.getElementById("lightbox");
+  if (!lb) {
+    lb = document.createElement("div");
+    lb.id = "lightbox";
+    lb.className = "lightbox";
+    lb.setAttribute("role", "dialog");
+    lb.setAttribute("aria-modal", "true");
+    lb.innerHTML = '<button type="button" aria-label="إغلاق"><i class="fas fa-xmark"></i></button><img alt="" /><p></p>';
+    document.body.appendChild(lb);
+    const close = () => { lb.classList.remove("open"); document.documentElement.style.overflow = ""; };
+    lb.addEventListener("click", close);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && lb.classList.contains("open")) close(); });
+  }
+  const big = lb.querySelector("img");
+  big.src = img.currentSrc || img.src;
+  big.alt = img.alt || "";
+  const cap = img.closest("figure") && img.closest("figure").querySelector("figcaption");
+  lb.querySelector("p").textContent = cap ? cap.textContent : img.alt || "";
+  lb.classList.add("open");
+  document.documentElement.style.overflow = "hidden";
 }
 
 function buildToc(proseEl) {
@@ -143,13 +143,14 @@ function showArticle(a) {
 
   /* ---------- SEO ديناميكي لكل مقال ---------- */
   const SITE = "https://mohamedahmedhelmi.vercel.app";
-  const plain = String(a.content || "").replace(/```[\s\S]*?```/g, " ").replace(/[#>*`\[\]()!_-]/g, " ").replace(/\s+/g, " ").trim();
+  const plain = mdPlain(a.content);
   const descFull = (a.excerpt || plain).trim();
   const metaDesc = descFull.length > 158 ? descFull.slice(0, 155).replace(/\s+\S*$/, "") + "…" : descFull;
   const pageUrl = SITE + "/article.html?slug=" + encodeURIComponent(a.slug);
   const cat = a.category || "عام";
   const cover = a.cover_url && /^https?:/i.test(a.cover_url) ? a.cover_url : SITE + "/2.jpg";
   const words = plain ? plain.split(" ").length : 0;
+  const updated = a.updated_at && a.created_at && new Date(a.updated_at) - new Date(a.created_at) > 864e5 ? a.updated_at : "";
   const iso = (d) => { try { return new Date(d).toISOString(); } catch (_) { return undefined; } };
 
   document.title = a.title + " | محمد أحمد حلمي";
@@ -216,7 +217,14 @@ function showArticle(a) {
         <div class="byline">
           <img src="profile.webp" alt="محمد أحمد حلمي" width="42" height="42" />
           <div><b>محمد أحمد حلمي</b>
-            <small><time datetime="${escapeHtml(String(a.created_at || ""))}">${fmtDate(a.created_at)}</time> · <i class="far fa-clock"></i> ${mins} د قراءة</small></div>
+            <small><time datetime="${escapeHtml(String(a.created_at || ""))}">${fmtDate(a.created_at)}</time> · <i class="far fa-clock"></i> ${mins} د قراءة · <i class="far fa-file-lines"></i> ${words.toLocaleString("ar-EG")} كلمة${updated ? ` · <i class="fas fa-rotate"></i> تحديث ${fmtDate(updated)}` : ""}</small></div>
+        </div>
+        <div class="art-tools" role="toolbar" aria-label="أدوات القراءة">
+          <button type="button" class="tool-btn" data-act="fs-dec" aria-label="تصغير الخط" title="تصغير الخط">أ<small>−</small></button>
+          <button type="button" class="tool-btn" data-act="fs-inc" aria-label="تكبير الخط" title="تكبير الخط">أ<small>+</small></button>
+          <span class="tool-sep" aria-hidden="true"></span>
+          ${navigator.share ? '<button type="button" class="tool-btn" data-act="share" aria-label="مشاركة" title="مشاركة"><i class="fas fa-share-nodes"></i></button>' : ""}
+          <button type="button" class="tool-btn" data-act="print" aria-label="طباعة المقال" title="طباعة / حفظ PDF"><i class="fas fa-print"></i></button>
         </div>
       </header>
       ${a.cover_url ? `<img class="article-hero" src="${escapeHtml(safeUrl(a.cover_url))}" alt="${escapeHtml(a.title)}" width="1280" height="720" fetchpriority="high" decoding="async" />` : ""}
@@ -230,6 +238,7 @@ function showArticle(a) {
           <a class="share-btn fb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${enc(url)}"><i class="fab fa-facebook-f"></i> فيسبوك</a>
           <a class="share-btn x" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${enc(a.title)}&url=${enc(url)}"><i class="fab fa-x-twitter"></i> إكس</a>
           <a class="share-btn in" target="_blank" rel="noopener" href="https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}"><i class="fab fa-linkedin-in"></i> لينكدإن</a>
+          <a class="share-btn tg" target="_blank" rel="noopener" href="https://t.me/share/url?url=${enc(url)}&text=${enc(a.title)}"><i class="fab fa-telegram"></i> تيليجرام</a>
           <button class="share-btn" id="copy-link" type="button"><i class="far fa-copy"></i> نسخ الرابط</button>
         </div>
         <div class="author-box">
@@ -244,12 +253,16 @@ function showArticle(a) {
     </article>`;
 
   const prose = document.getElementById("prose");
+  setFs(prose, getFs());
 
   /* فهرس المحتويات */
   const tocHtml = buildToc(prose);
+  let tocFill = null;
   if (tocHtml) {
     prose.parentElement.insertAdjacentHTML("afterbegin", tocHtml);
     const toc = prose.parentElement.querySelector(".toc");
+    toc.insertAdjacentHTML("beforeend", '<div class="toc-bar" aria-hidden="true"><span></span></div>');
+    tocFill = toc.querySelector(".toc-bar span");
     if (window.matchMedia("(max-width: 1099px)").matches) toc.removeAttribute("open");
     const links = [...toc.querySelectorAll("a")];
     const map = new Map(links.map((l) => [l.dataset.id, l]));
@@ -267,29 +280,65 @@ function showArticle(a) {
     }
   }
 
-  /* زر نسخ للأكواد */
-  prose.querySelectorAll("pre").forEach((pre) => {
+  /* زر نسخ داخل ترويسة كل بلوك كود */
+  prose.querySelectorAll(".codebox").forEach((box) => {
+    const head = box.querySelector(".code-head");
+    const code = box.querySelector("pre code");
+    if (!head || !code) return;
     const b = document.createElement("button");
     b.type = "button";
     b.className = "copy-code";
-    b.textContent = "نسخ";
+    b.innerHTML = '<i class="far fa-copy"></i> نسخ';
     b.addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(pre.innerText.replace(/نسخ$/, "").trim()); b.textContent = "تم ✓"; }
-      catch (_) { b.textContent = "تعذر"; }
-      setTimeout(() => (b.textContent = "نسخ"), 1500);
+      const ok = await copyText(code.textContent);
+      b.innerHTML = ok ? '<i class="fas fa-check"></i> تم' : "تعذر";
+      setTimeout(() => (b.innerHTML = '<i class="far fa-copy"></i> نسخ'), 1500);
     });
-    pre.appendChild(b);
+    head.appendChild(b);
+  });
+
+  /* نقر على الصور = عرض كبير / نقر على # = نسخ رابط القسم */
+  prose.addEventListener("click", (e) => {
+    const img = e.target.closest("img");
+    if (img && !img.closest("a")) { openLightbox(img); return; }
+    const anc = e.target.closest("a.anc");
+    if (anc) {
+      const link = location.origin + location.pathname + location.search + anc.getAttribute("href");
+      copyText(link).then((ok) => ok && artToast("تم نسخ رابط القسم ✓"));
+    }
+  });
+
+  /* أدوات القراءة */
+  const tools = root.querySelector(".art-tools");
+  if (tools) tools.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b) return;
+    const act = b.dataset.act;
+    const cur = parseFloat(getComputedStyle(prose).fontSize) / 16;
+    if (act === "fs-inc") artToast("حجم الخط: " + Math.round((setFs(prose, cur + 0.08) / FS_DEF) * 100) + "%");
+    else if (act === "fs-dec") artToast("حجم الخط: " + Math.round((setFs(prose, cur - 0.08) / FS_DEF) * 100) + "%");
+    else if (act === "print") window.print();
+    else if (act === "share") navigator.share({ title: a.title, text: desc, url }).catch(() => {});
   });
 
   document.getElementById("copy-link").addEventListener("click", async (e) => {
     const b = e.currentTarget;
-    try {
-      await navigator.clipboard.writeText(url);
-      b.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
-    } catch (_) {
-      b.textContent = url;
-    }
+    const ok = await copyText(url);
+    b.innerHTML = ok ? '<i class="fas fa-check"></i> تم النسخ' : url;
   });
+
+  /* زر العودة للأعلى بحلقة تقدّم القراءة */
+  let fab = document.getElementById("read-fab");
+  if (!fab) {
+    fab = document.createElement("button");
+    fab.id = "read-fab";
+    fab.type = "button";
+    fab.className = "read-fab";
+    fab.setAttribute("aria-label", "العودة لأعلى المقال");
+    fab.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    fab.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    document.body.appendChild(fab);
+  }
 
   /* شريط تقدّم القراءة */
   const bar = document.getElementById("read-progress");
@@ -304,10 +353,26 @@ function showArticle(a) {
       const total = r.height - window.innerHeight * 0.6;
       const p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
       bar.style.transform = `scaleX(${p})`;
+      const f = document.getElementById("read-fab");
+      if (f) {
+        f.style.setProperty("--p", Math.round(p * 100));
+        f.classList.toggle("show", window.scrollY > 700);
+      }
+      const tf = document.querySelector(".toc-bar span");
+      if (tf) tf.style.width = Math.round(p * 100) + "%";
     };
     window.addEventListener("scroll", () => { if (!tick) { tick = true; requestAnimationFrame(upd); } }, { passive: true });
     upd();
   }
+
+  /* لو الرابط فيه #قسم، ننزل له بعد ما المحتوى يترسم */
+  if (!showArticle.done && location.hash.length > 1) {
+    try {
+      const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (target) setTimeout(() => target.scrollIntoView(), 60);
+    } catch (_) {}
+  }
+  showArticle.done = true;
 }
 
 /* السابق/التالي + مقالات ذات صلة — بنفس استعلام صفحة القائمة (من الكاش لو الزائر جاي منها) */

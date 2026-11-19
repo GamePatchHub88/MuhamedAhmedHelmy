@@ -5113,13 +5113,18 @@
           certEl.cancel.hidden = true;
           queue.forEach((it) => { it.status = "wait"; it.err = ""; paintBatchItem(it); });
           updateBatchInfo();
-          await runPool(queue, 3, async (it) => {
+          // رفع واحدة ورا واحدة (أثبت على Vercel) + إعادة محاولة تلقائية
+          await runPool(queue, 1, async (it) => {
             it.status = "up"; paintBatchItem(it);
-            try {
-              await sApi("/certificates", { method: "POST", body: { order_index: startOrder + it.idx, image: it.dataUrl } });
-              it.status = "ok";
-            } catch (e) {
-              it.status = "err"; it.err = e.message;
+            for (let attempt = 1; attempt <= 3; attempt++) {
+              try {
+                await sApi("/certificates", { method: "POST", body: { order_index: startOrder + it.idx, image: it.dataUrl } });
+                it.status = "ok"; it.err = "";
+                break;
+              } catch (e) {
+                it.status = "err"; it.err = e.message;
+                if (attempt < 3) await new Promise((r) => setTimeout(r, 1000 * attempt));
+              }
             }
             paintBatchItem(it);
             updateBatchInfo();
@@ -5135,7 +5140,8 @@
             setTimeout(resetCertForm, 1200);
           } else {
             // نبقي الفاشلة فقط جاهزة لإعادة المحاولة
-            toast(`تم رفع ${okN} وفشل ${errN} — دوس الزر لإعادة محاولة الفاشلة`, false);
+            const firstErr = (certBatch.find((x) => x.status === "err") || {}).err || "";
+            toast(`تم رفع ${okN} وفشل ${errN}${firstErr ? " — السبب: " + firstErr : ""} — دوس الزر لإعادة المحاولة`, false);
             certBatch = certBatch.filter((x) => x.status === "err");
             certEl.save.querySelector("span").textContent = `إعادة رفع ${errN} فاشلة`;
           }

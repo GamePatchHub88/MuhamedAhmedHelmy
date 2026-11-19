@@ -193,6 +193,92 @@ function renderReviews(data) {
   document.getElementById("rev-prev").addEventListener("click", () => go(1));
 })();
 
+
+/* ---------- شهاداتي (سلايدر — البيانات من MongoDB عبر /api/certificates) ---------- */
+(function () {
+  const track = document.getElementById("cert-track");
+  const dotsBox = document.getElementById("cert-dots");
+  const empty = document.getElementById("cert-empty");
+  const prev = document.getElementById("cert-prev");
+  const next = document.getElementById("cert-next");
+  if (!track) return;
+  let slides = [], idx = 0, timer = null;
+
+  const show = (i, smooth) => {
+    if (!slides.length) return;
+    idx = (i + slides.length) % slides.length;
+    slides[idx].scrollIntoView({ behavior: smooth === false ? "auto" : "smooth", inline: "center", block: "nearest" });
+  };
+  const sync = () => {
+    const slideRects = slides.map((s) => Math.abs(s.getBoundingClientRect().left - track.getBoundingClientRect().left));
+    const i = slideRects.indexOf(Math.min.apply(null, slideRects));
+    idx = i < 0 ? 0 : i;
+    dotsBox.querySelectorAll("button").forEach((d, k) => d.classList.toggle("on", k === idx));
+  };
+  const start = () => {
+    clearInterval(timer);
+    if (slides.length > 1 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setInterval(() => show(idx + 1), 6000);
+  };
+
+  function render(data) {
+    clearInterval(timer);
+    if (!data || !data.length) {
+      track.innerHTML = "";
+      dotsBox.innerHTML = "";
+      empty.classList.remove("hidden");
+      prev.hidden = next.hidden = true;
+      return;
+    }
+    empty.classList.add("hidden");
+    track.innerHTML = data
+      .map((c, i) => `
+        <figure class="cert-slide" aria-roledescription="slide" aria-label="${i + 1} / ${data.length}">
+          <div class="cert-img"><img src="${escapeHtml(safeUrl(c.image_url))}" alt="${escapeHtml(c.title)}" ${i ? 'loading="lazy"' : ""} decoding="async" /></div>
+          <figcaption class="cert-cap">
+            <h3>${escapeHtml(c.title)}</h3>
+            ${c.issuer || c.issued_at ? `<p>${escapeHtml([c.issuer, c.issued_at].filter(Boolean).join(" • "))}</p>` : ""}
+          </figcaption>
+        </figure>`)
+      .join("");
+    slides = Array.from(track.children);
+    const multi = slides.length > 1;
+    prev.hidden = next.hidden = !multi;
+    dotsBox.innerHTML = multi ? data.map((c, i) => `<button type="button" aria-label="الشهادة ${i + 1}"${i === 0 ? ' class="on"' : ""}></button>`).join("") : "";
+    idx = 0;
+    start();
+  }
+
+  prev.addEventListener("click", () => { show(idx - 1); start(); });
+  next.addEventListener("click", () => { show(idx + 1); start(); });
+  dotsBox.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    show(Array.prototype.indexOf.call(dotsBox.children, b));
+    start();
+  });
+  let t;
+  track.addEventListener("scroll", () => { clearTimeout(t); t = setTimeout(sync, 60); }, { passive: true });
+  track.addEventListener("pointerenter", () => clearInterval(timer));
+  track.addEventListener("pointerleave", start);
+  track.addEventListener("touchstart", () => clearInterval(timer), { passive: true });
+
+  const KEY = "certs:v1";
+  let cached = null;
+  try { cached = sessionStorage.getItem(KEY); if (cached) render(JSON.parse(cached)); } catch (_) {}
+  fetch("/api/certificates")
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then((fresh) => {
+      const s = JSON.stringify(fresh);
+      if (s === cached) return;
+      try { sessionStorage.setItem(KEY, s); } catch (_) {}
+      render(fresh);
+    })
+    .catch((err) => {
+      console.warn("الشهادات:", err);
+      if (!cached) { track.innerHTML = ""; empty.textContent = "تعذر تحميل الشهادات حاليًا، حاول لاحقًا."; empty.classList.remove("hidden"); }
+    });
+})();
+
 /* ---------- الأخبار والإعلانات (أعلى الصفحة، فوق صورتي) ---------- */
 let newsTimer = null;
 const NEWS_ICONS = { "خبر": "fa-newspaper", "إعلان": "fa-bullhorn", "عرض": "fa-tag", "تنبيه": "fa-bell" };

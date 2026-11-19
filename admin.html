@@ -818,6 +818,9 @@
           <button class="tab-btn active" data-tab="skills">
             <i class="fas fa-code"></i> المهارات
           </button>
+          <button class="tab-btn" data-tab="certs">
+            <i class="fas fa-award"></i> شهاداتي
+          </button>
           <button class="tab-btn" data-tab="projects">
             <i class="fas fa-diagram-project"></i> الأعمال والمشاريع
           </button>
@@ -887,6 +890,54 @@
             <h2 class="text-lg font-bold text-white mb-1">المهارات الحالية</h2>
             <p class="text-xs text-muted mb-5">الرقم الأصغر يظهر أول في الموقع. عدّل الرقم ودوس أيقونة الحفظ.</p>
             <div id="skills-list"></div>
+          </div>
+        </div>
+
+        <!-- ===================== CERTIFICATES TAB ===================== -->
+        <div class="tab-panel" id="tab-certs">
+          <div class="flex items-center gap-3 mb-8">
+            <span class="stat-chip">إجمالي الشهادات: <b id="certs-count">0</b></span>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
+            <h2 id="cert-form-title" class="text-lg font-bold text-white mb-1">إضافة شهادة جديدة</h2>
+            <p class="text-xs text-muted mb-6">هتظهر في قسم "شهاداتي" كسلايدر. الصورة بتتصغّر وتتضغط تلقائيًا قبل الرفع (حد أقصى 1400px) عشان متبقاش تقيلة على الأجهزة.</p>
+
+            <div class="mb-5">
+              <label class="admin-label">اسم الشهادة</label>
+              <input id="cert-title" type="text" maxlength="120" class="admin-input" placeholder="مثال: Google Cybersecurity Certificate" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">الجهة المانحة (اختياري)</label>
+              <input id="cert-issuer" type="text" maxlength="120" class="admin-input" placeholder="مثال: Coursera" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">التاريخ (اختياري)</label>
+              <input id="cert-date" type="text" maxlength="40" class="admin-input" placeholder="مثال: مارس 2026" />
+            </div>
+            <div class="mb-5">
+              <label class="admin-label">الترتيب (الأصغر يظهر أولًا)</label>
+              <input id="cert-order" type="number" class="admin-input" value="0" />
+            </div>
+            <div class="mb-2">
+              <label class="admin-label">صورة الشهادة</label>
+              <input id="cert-file" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input" />
+              <div id="cert-preview" class="mt-3" hidden>
+                <img id="cert-preview-img" alt="معاينة" style="max-width:100%;max-height:220px;border-radius:12px;border:1px solid var(--line)" />
+                <div id="cert-preview-info" class="mono text-xs text-muted mt-2"></div>
+              </div>
+            </div>
+
+            <div class="flex gap-3 mt-5">
+              <button id="cert-save-btn" class="admin-btn"><i class="fas fa-plus"></i> <span>إضافة الشهادة</span></button>
+              <button id="cert-cancel-btn" class="admin-btn" type="button" hidden style="background:transparent;border:1px solid var(--line);color:var(--muted)">إلغاء التعديل</button>
+            </div>
+          </div>
+
+          <div class="bg-panel border border-line rounded-2xl p-7">
+            <h2 class="text-lg font-bold text-white mb-1">الشهادات الحالية</h2>
+            <p class="text-xs text-muted mb-5">عدّل الرقم ودوس أيقونة الحفظ لتغيير الترتيب.</p>
+            <div id="certs-list"></div>
           </div>
         </div>
 
@@ -1690,6 +1741,7 @@
           loadReviews();
           loadArticles();
           loadNews();
+          loadCerts();
           loadStudents();
           loadSolReviews(true);
         } else {
@@ -4898,6 +4950,143 @@
           }),
         );
         wireRowActions("news", loadNews);
+      }
+
+      /* ---------- Certificates (شهاداتي — MongoDB عبر /api/certificates) ---------- */
+      const certEl = {
+        title: document.getElementById("cert-title"), issuer: document.getElementById("cert-issuer"),
+        date: document.getElementById("cert-date"), order: document.getElementById("cert-order"),
+        file: document.getElementById("cert-file"), prev: document.getElementById("cert-preview"),
+        prevImg: document.getElementById("cert-preview-img"), prevInfo: document.getElementById("cert-preview-info"),
+        save: document.getElementById("cert-save-btn"), cancel: document.getElementById("cert-cancel-btn"),
+        list: document.getElementById("certs-list"), count: document.getElementById("certs-count"),
+        formTitle: document.getElementById("cert-form-title"),
+      };
+      let certImage = null; // dataURL بعد الضغط
+      let certsCache = [];
+      let editingCert = null;
+
+      const fmtKB = (n) => (n / 1024 < 1024 ? Math.round(n / 1024) + " KB" : (n / 1048576).toFixed(2) + " MB");
+
+      /* تصغير الأبعاد + ضغط (WebP، أو JPEG لو المتصفح لا يدعم WebP) حتى الوصول لحجم مناسب */
+      async function compressImage(file, maxDim = 1400, targetBytes = 300 * 1024) {
+        const bmp = await createImageBitmap(file).catch(() => null);
+        if (!bmp) throw new Error("تعذر قراءة الصورة");
+        const k = Math.min(1, maxDim / Math.max(bmp.width, bmp.height));
+        const w = Math.max(1, Math.round(bmp.width * k)), h = Math.max(1, Math.round(bmp.height * k));
+        const cv = document.createElement("canvas");
+        cv.width = w; cv.height = h;
+        cv.getContext("2d").drawImage(bmp, 0, 0, w, h);
+        if (bmp.close) bmp.close();
+        const toBlob = (type, q) => new Promise((res) => cv.toBlob(res, type, q));
+        let type = "image/webp";
+        let blob = await toBlob(type, 0.85);
+        if (!blob || blob.type !== "image/webp") { type = "image/jpeg"; blob = await toBlob(type, 0.85); }
+        for (let q = 0.75; blob && blob.size > targetBytes && q >= 0.4; q -= 0.1) blob = await toBlob(type, q);
+        if (!blob) throw new Error("فشل ضغط الصورة");
+        const dataUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
+        return { dataUrl, size: blob.size, w, h };
+      }
+
+      certEl.file.addEventListener("change", async () => {
+        const f = certEl.file.files[0];
+        certImage = null;
+        certEl.prev.hidden = true;
+        if (!f) return;
+        if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { certEl.file.value = ""; return toast("الصيغ المسموحة: JPG / PNG / WEBP", false); }
+        try {
+          certEl.prevInfo.textContent = "جاري الضغط...";
+          certEl.prev.hidden = false;
+          const r = await compressImage(f);
+          certImage = r.dataUrl;
+          certEl.prevImg.src = r.dataUrl;
+          certEl.prevInfo.textContent = `${fmtKB(f.size)} ← ${fmtKB(r.size)} (${r.w}×${r.h})`;
+        } catch (e) {
+          certEl.prev.hidden = true;
+          toast(e.message, false);
+        }
+      });
+
+      function resetCertForm() {
+        editingCert = null; certImage = null;
+        certEl.title.value = certEl.issuer.value = certEl.date.value = "";
+        certEl.order.value = 0; certEl.file.value = ""; certEl.prev.hidden = true;
+        certEl.formTitle.textContent = "إضافة شهادة جديدة";
+        certEl.save.querySelector("span").textContent = "إضافة الشهادة";
+        certEl.cancel.hidden = true;
+      }
+      certEl.cancel.addEventListener("click", resetCertForm);
+
+      certEl.save.addEventListener("click", async () => {
+        const title = certEl.title.value.trim();
+        if (!title) return toast("اكتب اسم الشهادة", false);
+        if (!editingCert && !certImage) return toast("اختر صورة الشهادة", false);
+        const body = { title, issuer: certEl.issuer.value.trim(), issued_at: certEl.date.value.trim(), order_index: parseInt(certEl.order.value, 10) || 0 };
+        if (certImage) body.image = certImage;
+        certEl.save.disabled = true;
+        try {
+          if (editingCert) await sApi("/certificates/" + editingCert, { method: "PUT", body });
+          else await sApi("/certificates", { method: "POST", body });
+          toast(editingCert ? "تم حفظ التعديل ✅" : "تمت إضافة الشهادة ✅", true);
+          resetCertForm();
+          loadCerts();
+        } catch (e) {
+          toast("حصل خطأ: " + e.message, false);
+        } finally {
+          certEl.save.disabled = false;
+        }
+      });
+
+      async function loadCerts() {
+        certEl.list.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
+        try {
+          const res = await fetch(STUDENTS_API + "/certificates", { cache: "no-store" });
+          if (!res.ok) throw new Error("http " + res.status);
+          certsCache = await res.json();
+        } catch (e) {
+          certEl.list.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل الشهادات — تأكد من ضبط MONGODB_URI على Vercel</p>';
+          return;
+        }
+        certEl.count.textContent = certsCache.length;
+        if (!certsCache.length) { certEl.list.innerHTML = '<p class="text-muted text-sm">لا توجد شهادات بعد.</p>'; return; }
+        certEl.list.innerHTML = certsCache.map((c) => `
+          <div class="item-row${editingCert === c.id ? " is-editing" : ""}">
+            <div class="flex items-center gap-3" style="min-width: 0">
+              <img src="${escapeHtml(c.image_url)}" class="item-thumb" alt="" loading="lazy" />
+              <input type="number" data-cid="${c.id}" class="cert-order admin-input" value="${c.order_index}" style="width:4.5rem" />
+              <div style="min-width: 0">
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(c.title)}</div>
+                <div class="mono text-xs text-muted">${escapeHtml(c.issuer || "")} · ${fmtKB(c.size)}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <button data-cid="${c.id}" class="cert-order-save" title="حفظ الترتيب" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:0.95rem"><i class="fas fa-floppy-disk"></i></button>
+              <button data-cid="${c.id}" class="cert-edit" title="تعديل" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:0.95rem"><i class="fas fa-pen"></i></button>
+              <button data-cid="${c.id}" class="cert-del" title="حذف" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.95rem"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>`).join("");
+
+        certEl.list.querySelectorAll(".cert-order-save").forEach((b) => b.addEventListener("click", async () => {
+          const v = parseInt(certEl.list.querySelector(`.cert-order[data-cid="${b.dataset.cid}"]`).value, 10) || 0;
+          try { await sApi("/certificates/" + b.dataset.cid, { method: "PUT", body: { order_index: v } }); toast("تم حفظ الترتيب ✅", true); loadCerts(); }
+          catch (e) { toast("حصل خطأ: " + e.message, false); }
+        }));
+        certEl.list.querySelectorAll(".cert-edit").forEach((b) => b.addEventListener("click", () => {
+          const c = certsCache.find((x) => x.id === b.dataset.cid);
+          if (!c) return;
+          editingCert = c.id; certImage = null; certEl.file.value = "";
+          certEl.title.value = c.title; certEl.issuer.value = c.issuer || ""; certEl.date.value = c.issued_at || ""; certEl.order.value = c.order_index;
+          certEl.prevImg.src = c.image_url; certEl.prevInfo.textContent = "الصورة الحالية — اختر صورة جديدة لو عايز تغيّرها"; certEl.prev.hidden = false;
+          certEl.formTitle.textContent = "تعديل الشهادة";
+          certEl.save.querySelector("span").textContent = "حفظ التعديل";
+          certEl.cancel.hidden = false;
+          certEl.title.scrollIntoView({ behavior: "smooth", block: "center" });
+        }));
+        certEl.list.querySelectorAll(".cert-del").forEach((b) => b.addEventListener("click", async () => {
+          if (!confirm("متأكد إنك عايز تحذف الشهادة دي؟")) return;
+          try { await sApi("/certificates/" + b.dataset.cid, { method: "DELETE" }); toast("تم الحذف", true); if (editingCert === b.dataset.cid) resetCertForm(); loadCerts(); }
+          catch (e) { toast("حصل خطأ: " + e.message, false); }
+        }));
       }
 
       checkSession();

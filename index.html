@@ -260,6 +260,7 @@
         <nav class="hnav" aria-label="القائمة الرئيسية">
           <a href="#home" class="hnav-link" data-spy="home">الرئيسية</a>
           <a href="#about" class="hnav-link" data-spy="about">نبذة عني</a>
+          <a href="#certificates" class="hnav-link" data-spy="certificates">شهاداتي</a>
           <a href="#skills" class="hnav-link" data-spy="skills">المهارات</a>
           <a href="#services" class="hnav-link" data-spy="services">خدماتي</a>
           <a href="#projects" class="hnav-link" data-spy="projects">أعمالي</a>
@@ -275,6 +276,7 @@
       <div id="mobile-menu" class="mobile-menu">
         <a href="#home" class="mobile-link"><i class="fas fa-house"></i>الرئيسية</a>
         <a href="#about" class="mobile-link"><i class="fas fa-user"></i>نبذة عني</a>
+        <a href="#certificates" class="mobile-link"><i class="fas fa-award"></i>شهاداتي</a>
         <a href="#skills" class="mobile-link"><i class="fas fa-code"></i>المهارات</a>
         <a href="#identity" class="mobile-link"><i class="fas fa-fingerprint"></i>الهوية</a>
         <a href="#design" class="mobile-link"><i class="fas fa-pen-nib"></i>التصميم</a>
@@ -468,6 +470,25 @@
 <li class="road-step" style="--sc:#f472b6;--d:0.50s"><span class="road-node"><i class="fas fa-language"></i></span><div class="road-card"><span class="road-num">03</span><h3>محتوى عربي</h3><p>خبرة فعلية في بناء واجهات RTL ومحتوى عربي معقّد بسلاسة.</p></div></li>
 <li class="road-step" style="--sc:#ffc46b;--d:0.75s"><span class="road-node"><i class="fas fa-rocket"></i></span><div class="road-card"><span class="road-num">04</span><h3>جاهز للعمل</h3><p>متاح للمشاريع الحرة، وأتواصل بوضوح من أول بريف للتسليم.</p></div></li>
 </ol></div>
+      </div>
+    </section>
+
+    <section id="certificates" class="py-24 border-b border-line">
+      <div class="container mx-auto px-6 max-w-6xl">
+        <div class="mb-16">
+          <span class="mono badge text-cyan">// CERTIFICATES</span>
+          <h2 class="text-3xl md:text-4xl font-black text-white mt-2">شهاداتي</h2>
+        </div>
+
+        <div class="cert-slider" id="cert-slider" aria-roledescription="carousel" aria-label="شهاداتي">
+          <button id="cert-prev" type="button" class="rev-btn cert-arrow" aria-label="السابق"><i class="fas fa-chevron-right"></i></button>
+          <div id="cert-track" class="cert-track">
+            <p class="text-muted mono text-sm">جاري تحميل الشهادات...</p>
+          </div>
+          <button id="cert-next" type="button" class="rev-btn cert-arrow" aria-label="التالي"><i class="fas fa-chevron-left"></i></button>
+        </div>
+        <div id="cert-dots" class="cert-dots" role="tablist" aria-label="اختيار الشهادة"></div>
+        <p id="cert-empty" class="hidden text-center text-muted mono text-sm mt-4">لا توجد شهادات مضافة حتى الآن.</p>
       </div>
     </section>
 

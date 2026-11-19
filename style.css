@@ -1590,9 +1590,10 @@ body, .header-bar, .bg-panel, .art-card, .svc-card, .road-card { transition: bac
 .cert-track > p { margin: 0 auto; padding: 2rem 0; }
 .cert-slide {
   flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; margin: 0;
-  display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1rem;
-  background: var(--panel); border: 1px solid var(--line); border-radius: 22px;
+  display: grid; place-items: center; padding: 0;
+  background: transparent; border-radius: 22px;
 }
+.cert-slide img { max-width: 100%; height: auto; max-height: clamp(200px, 42vw, 400px); width: auto; object-fit: contain; border-radius: 14px; border: 1px solid var(--line); }
 .cert-img {
   width: 100%; height: clamp(240px, 52vw, 520px); display: grid; place-items: center;
   border-radius: 14px; background: rgba(var(--ink-rgb), .35); overflow: hidden;
@@ -1610,5 +1611,4 @@ body, .header-bar, .bg-panel, .art-card, .svc-card, .road-card { transition: bac
 @media (max-width: 640px) {
   .cert-arrow { position: absolute; z-index: 2; top: 40%; width: 2.3rem; height: 2.3rem; backdrop-filter: blur(6px); background: rgba(var(--ink-rgb), .7); }
   #cert-prev { right: .4rem; } #cert-next { left: .4rem; }
-  .cert-slide { padding: .6rem; }
 }

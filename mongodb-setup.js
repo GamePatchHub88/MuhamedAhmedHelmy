@@ -10,7 +10,7 @@ if (!d.getCollectionNames().includes("certificates")) {
     validator: {
       $jsonSchema: {
         bsonType: "object",
-        required: ["title", "image", "mime", "created_at"],
+        required: ["image", "mime", "created_at"],
         properties: {
           title: { bsonType: "string", maxLength: 120 },       // اسم الشهادة
           issuer: { bsonType: "string", maxLength: 120 },      // الجهة المانحة

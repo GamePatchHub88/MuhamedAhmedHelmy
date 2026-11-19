@@ -16,8 +16,8 @@
 const express = require("express");
 const { MongoClient, ObjectId, Binary } = require("mongodb");
 
-const MAX_IMAGE_BYTES = 1024 * 1024; // أقصى حجم للصورة بعد الضغط: 1MB
-const MAX_DIM = 1400; // أقصى بُعد (px) — يُطبّق أيضًا على السيرفر لو sharp متاح
+const MAX_IMAGE_BYTES = 400 * 1024; // أقصى حجم للصورة بعد الضغط: 400KB
+const MAX_DIM = 1000; // أقصى بُعد (px) — يُطبّق أيضًا على السيرفر لو sharp متاح
 
 let sharp = null;
 try { sharp = require("sharp"); } catch (_) { /* اختياري */ }
@@ -86,11 +86,11 @@ async function parseImage(dataUrl) {
   if (sharp) {
     // ضغط إضافي على السيرفر كطبقة أمان (لو الرفع تم بدون ضغط من المتصفح)
     try {
-      buf = await sharp(buf).rotate().resize({ width: MAX_DIM, height: MAX_DIM, fit: "inside", withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
+      buf = await sharp(buf).rotate().resize({ width: MAX_DIM, height: MAX_DIM, fit: "inside", withoutEnlargement: true }).webp({ quality: 70 }).toBuffer();
       mime = "image/webp";
     } catch (_) { throw new Error("تعذر قراءة الصورة"); }
   }
-  if (buf.length > MAX_IMAGE_BYTES) throw new Error("حجم الصورة كبير بعد الضغط (الحد 1MB)");
+  if (buf.length > MAX_IMAGE_BYTES) throw new Error("حجم الصورة كبير بعد الضغط (الحد 400KB)");
   return { buf, mime };
 }
 
@@ -117,7 +117,9 @@ const wrap = (fn) => (req, res) =>
 
 router.get("/", wrap(async (req, res) => {
   const col = await getCol();
-  const docs = await col.find({}, { projection: { image: 0 } }).sort({ order_index: 1, created_at: -1 }).toArray();
+  // العام: الشهادات التي لها صورة فقط — الأدمن (?all=1) يرى الكل لحذف أي سجل فارغ
+  const q = req.query.all === "1" ? {} : { size: { $gt: 0 } };
+  const docs = await col.find(q, { projection: { image: 0 } }).sort({ order_index: 1, created_at: -1 }).toArray();
   res.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
   res.json(docs.map(pub));
 }));
@@ -134,14 +136,12 @@ router.get("/:id/image", wrap(async (req, res) => {
 
 router.post("/", requireAdmin, json, wrap(async (req, res) => {
   const b = req.body || {};
-  const title = clean(b.title, 120);
-  if (!title) return res.status(400).json({ error: "اكتب اسم الشهادة" });
   let img;
   try { img = await parseImage(b.image); } catch (e) { return res.status(400).json({ error: e.message }); }
   const col = await getCol();
   const now = new Date();
   const r = await col.insertOne({
-    title, issuer: clean(b.issuer, 120), issued_at: clean(b.issued_at, 40),
+    title: "",
     order_index: parseInt(b.order_index, 10) || 0,
     image: new Binary(img.buf), mime: img.mime, size: img.buf.length,
     created_at: now, updated_at: now,
@@ -154,9 +154,6 @@ router.put("/:id", requireAdmin, json, wrap(async (req, res) => {
   if (!_id) return res.status(404).json({ error: "not found" });
   const b = req.body || {};
   const set = { updated_at: new Date() };
-  if (b.title !== undefined) { set.title = clean(b.title, 120); if (!set.title) return res.status(400).json({ error: "اكتب اسم الشهادة" }); }
-  if (b.issuer !== undefined) set.issuer = clean(b.issuer, 120);
-  if (b.issued_at !== undefined) set.issued_at = clean(b.issued_at, 40);
   if (b.order_index !== undefined) set.order_index = parseInt(b.order_index, 10) || 0;
   if (b.image) {
     try { const img = await parseImage(b.image); set.image = new Binary(img.buf); set.mime = img.mime; set.size = img.buf.length; }
@@ -172,7 +169,7 @@ router.delete("/:id", requireAdmin, wrap(async (req, res) => {
   const _id = toId(req.params.id);
   if (!_id) return res.status(404).json({ error: "not found" });
   const col = await getCol();
-  await col.deleteOne({ _id });
+  await col.deleteOne({ $or: [{ _id }, { _id: req.params.id }] });
   res.json({ ok: true });
 }));
 

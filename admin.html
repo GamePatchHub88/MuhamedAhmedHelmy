@@ -901,20 +901,8 @@
 
           <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
             <h2 id="cert-form-title" class="text-lg font-bold text-white mb-1">إضافة شهادة جديدة</h2>
-            <p class="text-xs text-muted mb-6">هتظهر في قسم "شهاداتي" كسلايدر. الصورة بتتصغّر وتتضغط تلقائيًا قبل الرفع (حد أقصى 1400px) عشان متبقاش تقيلة على الأجهزة.</p>
+            <p class="text-xs text-muted mb-6">هتظهر في قسم "شهاداتي" كسلايدر. الصورة بتتصغّر وتتضغط تلقائيًا قبل الرفع (حد أقصى 1000px) عشان متبقاش تقيلة على الأجهزة.</p>
 
-            <div class="mb-5">
-              <label class="admin-label">اسم الشهادة</label>
-              <input id="cert-title" type="text" maxlength="120" class="admin-input" placeholder="مثال: Google Cybersecurity Certificate" />
-            </div>
-            <div class="mb-5">
-              <label class="admin-label">الجهة المانحة (اختياري)</label>
-              <input id="cert-issuer" type="text" maxlength="120" class="admin-input" placeholder="مثال: Coursera" />
-            </div>
-            <div class="mb-5">
-              <label class="admin-label">التاريخ (اختياري)</label>
-              <input id="cert-date" type="text" maxlength="40" class="admin-input" placeholder="مثال: مارس 2026" />
-            </div>
             <div class="mb-5">
               <label class="admin-label">الترتيب (الأصغر يظهر أولًا)</label>
               <input id="cert-order" type="number" class="admin-input" value="0" />
@@ -4954,8 +4942,7 @@
 
       /* ---------- Certificates (شهاداتي — MongoDB عبر /api/certificates) ---------- */
       const certEl = {
-        title: document.getElementById("cert-title"), issuer: document.getElementById("cert-issuer"),
-        date: document.getElementById("cert-date"), order: document.getElementById("cert-order"),
+        order: document.getElementById("cert-order"),
         file: document.getElementById("cert-file"), prev: document.getElementById("cert-preview"),
         prevImg: document.getElementById("cert-preview-img"), prevInfo: document.getElementById("cert-preview-info"),
         save: document.getElementById("cert-save-btn"), cancel: document.getElementById("cert-cancel-btn"),
@@ -4969,7 +4956,7 @@
       const fmtKB = (n) => (n / 1024 < 1024 ? Math.round(n / 1024) + " KB" : (n / 1048576).toFixed(2) + " MB");
 
       /* تصغير الأبعاد + ضغط (WebP، أو JPEG لو المتصفح لا يدعم WebP) حتى الوصول لحجم مناسب */
-      async function compressImage(file, maxDim = 1400, targetBytes = 300 * 1024) {
+      async function compressImage(file, maxDim = 1000, targetBytes = 120 * 1024) {
         const bmp = await createImageBitmap(file).catch(() => null);
         if (!bmp) throw new Error("تعذر قراءة الصورة");
         const k = Math.min(1, maxDim / Math.max(bmp.width, bmp.height));
@@ -4980,9 +4967,9 @@
         if (bmp.close) bmp.close();
         const toBlob = (type, q) => new Promise((res) => cv.toBlob(res, type, q));
         let type = "image/webp";
-        let blob = await toBlob(type, 0.85);
+        let blob = await toBlob(type, 0.75);
         if (!blob || blob.type !== "image/webp") { type = "image/jpeg"; blob = await toBlob(type, 0.85); }
-        for (let q = 0.75; blob && blob.size > targetBytes && q >= 0.4; q -= 0.1) blob = await toBlob(type, q);
+        for (let q = 0.65; blob && blob.size > targetBytes && q >= 0.3; q -= 0.1) blob = await toBlob(type, q);
         if (!blob) throw new Error("فشل ضغط الصورة");
         const dataUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
         return { dataUrl, size: blob.size, w, h };
@@ -5009,7 +4996,6 @@
 
       function resetCertForm() {
         editingCert = null; certImage = null;
-        certEl.title.value = certEl.issuer.value = certEl.date.value = "";
         certEl.order.value = 0; certEl.file.value = ""; certEl.prev.hidden = true;
         certEl.formTitle.textContent = "إضافة شهادة جديدة";
         certEl.save.querySelector("span").textContent = "إضافة الشهادة";
@@ -5018,10 +5004,8 @@
       certEl.cancel.addEventListener("click", resetCertForm);
 
       certEl.save.addEventListener("click", async () => {
-        const title = certEl.title.value.trim();
-        if (!title) return toast("اكتب اسم الشهادة", false);
         if (!editingCert && !certImage) return toast("اختر صورة الشهادة", false);
-        const body = { title, issuer: certEl.issuer.value.trim(), issued_at: certEl.date.value.trim(), order_index: parseInt(certEl.order.value, 10) || 0 };
+        const body = { order_index: parseInt(certEl.order.value, 10) || 0 };
         if (certImage) body.image = certImage;
         certEl.save.disabled = true;
         try {
@@ -5040,7 +5024,7 @@
       async function loadCerts() {
         certEl.list.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
         try {
-          const res = await fetch(STUDENTS_API + "/certificates", { cache: "no-store" });
+          const res = await fetch(STUDENTS_API + "/certificates?all=1", { cache: "no-store" });
           if (!res.ok) throw new Error("http " + res.status);
           certsCache = await res.json();
         } catch (e) {
@@ -5052,11 +5036,11 @@
         certEl.list.innerHTML = certsCache.map((c) => `
           <div class="item-row${editingCert === c.id ? " is-editing" : ""}">
             <div class="flex items-center gap-3" style="min-width: 0">
-              <img src="${escapeHtml(c.image_url)}" class="item-thumb" alt="" loading="lazy" />
+              <img src="${escapeHtml(c.image_url)}" class="item-thumb" alt="" loading="lazy" onerror="this.style.visibility='hidden'" />
               <input type="number" data-cid="${c.id}" class="cert-order admin-input" value="${c.order_index}" style="width:4.5rem" />
               <div style="min-width: 0">
-                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">${escapeHtml(c.title)}</div>
-                <div class="mono text-xs text-muted">${escapeHtml(c.issuer || "")} · ${fmtKB(c.size)}</div>
+                <div class="text-sm font-bold text-white" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px">شهادة ${certsCache.indexOf(c) + 1}</div>
+                <div class="mono text-xs text-muted">${c.size ? fmtKB(c.size) : "بدون صورة"}</div>
               </div>
             </div>
             <div class="flex items-center gap-3">
@@ -5075,12 +5059,12 @@
           const c = certsCache.find((x) => x.id === b.dataset.cid);
           if (!c) return;
           editingCert = c.id; certImage = null; certEl.file.value = "";
-          certEl.title.value = c.title; certEl.issuer.value = c.issuer || ""; certEl.date.value = c.issued_at || ""; certEl.order.value = c.order_index;
+          certEl.order.value = c.order_index;
           certEl.prevImg.src = c.image_url; certEl.prevInfo.textContent = "الصورة الحالية — اختر صورة جديدة لو عايز تغيّرها"; certEl.prev.hidden = false;
           certEl.formTitle.textContent = "تعديل الشهادة";
           certEl.save.querySelector("span").textContent = "حفظ التعديل";
           certEl.cancel.hidden = false;
-          certEl.title.scrollIntoView({ behavior: "smooth", block: "center" });
+          certEl.order.scrollIntoView({ behavior: "smooth", block: "center" });
         }));
         certEl.list.querySelectorAll(".cert-del").forEach((b) => b.addEventListener("click", async () => {
           if (!confirm("متأكد إنك عايز تحذف الشهادة دي؟")) return;

@@ -220,7 +220,16 @@ function renderReviews(data) {
     if (slides.length > 1 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setInterval(() => show(idx + 1), 6000);
   };
 
+  function rebuild() {
+    slides = Array.from(track.children).filter((s) => s.classList.contains("cert-slide"));
+    const multi = slides.length > 1;
+    prev.hidden = next.hidden = !multi;
+    dotsBox.innerHTML = multi ? slides.map((_, i) => `<button type="button" aria-label="الشهادة ${i + 1}"${i === 0 ? ' class="on"' : ""}></button>`).join("") : "";
+    if (!slides.length) empty.classList.remove("hidden");
+  }
+
   function render(data) {
+    data = (data || []).filter((c) => c && c.image_url);
     clearInterval(timer);
     if (!data || !data.length) {
       track.innerHTML = "";
@@ -233,13 +242,10 @@ function renderReviews(data) {
     track.innerHTML = data
       .map((c, i) => `
         <figure class="cert-slide" aria-roledescription="slide" aria-label="${i + 1} / ${data.length}">
-          <div class="cert-img"><img src="${escapeHtml(safeUrl(c.image_url))}" alt="${escapeHtml(c.title)}" ${i ? 'loading="lazy"' : ""} decoding="async" /></div>
-          <figcaption class="cert-cap">
-            <h3>${escapeHtml(c.title)}</h3>
-            ${c.issuer || c.issued_at ? `<p>${escapeHtml([c.issuer, c.issued_at].filter(Boolean).join(" • "))}</p>` : ""}
-          </figcaption>
+          <img src="${escapeHtml(safeUrl(c.image_url))}" alt="شهادة ${i + 1}" ${i ? 'loading="lazy"' : ""} decoding="async" />
         </figure>`)
       .join("");
+    track.querySelectorAll("img").forEach((im) => im.addEventListener("error", () => { im.closest(".cert-slide").remove(); rebuild(); }));
     slides = Array.from(track.children);
     const multi = slides.length > 1;
     prev.hidden = next.hidden = !multi;
@@ -262,7 +268,7 @@ function renderReviews(data) {
   track.addEventListener("pointerleave", start);
   track.addEventListener("touchstart", () => clearInterval(timer), { passive: true });
 
-  const KEY = "certs:v1";
+  const KEY = "certs:v2";
   let cached = null;
   try { cached = sessionStorage.getItem(KEY); if (cached) render(JSON.parse(cached)); } catch (_) {}
   fetch("/api/certificates")

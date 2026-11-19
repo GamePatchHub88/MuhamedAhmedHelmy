@@ -909,10 +909,18 @@
             </div>
             <div class="mb-2">
               <label class="admin-label">صورة الشهادة</label>
-              <input id="cert-file" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input" />
+              <input id="cert-file" type="file" accept="image/jpeg,image/png,image/webp" multiple class="admin-input" />
+              <p id="cert-multi-hint" class="text-xs text-muted mt-2">تقدر تختار عدة صور مرة واحدة (Ctrl/Shift أو تحديد متعدد) وهتترفع كلها بالترتيب.</p>
               <div id="cert-preview" class="mt-3" hidden>
                 <img id="cert-preview-img" alt="معاينة" style="max-width:100%;max-height:220px;border-radius:12px;border:1px solid var(--line)" />
                 <div id="cert-preview-info" class="mono text-xs text-muted mt-2"></div>
+              </div>
+              <div id="cert-batch" class="mt-3" hidden>
+                <div id="cert-batch-info" class="mono text-xs text-muted mb-2"></div>
+                <div id="cert-batch-bar" style="height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:12px">
+                  <div id="cert-batch-fill" style="height:100%;width:0;background:var(--cyan);transition:width .2s"></div>
+                </div>
+                <div id="cert-batch-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px"></div>
               </div>
             </div>
 
@@ -4948,8 +4956,13 @@
         save: document.getElementById("cert-save-btn"), cancel: document.getElementById("cert-cancel-btn"),
         list: document.getElementById("certs-list"), count: document.getElementById("certs-count"),
         formTitle: document.getElementById("cert-form-title"),
+        batch: document.getElementById("cert-batch"), batchInfo: document.getElementById("cert-batch-info"),
+        batchFill: document.getElementById("cert-batch-fill"), batchGrid: document.getElementById("cert-batch-grid"),
+        multiHint: document.getElementById("cert-multi-hint"),
       };
       let certImage = null; // dataURL بعد الضغط
+      let certBatch = []; // رفع جماعي: [{ file, dataUrl, size, w, h, status, el }]
+      let certBusy = false;
       let certsCache = [];
       let editingCert = null;
 
@@ -4975,27 +4988,111 @@
         return { dataUrl, size: blob.size, w, h };
       }
 
+      function clearCertBatch() {
+        certBatch = [];
+        certEl.batch.hidden = true;
+        certEl.batchGrid.innerHTML = "";
+        certEl.batchFill.style.width = "0";
+        certEl.batchInfo.textContent = "";
+      }
+
+      const BATCH_ICON = { wait: "⏳", ready: "", up: "⬆️", ok: "✅", err: "❌" };
+      function paintBatchItem(it) {
+        if (!it.el) return;
+        it.el.querySelector(".cb-st").textContent = BATCH_ICON[it.status] || "";
+        it.el.style.outline = it.status === "err" ? "2px solid #f87171" : it.status === "ok" ? "2px solid #34d399" : "none";
+        it.el.title = it.err ? it.name + " — " + it.err : it.name;
+      }
+      function updateBatchInfo() {
+        const total = certBatch.length;
+        const ok = certBatch.filter((x) => x.status === "ok").length;
+        const err = certBatch.filter((x) => x.status === "err").length;
+        const bad = certBatch.filter((x) => x.status === "bad").length;
+        const done = ok + err;
+        const sumKB = certBatch.reduce((a, x) => a + (x.size || 0), 0);
+        certEl.batchInfo.textContent = certBusy
+          ? `جاري الرفع... ${done} / ${total}` + (err ? ` (فشل ${err})` : "")
+          : `${total} صورة جاهزة — الإجمالي بعد الضغط ${fmtKB(sumKB)}` + (ok ? ` — تم رفع ${ok}` : "") + (err ? ` — فشل ${err}` : "") + (bad ? ` — تم تجاهل ${bad}` : "");
+        certEl.batchFill.style.width = total ? Math.round((done / total) * 100) + "%" : "0";
+      }
+
+      /* تشغيل مهام بالتوازي بحد أقصى (limit) */
+      async function runPool(items, limit, worker) {
+        let i = 0;
+        const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
+          while (i < items.length) { const it = items[i++]; await worker(it); }
+        });
+        await Promise.all(runners);
+      }
+
       certEl.file.addEventListener("change", async () => {
-        const f = certEl.file.files[0];
+        const all = Array.from(certEl.file.files || []);
         certImage = null;
         certEl.prev.hidden = true;
-        if (!f) return;
-        if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { certEl.file.value = ""; return toast("الصيغ المسموحة: JPG / PNG / WEBP", false); }
-        try {
-          certEl.prevInfo.textContent = "جاري الضغط...";
-          certEl.prev.hidden = false;
-          const r = await compressImage(f);
-          certImage = r.dataUrl;
-          certEl.prevImg.src = r.dataUrl;
-          certEl.prevInfo.textContent = `${fmtKB(f.size)} ← ${fmtKB(r.size)} (${r.w}×${r.h})`;
-        } catch (e) {
-          certEl.prev.hidden = true;
-          toast(e.message, false);
+        clearCertBatch();
+        if (!all.length) return;
+
+        const files = all.filter((f) => /^image\/(jpeg|png|webp)$/.test(f.type));
+        const skipped = all.length - files.length;
+        if (!files.length) { certEl.file.value = ""; return toast("الصيغ المسموحة: JPG / PNG / WEBP", false); }
+        if (skipped) toast(`تم تجاهل ${skipped} ملف (الصيغ المسموحة: JPG / PNG / WEBP)`, false);
+
+        // وضع التعديل أو صورة واحدة: نفس السلوك القديم
+        if (editingCert || files.length === 1) {
+          const f = files[0];
+          try {
+            certEl.prevInfo.textContent = "جاري الضغط...";
+            certEl.prev.hidden = false;
+            const r = await compressImage(f);
+            certImage = r.dataUrl;
+            certEl.prevImg.src = r.dataUrl;
+            certEl.prevInfo.textContent = `${fmtKB(f.size)} ← ${fmtKB(r.size)} (${r.w}×${r.h})`;
+          } catch (e) {
+            certEl.prev.hidden = true;
+            toast(e.message, false);
+          }
+          if (editingCert && files.length > 1) toast("في وضع التعديل بتتغيّر صورة واحدة فقط — اتاخدت أول صورة", false);
+          return;
         }
+
+        // وضع الرفع الجماعي
+        certBatch = files.map((f, i) => ({ idx: i, file: f, name: f.name, status: "wait", dataUrl: null, size: 0, el: null }));
+        certEl.batch.hidden = false;
+        certEl.batchGrid.innerHTML = certBatch.map((it, i) => `
+          <div class="cb-item" data-i="${i}" style="position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);aspect-ratio:1/1;background:rgba(255,255,255,.03)">
+            <img alt="" style="width:100%;height:100%;object-fit:cover;display:none" />
+            <span class="cb-st" style="position:absolute;top:4px;inset-inline-start:6px;font-size:14px"></span>
+            <span style="position:absolute;bottom:0;inset-inline:0;background:rgba(0,0,0,.55);color:#fff;font-size:10px;text-align:center;padding:2px 0">${i + 1}</span>
+          </div>`).join("");
+        certEl.batchGrid.querySelectorAll(".cb-item").forEach((el) => { certBatch[+el.dataset.i].el = el; });
+        certBatch.forEach(paintBatchItem);
+        certEl.batchInfo.textContent = `جاري ضغط ${files.length} صورة...`;
+        certBusy = true;
+        certEl.save.disabled = true;
+        const myBatch = certBatch;
+        try {
+          await runPool(myBatch, 3, async (it) => {
+            try {
+              const r = await compressImage(it.file);
+              it.dataUrl = r.dataUrl; it.size = r.size; it.status = "ready";
+              const img = it.el.querySelector("img"); img.src = r.dataUrl; img.style.display = "block";
+            } catch (e) {
+              it.status = "bad"; it.err = e.message;
+              it.el.style.opacity = ".4";
+            }
+            paintBatchItem(it);
+          });
+        } finally {
+          if (certBatch === myBatch) { certBusy = false; certEl.save.disabled = false; }
+        }
+        if (certBatch !== myBatch) return;
+        const okN = myBatch.filter((x) => x.status === "ready").length;
+        updateBatchInfo();
+        certEl.save.querySelector("span").textContent = okN > 1 ? `رفع ${okN} شهادة` : "إضافة الشهادة";
       });
 
       function resetCertForm() {
-        editingCert = null; certImage = null;
+        editingCert = null; certImage = null; clearCertBatch();
         certEl.order.value = 0; certEl.file.value = ""; certEl.prev.hidden = true;
         certEl.formTitle.textContent = "إضافة شهادة جديدة";
         certEl.save.querySelector("span").textContent = "إضافة الشهادة";
@@ -5004,6 +5101,48 @@
       certEl.cancel.addEventListener("click", resetCertForm);
 
       certEl.save.addEventListener("click", async () => {
+        if (certBusy) return;
+
+        // رفع جماعي
+        const queue = certBatch.filter((x) => x.status === "ready" || x.status === "err");
+        if (!editingCert && queue.length) {
+          const startOrder = parseInt(certEl.order.value, 10) || 0;
+          // الترتيب النهائي حسب ترتيب الاختيار (حتى لو بعض الصور فشلت وتتعاد)
+          certBusy = true;
+          certEl.save.disabled = true;
+          certEl.cancel.hidden = true;
+          queue.forEach((it) => { it.status = "wait"; it.err = ""; paintBatchItem(it); });
+          updateBatchInfo();
+          await runPool(queue, 3, async (it) => {
+            it.status = "up"; paintBatchItem(it);
+            try {
+              await sApi("/certificates", { method: "POST", body: { order_index: startOrder + it.idx, image: it.dataUrl } });
+              it.status = "ok";
+            } catch (e) {
+              it.status = "err"; it.err = e.message;
+            }
+            paintBatchItem(it);
+            updateBatchInfo();
+          });
+          certBusy = false;
+          certEl.save.disabled = false;
+          const okN = certBatch.filter((x) => x.status === "ok").length;
+          const errN = certBatch.filter((x) => x.status === "err").length;
+          updateBatchInfo();
+          loadCerts();
+          if (!errN) {
+            toast(`تم رفع ${okN} شهادة ✅`, true);
+            setTimeout(resetCertForm, 1200);
+          } else {
+            // نبقي الفاشلة فقط جاهزة لإعادة المحاولة
+            toast(`تم رفع ${okN} وفشل ${errN} — دوس الزر لإعادة محاولة الفاشلة`, false);
+            certBatch = certBatch.filter((x) => x.status === "err");
+            certEl.save.querySelector("span").textContent = `إعادة رفع ${errN} فاشلة`;
+          }
+          return;
+        }
+
+        // إضافة/تعديل صورة واحدة (السلوك القديم)
         if (!editingCert && !certImage) return toast("اختر صورة الشهادة", false);
         const body = { order_index: parseInt(certEl.order.value, 10) || 0 };
         if (certImage) body.image = certImage;
@@ -5058,7 +5197,7 @@
         certEl.list.querySelectorAll(".cert-edit").forEach((b) => b.addEventListener("click", () => {
           const c = certsCache.find((x) => x.id === b.dataset.cid);
           if (!c) return;
-          editingCert = c.id; certImage = null; certEl.file.value = "";
+          editingCert = c.id; certImage = null; certEl.file.value = ""; clearCertBatch();
           certEl.order.value = c.order_index;
           certEl.prevImg.src = c.image_url; certEl.prevInfo.textContent = "الصورة الحالية — اختر صورة جديدة لو عايز تغيّرها"; certEl.prev.hidden = false;
           certEl.formTitle.textContent = "تعديل الشهادة";

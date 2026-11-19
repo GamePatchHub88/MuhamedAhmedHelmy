@@ -83,7 +83,8 @@ async function parseImage(dataUrl) {
   let buf = Buffer.from(m[1], "base64");
   let mime = sniff(buf);
   if (!mime) throw new Error("الملف ليس صورة صالحة");
-  if (sharp) {
+  const alreadySmall = buf.length <= MAX_IMAGE_BYTES && (mime === "image/webp" || mime === "image/jpeg");
+  if (sharp && !alreadySmall) {
     // ضغط إضافي على السيرفر كطبقة أمان (لو الرفع تم بدون ضغط من المتصفح)
     try {
       buf = await sharp(buf).rotate().resize({ width: MAX_DIM, height: MAX_DIM, fit: "inside", withoutEnlargement: true }).webp({ quality: 70 }).toBuffer();
@@ -112,7 +113,8 @@ const json = express.json({ limit: "2mb" });
 const wrap = (fn) => (req, res) =>
   fn(req, res).catch((e) => {
     console.error("certificates:", e.message);
-    res.status(e.status || 500).json({ error: e.status ? e.message : "server error" });
+    const detail = req.method !== "GET" ? String(e.message || e).slice(0, 200) : "";
+    res.status(e.status || 500).json({ error: e.status ? e.message : "server error" + (detail ? ": " + detail : "") });
   });
 
 router.get("/", wrap(async (req, res) => {

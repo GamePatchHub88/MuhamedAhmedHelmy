@@ -752,6 +752,53 @@
       .me.full .me-panes { flex: 1; min-height: 0; }
       .me.full .me-input, .me.full .me-preview { height: 100%; resize: none; }
       .me.full[data-view="split"] .me-panes { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    
+      /* ---------- سرعة الموقع ---------- */
+      #tab-speed .sp-opts { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1rem; }
+      #tab-speed .sp-opts label { display: flex; flex-direction: column; gap: .35rem; font-size: .74rem; font-weight: 700; color: var(--muted); }
+      #tab-speed .sp-opts label.grow { flex: 1 1 260px; }
+      #tab-speed .sp-opts .hx-sel { font-size: .8rem; padding: .45rem .7rem; width: 100%; }
+      #tab-speed .hx-card h3 { display: flex; align-items: center; gap: .5rem; font-size: .92rem; font-weight: 800; margin-bottom: .8rem; }
+      #tab-speed .hx-card h3 i { color: var(--hx); }
+      #tab-speed .sp-empty ul { margin: 0 0 .8rem; padding-inline-start: 1.1rem; display: grid; gap: .4rem; font-size: .82rem; line-height: 1.9; color: var(--fog); list-style: disc; }
+      #tab-speed .sp-empty p { font-size: .8rem; color: var(--muted); line-height: 1.9; }
+      #tab-speed .sp-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+      @media (max-width: 900px) { #tab-speed .sp-grid2 { grid-template-columns: minmax(0, 1fr); } }
+      #tab-speed .sp-scroll { overflow-x: auto; }
+      .sp-progwrap { margin-bottom: 1rem; }
+      .sp-step { font-size: .78rem; font-weight: 700; color: var(--hx); margin-bottom: .4rem; }
+      .sp-prog { height: 6px; border-radius: 99px; background: var(--panel2); overflow: hidden; }
+      .sp-prog i { display: block; height: 100%; width: 0; background: var(--hx); transition: width .35s ease; }
+      .sp-cause { border: 1px solid var(--line); border-radius: 12px; padding: .7rem .95rem; margin-bottom: .55rem; background: var(--panel2); }
+      .sp-cause.bad { border-color: rgba(255, 92, 122, .55); } .sp-cause.warn { border-color: rgba(255, 184, 77, .5); }
+      .sp-cause.ok { border-color: rgba(var(--hx-rgb), .4); }
+      .sp-cause .h { display: flex; align-items: center; gap: .6rem; font-weight: 800; font-size: .84rem; color: var(--fog); }
+      .sp-cause.bad .h i { color: var(--hx-bad); } .sp-cause.warn .h i { color: var(--hx-warn); }
+      .sp-cause.ok .h i { color: var(--hx); } .sp-cause.info .h i { color: var(--cyan); }
+      .sp-cause .e, .sp-cause .f { font-size: .76rem; line-height: 1.85; margin-top: .3rem; overflow-wrap: anywhere; }
+      .sp-cause .e { color: var(--muted); } .sp-cause .f { color: var(--fog); }
+      .sp-cause .f b { color: var(--hx); }
+      .sp-bar { display: grid; grid-template-columns: 9.5rem 1fr 4.6rem; align-items: center; gap: .6rem; font-size: .74rem; margin-bottom: .45rem; }
+      .sp-bar .n { color: var(--muted); font-weight: 700; }
+      .sp-bar .t { height: 8px; border-radius: 99px; background: var(--panel2); overflow: hidden; direction: ltr; }
+      .sp-bar .t i { display: block; height: 100%; border-radius: 99px; background: var(--hx); }
+      .sp-bar .t i.warn { background: var(--hx-warn); } .sp-bar .t i.bad { background: var(--hx-bad); }
+      .sp-bar .v { text-align: end; font-weight: 700; }
+      .sp-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .8rem; }
+      .sp-chip { font-size: .7rem; font-weight: 700; padding: .2rem .6rem; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
+      .sp-chip b { color: var(--hx); font-family: "JetBrains Mono", monospace; direction: ltr; unicode-bidi: plaintext; }
+      .sp-chip.warn b { color: var(--hx-warn); } .sp-chip.bad b { color: var(--hx-bad); }
+      .sp-kv { display: grid; grid-template-columns: auto 1fr; gap: .3rem 1rem; font-size: .76rem; }
+      .sp-kv dt { color: var(--muted); font-weight: 700; } .sp-kv dd { margin: 0; font-weight: 700; text-align: end; direction: ltr; unicode-bidi: plaintext; }
+      .sp-kv dd.warn { color: var(--hx-warn); } .sp-kv dd.bad { color: var(--hx-bad); } .sp-kv dd.ok { color: var(--hx); }
+      .sp-t { width: 100%; border-collapse: collapse; font-size: .74rem; }
+      .sp-t th { text-align: start; color: var(--muted); font-weight: 700; padding: .3rem .5rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+      .sp-t td { padding: .38rem .5rem; border-bottom: 1px solid rgba(128, 128, 160, .12); vertical-align: middle; }
+      .sp-t td.m { font-family: "JetBrains Mono", monospace; direction: ltr; unicode-bidi: plaintext; white-space: nowrap; }
+      .sp-t td.u { direction: ltr; unicode-bidi: plaintext; max-width: 16rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .sp-t .warn { color: var(--hx-warn); } .sp-t .bad { color: var(--hx-bad); } .sp-t .ok { color: var(--hx); }
+      .sp-tag { font-size: .62rem; font-weight: 800; padding: .08rem .45rem; border-radius: 99px; background: rgba(var(--hx-rgb), .12); color: var(--hx); }
+      @media (max-width: 640px) { .sp-bar { grid-template-columns: 6.5rem 1fr 4rem; } }
     </style>
   </head>
   <body class="bg-ink text-fog antialiased">
@@ -835,6 +882,9 @@
           </button>
           <button class="tab-btn" data-tab="students">
             <i class="fas fa-graduation-cap"></i> موقع الحلول <span id="sol-tab-badge" class="sol-badge" hidden>0</span>
+          </button>
+          <button class="tab-btn" data-tab="speed">
+            <i class="fas fa-gauge-high"></i> سرعة الموقع
           </button>
         </div>
 
@@ -1523,6 +1573,85 @@
             </div>
           </div>
 
+        </div>
+
+        <!-- ===================== SPEED TAB (قياس سرعة الموقع وأسباب البطء) ===================== -->
+        <div class="tab-panel hx" id="tab-speed">
+          <div class="hx-term">
+            <div><span class="p">root@speed:~#</span> <span>diagnose --site --api --db</span><span class="blink">_</span></div>
+            <div class="r">
+              <span id="sp-status" class="hx-live off"><i></i> IDLE</span>
+              <span id="sp-time" class="mono">--:--:--</span>
+              <button id="sp-run" class="hx-btn on" type="button"><i class="fas fa-play"></i> ابدأ القياس</button>
+              <button id="sp-copy" class="hx-btn" type="button" disabled><i class="fas fa-copy"></i> نسخ التقرير</button>
+            </div>
+          </div>
+
+          <div class="hx-card sp-opts">
+            <label>الصفحة المراد تحليلها
+              <select id="sp-page" class="hx-sel">
+                <option value="/">الصفحة الرئيسية</option>
+                <option value="/articles.html">صفحة المقالات</option>
+              </select>
+            </label>
+            <label class="grow">رابط إضافي للقياس (اختياري، مثل موقع الحلول)
+              <input id="sp-custom" class="hx-sel" type="url" placeholder="https://example.com" spellcheck="false" />
+            </label>
+          </div>
+
+          <div id="sp-prog" class="sp-progwrap" hidden>
+            <div id="sp-step" class="sp-step"></div>
+            <div class="sp-prog"><i id="sp-bar"></i></div>
+          </div>
+
+          <div id="sp-empty" class="hx-card sp-empty">
+            <h3><i class="fas fa-stethoscope"></i> ماذا يقيس هذا القسم؟</h3>
+            <ul>
+              <li><b>الخادم وقاعدة البيانات:</b> بداية الدالة الباردة (Cold Start)، زمن الاتصال والقراءة من MongoDB، حجم المجموعات، وزمن Supabase.</li>
+              <li><b>تحميل الصفحة فعليًا من متصفحك:</b> TTFB وFCP وLCP وCLS، ومراحل التحميل، وأثقل وأبطأ الملفات.</li>
+              <li><b>استجابة الروابط وواجهات الـ API:</b> ثلاث محاولات لكل رابط مع حالة الكاش على CDN.</li>
+              <li><b>تحليل كود الصفحة:</b> سكربتات تحجب العرض، نطاقات خارجية، صور بلا أبعاد، حجم الـ HTML.</li>
+            </ul>
+            <p>بعد القياس تظهر قائمة <b>أسباب البطء المحتملة</b> مرتبة بالأخطر، مع الدليل المقاس وطريقة الإصلاح. القياس يتم من جهازك وشبكتك الحالية، فجرّبه أيضًا من الموبايل.</p>
+          </div>
+
+          <div id="sp-out" hidden>
+            <div id="sp-kpis" class="hx-kpis"></div>
+            <section class="hx-card" style="margin-bottom:1rem">
+              <h3><i class="fas fa-triangle-exclamation"></i> أسباب البطء المحتملة</h3>
+              <div id="sp-causes"></div>
+            </section>
+            <div class="sp-grid2">
+              <section class="hx-card">
+                <h3><i class="fas fa-stopwatch"></i> مراحل تحميل الصفحة</h3>
+                <div id="sp-phases"></div>
+              </section>
+              <section class="hx-card">
+                <h3><i class="fas fa-server"></i> الخادم وقاعدة البيانات</h3>
+                <div id="sp-srv"></div>
+              </section>
+            </div>
+            <section class="hx-card" style="margin-bottom:1rem">
+              <h3><i class="fas fa-network-wired"></i> زمن استجابة الروابط (3 محاولات)</h3>
+              <div id="sp-probes" class="sp-scroll"></div>
+            </section>
+            <div class="sp-grid2">
+              <section class="hx-card">
+                <h3><i class="fas fa-weight-hanging"></i> أثقل الملفات</h3>
+                <div id="sp-heavy" class="sp-scroll"></div>
+              </section>
+              <section class="hx-card">
+                <h3><i class="fas fa-hourglass-half"></i> أبطأ الملفات</h3>
+                <div id="sp-slow" class="sp-scroll"></div>
+              </section>
+            </div>
+            <section class="hx-card">
+              <h3><i class="fas fa-clock-rotate-left"></i> آخر القياسات
+                <button id="sp-clear" class="hx-btn danger" type="button" style="margin-inline-start:auto"><i class="fas fa-trash"></i> مسح</button>
+              </h3>
+              <div id="sp-hist" class="sp-scroll"></div>
+            </section>
+          </div>
         </div>
       </main>
     </div>
@@ -5220,6 +5349,419 @@
 
       checkSession();
     </script>
+  <script>
+    /* =========================================================
+       سرعة الموقع: قياس حي من المتصفح + الخادم، ثم تشخيص أسباب البطء
+    ========================================================= */
+    (function () {
+      "use strict";
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) => escapeHtml(s);
+      const isNum = (n) => typeof n === "number" && isFinite(n);
+      const ms = (n) => (!isNum(n) ? "—" : n >= 1000 ? (n / 1000).toFixed(2) + " s" : Math.round(n) + " ms");
+      const kb = (b) => (!isNum(b) ? "—" : b >= 1048576 ? (b / 1048576).toFixed(2) + " MB" : b >= 1024 ? Math.round(b / 1024) + " KB" : Math.round(b) + " B");
+      const med = (a) => {
+        a = a.filter(isNum).sort((x, y) => x - y);
+        if (!a.length) return null;
+        const m = a.length >> 1;
+        return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+      };
+      const lv = (v, w, b) => (!isNum(v) ? "" : v >= b ? "bad" : v >= w ? "warn" : "");
+      const short = (u, n) => {
+        n = n || 44;
+        try {
+          const x = new URL(u, location.href);
+          const t = (x.origin === location.origin ? "" : x.host) + x.pathname + x.search;
+          return t.length > n ? t.slice(0, n - 1) + "…" : t;
+        } catch (_) { return String(u).slice(0, n); }
+      };
+      const TYPE_AR = { css: "CSS", js: "JS", img: "صورة", font: "خط", api: "API", other: "أخرى" };
+      const rtype = (e) => {
+        const n = e.name.split("?")[0].toLowerCase();
+        if (/fonts\.googleapis\.com/.test(n) || /\.css$/.test(n)) return "css";
+        if (/\.m?js$/.test(n)) return "js";
+        if (/fonts\.gstatic\.com/.test(n) || /\.(woff2?|ttf|otf)$/.test(n)) return "font";
+        if (/\.(png|jpe?g|webp|gif|svg|avif|ico)$/.test(n) || e.initiatorType === "img") return "img";
+        if (e.initiatorType === "fetch" || e.initiatorType === "xmlhttprequest") return "api";
+        return "other";
+      };
+
+      /* ---------- طلب مع قياس الزمن ---------- */
+      async function fetchTimed(url, opt) {
+        opt = opt || {};
+        const ctl = new AbortController();
+        const to = setTimeout(() => ctl.abort(), 15000);
+        const t = performance.now();
+        try {
+          const r = await fetch(url, { cache: "no-store", headers: opt.headers, mode: opt.noCors ? "no-cors" : "cors", signal: ctl.signal });
+          const first = performance.now() - t;
+          if (opt.noCors) return { ms: first, size: null, status: 0, ok: true };
+          const size = (await r.arrayBuffer()).byteLength;
+          return {
+            ms: performance.now() - t, size, status: r.status, ok: r.ok,
+            cdn: r.headers.get("x-vercel-cache"), enc: r.headers.get("content-encoding"), type: r.headers.get("content-type") || "",
+          };
+        } catch (e) {
+          return { error: e.name === "AbortError" ? "انتهت المهلة (15 ث)" : e.message || "فشل الطلب" };
+        } finally { clearTimeout(to); }
+      }
+
+      /* ---------- تحميل صفحة داخل iframe مخفي وقراءة توقيتاتها ---------- */
+      async function collect(w) {
+        const perf = w.performance;
+        const nav = perf.getEntriesByType("navigation")[0];
+        if (!nav) throw new Error("المتصفح لم يعرض بيانات التوقيت");
+        const pos = (v) => (isNum(v) && v > 0 ? v : 0);
+        const nv = {
+          redirect: pos(nav.redirectEnd - nav.redirectStart),
+          dns: pos(nav.domainLookupEnd - nav.domainLookupStart),
+          tcp: pos((nav.secureConnectionStart > 0 ? nav.secureConnectionStart : nav.connectEnd) - nav.connectStart),
+          tls: nav.secureConnectionStart > 0 ? pos(nav.connectEnd - nav.secureConnectionStart) : 0,
+          ttfb: pos(nav.responseStart - nav.requestStart),
+          download: pos(nav.responseEnd - nav.responseStart),
+          dom: pos(nav.domInteractive - nav.responseEnd),
+          rest: pos(nav.loadEventEnd - nav.domInteractive),
+          load: pos(nav.loadEventEnd),
+          html: Math.max(nav.transferSize || 0, nav.encodedBodySize || 0),
+        };
+        const res = perf.getEntriesByType("resource").map((e) => ({
+          name: e.name, type: rtype(e), dur: e.duration, size: Math.max(e.transferSize || 0, e.encodedBodySize || 0),
+          wire: e.transferSize || 0, enc: e.encodedBodySize || 0, status: e.responseStatus || 0,
+        }));
+        const paint = {};
+        perf.getEntriesByType("paint").forEach((p) => { paint[p.name] = p.startTime; });
+        const o = { lcp: null, lcpEl: "", cls: 0, tbt: 0 };
+        const obs = [];
+        const watch = (type, cb) => {
+          try { const ob = new w.PerformanceObserver((l) => l.getEntries().forEach(cb)); ob.observe({ type, buffered: true }); obs.push(ob); } catch (_) { /* غير مدعوم */ }
+        };
+        watch("largest-contentful-paint", (e) => { o.lcp = e.startTime; o.lcpEl = e.element ? e.element.tagName.toLowerCase() + (e.url ? " " + short(e.url, 28) : "") : ""; });
+        watch("layout-shift", (e) => { if (!e.hadRecentInput) o.cls += e.value; });
+        watch("longtask", (e) => { o.tbt += Math.max(0, e.duration - 50); });
+        await new Promise((r) => setTimeout(r, 400));
+        obs.forEach((ob) => ob.disconnect());
+        const tot = { bytes: nv.html, count: res.length + 1, js: 0, css: 0, img: 0, font: 0, api: 0, other: 0 };
+        res.forEach((r) => { tot.bytes += r.size; tot[r.type] += r.size; });
+        const reval = res.filter((r) => r.status === 304 || (r.wire > 0 && r.wire < 350 && r.enc === 0)).length;
+        return { nv, res, tot, reval, fcp: paint["first-contentful-paint"], lcp: o.lcp, lcpEl: o.lcpEl, cls: o.cls, tbt: o.tbt, dom: w.document.getElementsByTagName("*").length };
+      }
+      function loadFrame(path) {
+        return new Promise((resolve) => {
+          const f = document.createElement("iframe");
+          let done = false, kill = null;
+          const finish = (r) => { if (done) return; done = true; clearTimeout(kill); f.remove(); resolve(r); };
+          kill = setTimeout(() => finish({ error: "انتهت مهلة تحميل الصفحة (30 ث)" }), 30000);
+          f.setAttribute("aria-hidden", "true");
+          f.tabIndex = -1;
+          f.style.cssText = "position:fixed;top:0;inset-inline-start:0;width:412px;height:820px;opacity:.01;pointer-events:none;z-index:-1;border:0";
+          f.onload = () => setTimeout(async () => {
+            try { finish(await collect(f.contentWindow)); } catch (e) { finish({ error: e.message || "تعذر قياس الصفحة" }); }
+          }, 1500);
+          f.src = path;
+          document.body.appendChild(f);
+        });
+      }
+
+      /* ---------- تحليل كود الـ HTML ---------- */
+      function audit(text) {
+        const d = new DOMParser().parseFromString(text, "text/html");
+        const out = { bytes: new Blob([text]).size, blocking: [], sheets: [], hosts: [], imgs: 0, imgLazy: 0, imgNoDim: 0, inlineJs: 0, inlineCss: 0, fontWeights: 0 };
+        const hosts = new Set();
+        const note = (u) => { try { const x = new URL(u, location.href); if (x.host !== location.host && /^https?:/.test(x.protocol)) hosts.add(x.host); } catch (_) {} };
+        const live = (el) => !el.closest("noscript");
+        d.querySelectorAll("script[src]").forEach((el) => {
+          if (!live(el)) return;
+          const src = el.getAttribute("src");
+          note(src);
+          if (el.closest("head") && !el.hasAttribute("defer") && !el.hasAttribute("async") && el.getAttribute("type") !== "module") out.blocking.push(src);
+        });
+        d.querySelectorAll('link[rel~="stylesheet"]').forEach((el) => {
+          if (!live(el)) return;
+          const href = el.getAttribute("href") || "";
+          note(href);
+          const media = el.getAttribute("media");
+          if (!media || media === "all" || media === "screen") out.sheets.push(href);
+        });
+        d.querySelectorAll('link[href*="fonts.googleapis.com"]').forEach((el) => {
+          if (!live(el)) return;
+          out.fontWeights += ((el.getAttribute("href") || "").match(/\b\d{3}\b/g) || []).length;
+        });
+        d.querySelectorAll("img").forEach((el) => {
+          if (!live(el)) return;
+          out.imgs++;
+          if (el.getAttribute("loading") === "lazy") out.imgLazy++;
+          if (!(el.getAttribute("width") && el.getAttribute("height"))) out.imgNoDim++;
+          note(el.getAttribute("src") || "");
+        });
+        d.querySelectorAll("script:not([src])").forEach((el) => { if (live(el) && el.getAttribute("type") !== "application/ld+json") out.inlineJs += el.textContent.length; });
+        d.querySelectorAll("style").forEach((el) => { if (live(el)) out.inlineCss += el.textContent.length; });
+        out.hosts = Array.from(hosts);
+        return out;
+      }
+
+      /* ---------- التشخيص: كل قاعدة تضيف سببًا بدليل وحل ---------- */
+      function diagnose(c) {
+        const F = [];
+        const add = (sev, t, e, f) => F.push({ sev, t, e, f });
+        const s1 = c.s1, s2 = c.s2 || c.s1;
+        const pg = c.page && !c.page.error ? c.page : null;
+
+        if (c.srvErr) add("warn", "تعذر قياس جهة الخادم", c.srvErr, "تأكد أن آخر نسخة من <b>students-server.js</b> منشورة على Vercel (المسار <b>/api/admin/speed</b>) وأنك مسجّل الدخول بحساب المدير.");
+        if (s1) {
+          const sv = s1.server, mg = s1.mongo;
+          if (mg.error) add("bad", "قاعدة البيانات لا تستجيب", mg.error, "راجع <b>MONGODB_URI</b> وقائمة IP المسموحة في Atlas (0.0.0.0/0 على Vercel)، وافتح <b>/api/health</b>.");
+          else {
+            const pings = (s2.mongo.ping_ms || []), pm = med(pings);
+            if (sv.cold_start && isNum(mg.connect_ms) && mg.connect_ms > 600)
+              add(mg.connect_ms > 1500 ? "bad" : "warn", "بداية باردة (Cold Start) للدالة", "أول طلب بعد خمول احتاج " + ms(mg.connect_ms) + " لفتح اتصال MongoDB، ولم يكن للدالة اتصال جاهز.",
+                "اضبط تنبيه <b>UptimeRobot/Cron</b> على <b>/api/health</b> كل 5 دقائق ليبقى الاتصال دافئًا، ولا تُحمّل مكتبات ثقيلة (مثل <b>sharp</b> في certificates-api) عند بدء كل دالة إن لم تحتجها.");
+            else if (sv.cold_start) add("info", "الدالة بدأت للتو (Cold Start)", "اتصال MongoDB استغرق " + ms(mg.connect_ms) + " فقط، وهو مقبول.", "");
+            if (isNum(pm) && pm > 120)
+              add(pm > 250 ? "bad" : "warn", "قاعدة البيانات بعيدة عن الدالة", "وسيط ping داخل الخادم = " + ms(pm) + (sv.region ? " (منطقة الدالة: " + sv.region + ")" : "") + ". الطبيعي أقل من 30 ms عندما تكون المنطقتان متجاورتين.",
+                "اجعل منطقة <b>Atlas</b> ومنطقة دوال Vercel (<b>regions</b> في vercel.json) في نفس المنطقة أو متجاورتين.");
+            [["students", "قراءة الطلاب"], ["messages", "قراءة الرسائل"]].forEach(([k, n]) => {
+              const r = s2.mongo["read_" + k];
+              if (r && r.ms > 250) add(r.ms > 600 ? "bad" : "warn", n + " بطيئة", "استعلام بسيط (20 مستندًا مفهرسًا) أخذ " + ms(r.ms) + ".", "راجع الفهارس وتأكد أن الاستعلام يستثني الحقول الثقيلة (الصور والصوت).");
+            });
+            const msgC = (s1.collections || []).find((x) => x.name === "qureo_messages");
+            if (msgC && isNum(msgC.avg) && msgC.avg > 20480)
+              add("warn", "مستندات الرسائل ثقيلة", "متوسط حجم المستند " + kb(msgC.avg) + " (" + msgC.count + " رسالة، منها " + (mg.media_messages || 0) + " صوت/صورة مخزّنة Base64 داخل القاعدة).",
+                "انقل الوسائط إلى <b>تخزين ملفات</b> (Supabase Storage / Cloudinary / GridFS) واحتفظ في المستند بالرابط فقط، واستثنِ الحقول الثقيلة من كل قائمة.");
+            const stor = (s1.collections || []).reduce((a, x) => a + (x.storage || 0), 0);
+            if (stor > 400 * 1048576) add("warn", "اقتراب من حد التخزين المجاني", "حجم التخزين الحالي " + kb(stor) + " من 512 MB تقريبًا.", "احذف الوسائط القديمة أو انقلها خارج MongoDB قبل الامتلاء.");
+          }
+          if (isNum(s1.supabase.ms) && s1.supabase.ms > 500)
+            add("warn", "Supabase بطيء من جهة الخادم", s1.supabase.error ? s1.supabase.error : "فحص الصحة أخذ " + ms(s1.supabase.ms) + ".", "التحقق من تسجيل دخول المدير يمر به في أول طلب كل دقيقة. اختر منطقة مشروع أقرب أو قلّل الطلبات المحمية.");
+        }
+        if (isNum(c.net) && c.net > 250)
+          add(c.net > 450 ? "bad" : "warn", "بُعد الشبكة بين جهازك والخادم", "زمن الذهاب والإياب خارج معالجة الخادم ≈ " + ms(c.net) + (s2 && s2.server.region ? "، والدالة تعمل في " + s2.server.region : "") + ".",
+            "أضف في <b>vercel.json</b> الحقل <b>regions</b> بمنطقة أقرب لجمهورك (مثل <b>fra1</b> فرانكفورت أو <b>cdg1</b> باريس) وانقل قاعدة Atlas لنفس المنطقة.");
+
+        c.probes.forEach((p) => {
+          if (p.error || p.bad) { add("bad", "فشل الوصول: " + p.label, p.error || "الاستجابة " + p.status, "افتح الرابط يدويًا وراجع سجلات Vercel."); return; }
+          if ((p.kind === "api" || p.kind === "supabase") && isNum(p.med) && p.med > 800)
+            add(p.med > 1500 ? "bad" : "warn", "استجابة بطيئة: " + p.label, "الوسيط " + ms(p.med) + " والأسرع " + ms(p.min) + (p.cold ? " — أول محاولة أبطأ بوضوح (" + ms(p.times[0]) + ") فالسبب غالبًا Cold Start." : "."),
+              p.kind === "supabase" ? "فعّل كاش للبيانات العامة (الصفحات تستخدم sessionStorage بالفعل) أو انقل المشروع لمنطقة أقرب." : "راجع الاستعلامات والفهارس، وأضف <b>Cache-Control</b> مع <b>s-maxage</b> للإجابات العامة.");
+          else if (p.kind === "page" && isNum(p.med) && p.med > 1000)
+            add("warn", "تنزيل الصفحة بطيء: " + p.label, "وسيط " + ms(p.med) + " لملف HTML بحجم " + kb(p.size) + ".", "قلّل حجم الـ HTML وفعّل الضغط والكاش على CDN.");
+          if (p.size > 10240 && !p.enc && /text|javascript|json|css|xml|html/i.test(p.type))
+            add("warn", "بدون ضغط: " + p.label, "حجم " + kb(p.size) + " أُرسل غير مضغوط.", "فعّل <b>gzip/brotli</b> (تلقائي على Vercel للملفات الثابتة).");
+        });
+
+        if (c.page && c.page.error) add("warn", "تعذر قياس تحميل الصفحة", c.page.error, "جرّب إعادة القياس أو افتح الصفحة يدويًا للتأكد أنها تعمل.");
+        if (pg) {
+          const n = pg.nv, t = pg.tot;
+          if (n.ttfb > 600) add(n.ttfb > 1200 ? "bad" : "warn", "أول بايت متأخر (TTFB)", "الخادم احتاج " + ms(n.ttfb) + " ليبدأ إرسال الصفحة.", "الصفحة ثابتة؛ تأكد أنها تُخدَّم من CDN (<b>x-vercel-cache: HIT</b>) لا من دالة.");
+          if (isNum(pg.fcp) && pg.fcp > 1800) add(pg.fcp > 3000 ? "bad" : "warn", "ظهور أول محتوى متأخر (FCP)", "أول عنصر ظهر بعد " + ms(pg.fcp) + ".", "قلّل ما يحجب العرض: CSS الحرج مضمّن، والسكربتات بـ defer.");
+          if (isNum(pg.lcp) && pg.lcp > 2500) add(pg.lcp > 4000 ? "bad" : "warn", "أكبر عنصر يظهر متأخرًا (LCP)", "ظهر بعد " + ms(pg.lcp) + (pg.lcpEl ? " (العنصر: " + pg.lcpEl + ")" : "") + ".", "صغّر الصورة/العنصر الأكبر، واستخدم <b>preload</b> و<b>fetchpriority=high</b> له.");
+          if (pg.cls > 0.1) add(pg.cls > 0.25 ? "bad" : "warn", "اهتزاز التخطيط (CLS)", "قيمة CLS = " + pg.cls.toFixed(3) + " والمقبول أقل من 0.1.", "حدّد <b>width/height</b> للصور وخصّص مساحة للعناصر التي تُحمّل لاحقًا.");
+          if (pg.tbt > 200) add(pg.tbt > 600 ? "bad" : "warn", "الجافاسكربت يحجب الواجهة", "مجموع المهام الطويلة الزائدة ≈ " + ms(pg.tbt) + ".", "أجّل السكربتات غير الضرورية وقسّم الأكواد الطويلة.");
+          if (t.bytes > 1.5 * 1048576) add(t.bytes > 3 * 1048576 ? "bad" : "warn", "وزن الصفحة كبير", "الإجمالي " + kb(t.bytes) + " في " + t.count + " طلبًا.", "اضغط الصور (WebP/AVIF) وأزل ما لا يلزم.");
+          if (t.js > 400 * 1024) add("warn", "حجم الجافاسكربت كبير", "JS ≈ " + kb(t.js) + ".", "قلّل المكتبات وفعّل التقسيم والتحميل المؤجل.");
+          if (t.css > 120 * 1024) add("warn", "ملفات CSS كبيرة", "CSS ≈ " + kb(t.css) + ".", "صغّر الملف (minify) واحذف القواعد غير المستخدمة.");
+          if (t.img > 600 * 1024) add("warn", "الصور ثقيلة", "الصور ≈ " + kb(t.img) + ".", "حوّلها إلى WebP وحدّد أبعادها الفعلية وفعّل <b>loading=lazy</b>.");
+          const big = pg.res.filter((r) => r.size > 300 * 1024).sort((a, b) => b.size - a.size).slice(0, 3);
+          if (big.length) add("warn", "ملفات منفردة ضخمة", big.map((r) => short(r.name, 30) + " (" + kb(r.size) + ")").join("، "), "صغّرها أو حمّلها عند الحاجة فقط.");
+          if (t.count > 60) add("warn", "عدد الطلبات كبير", t.count + " طلبًا لتحميل الصفحة.", "ادمج الملفات الصغيرة وأجّل غير الضروري.");
+          const slow = pg.res.filter((r) => r.dur > 1500).sort((a, b) => b.dur - a.dur).slice(0, 3);
+          if (slow.length) add("warn", "موارد بطيئة التحميل", slow.map((r) => short(r.name, 30) + " (" + ms(r.dur) + ")").join("، "), "تحقق من مصدرها؛ إن كانت خارجية فهي خارج سيطرتك، فاستبدلها أو أجّلها.");
+          if (pg.reval >= 5) add("warn", "ملفات تُعاد مراجعتها في كل زيارة", pg.reval + " ملفًا كان في الكاش لكن المتصفح سأل الخادم عنه من جديد (Revalidation) فدفع رحلة شبكة لكل ملف.", "أضف في <b>vercel.json</b> رؤوس <b>Cache-Control: public, max-age=31536000, immutable</b> للملفات المُرقَّمة، ومدة قصيرة للباقي.");
+          if (pg.dom > 1500) add(pg.dom > 3000 ? "bad" : "warn", "صفحة ثقيلة العناصر", pg.dom + " عنصر DOM.", "بسّط البنية وحمّل الأقسام الطويلة عند الاقتراب منها.");
+        }
+        const a = c.audit;
+        if (a) {
+          if (a.blocking.length) add("warn", "سكربتات تحجب عرض الصفحة", a.blocking.map((x) => short(x, 34)).join("، "), "أضف <b>defer</b> أو <b>async</b> لها.");
+          if (a.sheets.length > 2) add("info", "عدة ملفات CSS تحجب العرض", a.sheets.length + " ملفات: " + a.sheets.map((x) => short(x, 30)).join("، "), "ادمجها أو ضمّن الحرِج منها.");
+          if (a.hosts.length >= 4) add("info", "اعتماد على نطاقات خارجية كثيرة", a.hosts.length + " نطاقات: " + a.hosts.join("، "), "كل نطاق يكلّف DNS وTLS؛ استضف المهم محليًا واستخدم <b>preconnect</b> لما تبقى.");
+          if (a.fontWeights >= 7) add("info", "أوزان خطوط كثيرة", a.fontWeights + " وزنًا مطلوبًا من Google Fonts.", "اقتصر على الأوزان المستخدمة فعلًا.");
+          if (a.bytes > 150 * 1024) add("warn", "ملف HTML كبير", "حجم الصفحة نفسها " + kb(a.bytes) + " (سكربت مضمّن " + kb(a.inlineJs) + "، CSS مضمّن " + kb(a.inlineCss) + ").", "انقل المضمّن إلى ملفات خارجية قابلة للكاش.");
+          if (a.imgs > 3 && a.imgNoDim > 0) add("info", "صور بلا أبعاد محددة", a.imgNoDim + " من " + a.imgs + " صور بدون width/height" + (a.imgLazy ? "" : " ولا loading=lazy") + ".", "حدّد الأبعاد لمنع اهتزاز التخطيط.");
+        }
+        const order = { bad: 0, warn: 1, info: 2, ok: 3 };
+        F.sort((x, y) => order[x.sev] - order[y.sev]);
+        if (!F.some((f) => f.sev === "bad" || f.sev === "warn")) F.unshift({ sev: "ok", t: "لم يظهر سبب واضح للبطء", e: "كل القياسات داخل الحدود المقبولة وقت القياس.", f: "أعد القياس في أوقات أخرى ومن شبكة الموبايل للتأكد." });
+        const score = Math.max(0, 100 - F.reduce((a2, f) => a2 + (f.sev === "bad" ? 14 : f.sev === "warn" ? 6 : 0), 0));
+        return { F, score };
+      }
+
+      /* ---------- العرض ---------- */
+      const SEV_ICON = { bad: "fa-circle-xmark", warn: "fa-triangle-exclamation", info: "fa-circle-info", ok: "fa-circle-check" };
+      const kpi = (l, v, s, c) => '<div class="hx-card hx-k ' + (c || "") + '"><div class="l">' + l + '</div><div class="v">' + v + '</div><div class="s">' + s + "</div></div>";
+      const kv = (k, v, c) => "<dt>" + k + '</dt><dd class="' + (c || "") + '">' + v + "</dd>";
+      let last = null, running = false;
+
+      function render(c, dg) {
+        const pg = c.page && !c.page.error ? c.page : null;
+        const s2 = c.s2 || c.s1;
+        const apis = c.probes.filter((p) => p.kind === "api" && isNum(p.med));
+        const worst = apis.slice().sort((a, b) => b.med - a.med)[0];
+        const apiMed = worst ? worst.med : null;
+        const pm = s2 && s2.mongo && !s2.mongo.error ? med(s2.mongo.ping_ms || []) : null;
+        const sc = dg.score >= 80 ? "" : dg.score >= 55 ? "warn" : "bad";
+        const word = dg.score >= 80 ? "سرعة جيدة" : dg.score >= 55 ? "تحتاج تحسينًا" : "بطيء";
+        $("sp-kpis").innerHTML =
+          kpi("الدرجة العامة", dg.score + "<small style=\"font-size:.9rem\">/100</small>", word, sc) +
+          kpi("تحميل الصفحة", pg ? ms(pg.nv.load) : "—", pg ? "TTFB " + ms(pg.nv.ttfb) + " · LCP " + ms(pg.lcp) : "لم يُقَس", pg ? lv(pg.nv.load, 3000, 6000) : "") +
+          kpi("أبطأ استجابة API", ms(apiMed), worst ? esc(worst.label) : "—", lv(apiMed, 800, 1500)) +
+          kpi("قاعدة البيانات", ms(pm), s2 && s2.mongo && !s2.mongo.error ? "اتصال " + ms(c.s1.mongo.connect_ms) + " · قراءة " + ms(s2.mongo.read_messages && s2.mongo.read_messages.ms) : s2 ? "غير متصلة" : "لم تُقَس", lv(pm, 120, 250));
+
+        $("sp-causes").innerHTML = dg.F.map((f) =>
+          '<div class="sp-cause ' + f.sev + '"><div class="h"><i class="fas ' + SEV_ICON[f.sev] + '"></i>' + esc(f.t) + "</div>" +
+          '<div class="e">' + esc(f.e) + "</div>" + (f.f ? '<div class="f"><b>الحل:</b> ' + f.f + "</div>" : "") + "</div>").join("");
+
+        if (pg) {
+          const n = pg.nv;
+          const ph = [["DNS", n.dns, 100, 300], ["TCP", n.tcp, 100, 300], ["TLS", n.tls, 150, 400], ["انتظار الخادم TTFB", n.ttfb, 600, 1200], ["تنزيل HTML", n.download, 300, 800], ["معالجة DOM", n.dom, 500, 1500], ["تحميل باقي الموارد", n.rest, 1500, 3500]];
+          const mx = Math.max.apply(null, ph.map((x) => x[1]).concat(1));
+          const chip = (l, v, c) => '<span class="sp-chip ' + (c || "") + '">' + l + " <b>" + v + "</b></span>";
+          $("sp-phases").innerHTML = ph.map((x) => '<div class="sp-bar"><span class="n">' + x[0] + '</span><div class="t"><i class="' + lv(x[1], x[2], x[3]) + '" style="width:' + Math.max(2, (x[1] / mx) * 100) + '%"></i></div><span class="v hx-mono">' + ms(x[1]) + "</span></div>").join("") +
+            '<div class="sp-chips">' + chip("FCP", ms(pg.fcp), lv(pg.fcp, 1800, 3000)) + chip("LCP", ms(pg.lcp), lv(pg.lcp, 2500, 4000)) + chip("CLS", pg.cls.toFixed(3), lv(pg.cls, 0.1, 0.25)) +
+            chip("حجب JS", ms(pg.tbt), lv(pg.tbt, 200, 600)) + chip("الوزن", kb(pg.tot.bytes), lv(pg.tot.bytes, 1.5 * 1048576, 3 * 1048576)) + chip("الطلبات", pg.tot.count, lv(pg.tot.count, 60, 100)) + chip("عناصر DOM", pg.dom, lv(pg.dom, 1500, 3000)) + "</div>" +
+            '<div class="sp-chips" style="margin-top:.4rem;font-size:.68rem;color:var(--muted)">الاتصال بالنطاق مُعاد استخدامه من لوحتك، فقد تظهر DNS/TCP/TLS قريبة من الصفر.</div>';
+          const tbl = (rows) => '<table class="sp-t"><thead><tr><th>الملف</th><th>النوع</th><th>الحجم</th><th>الزمن</th></tr></thead><tbody>' + rows.map((r) => '<tr><td class="u" title="' + esc(r.name) + '">' + esc(short(r.name, 38)) + '</td><td><span class="sp-tag">' + TYPE_AR[r.type] + '</span></td><td class="m ' + lv(r.size, 150 * 1024, 400 * 1024) + '">' + kb(r.size) + '</td><td class="m ' + lv(r.dur, 800, 1500) + '">' + ms(r.dur) + "</td></tr>").join("") + "</tbody></table>";
+          $("sp-heavy").innerHTML = pg.res.length ? tbl(pg.res.slice().sort((a, b) => b.size - a.size).slice(0, 8)) : "—";
+          $("sp-slow").innerHTML = pg.res.length ? tbl(pg.res.slice().sort((a, b) => b.dur - a.dur).slice(0, 8)) : "—";
+        } else {
+          $("sp-phases").innerHTML = $("sp-heavy").innerHTML = $("sp-slow").innerHTML = '<div style="color:var(--muted);font-size:.8rem">تعذر قياس الصفحة.</div>';
+        }
+
+        if (c.s1) {
+          const sv = c.s1.server, mg = c.s1.mongo, m2 = s2.mongo, pings = (m2.ping_ms || []).filter(isNum);
+          let h = '<dl class="sp-kv">' + kv("المنصة / المنطقة", esc(sv.platform + (sv.region ? " / " + sv.region : ""))) + kv("Cold Start", sv.cold_start ? "نعم" : "لا", sv.cold_start ? "warn" : "ok") +
+            kv("عمر الدالة", sv.uptime_s + " s") + kv("الذاكرة", sv.rss_mb + " MB") + kv("Node", esc(sv.node)) + kv("زمن الذهاب والإياب", ms(c.net), lv(c.net, 250, 450));
+          h += mg.error ? kv("MongoDB", "خطأ", "bad") : kv("اتصال MongoDB", ms(mg.connect_ms), lv(mg.connect_ms, 600, 1500)) + kv("ping (أدنى/وسيط/أعلى)", pings.length ? ms(Math.min.apply(null, pings)) + " / " + ms(med(pings)) + " / " + ms(Math.max.apply(null, pings)) : "—", lv(med(pings), 120, 250)) +
+            kv("قراءة الطلاب", ms(m2.read_students && m2.read_students.ms), lv(m2.read_students && m2.read_students.ms, 250, 600)) + kv("قراءة الرسائل", ms(m2.read_messages && m2.read_messages.ms), lv(m2.read_messages && m2.read_messages.ms, 250, 600));
+          h += kv("Supabase (من الخادم)", c.s1.supabase.error ? "خطأ" : ms(c.s1.supabase.ms), c.s1.supabase.error ? "bad" : lv(c.s1.supabase.ms, 500, 1000)) + "</dl>";
+          if ((c.s1.collections || []).length) h += '<table class="sp-t" style="margin-top:.9rem"><thead><tr><th>المجموعة</th><th>المستندات</th><th>الحجم</th><th>متوسط المستند</th></tr></thead><tbody>' +
+            c.s1.collections.map((x) => '<tr><td class="u">' + esc(x.name) + '</td><td class="m">' + (x.count || 0) + '</td><td class="m">' + kb(x.size) + '</td><td class="m ' + lv(x.avg, 20480, 102400) + '">' + kb(x.avg) + "</td></tr>").join("") + "</tbody></table>";
+          $("sp-srv").innerHTML = h;
+        } else $("sp-srv").innerHTML = '<div style="color:var(--muted);font-size:.8rem">' + esc(c.srvErr || "لا توجد بيانات") + "</div>";
+
+        $("sp-probes").innerHTML = '<table class="sp-t"><thead><tr><th>الرابط</th><th>المحاولات</th><th>الوسيط</th><th>الحجم</th><th>CDN</th></tr></thead><tbody>' +
+          c.probes.map((p) => '<tr><td class="u" title="' + esc(p.url) + '">' + esc(p.label) + '</td><td class="m">' + (p.error ? '<span class="bad">' + esc(p.error) + "</span>" : p.times.map((x) => Math.round(x)).join(" · ") + (p.cold ? ' <span class="warn">(بارد)</span>' : "")) +
+            '</td><td class="m ' + (p.kind === "page" ? lv(p.med, 600, 1200) : lv(p.med, 800, 1500)) + '">' + ms(p.med) + '</td><td class="m">' + (p.size != null ? kb(p.size) : "—") + '</td><td class="m">' + esc(p.cdn || "—") + "</td></tr>").join("") + "</tbody></table>" +
+          (c.probes.some((p) => p.noCors) ? '<div style="font-size:.7rem;color:var(--muted);margin-top:.5rem">الرابط الخارجي يُقاس زمن أول استجابة فقط (قيود CORS).</div>' : "");
+        $("sp-out").hidden = false;
+      }
+
+      /* ---------- السجل ---------- */
+      const HK = "sp_hist";
+      const readH = () => { try { return JSON.parse(localStorage.getItem(HK) || "[]"); } catch (_) { return []; } };
+      function renderH() {
+        const h = readH();
+        $("sp-hist").innerHTML = h.length ? '<table class="sp-t"><thead><tr><th>الوقت</th><th>الدرجة</th><th>تحميل الصفحة</th><th>أبطأ API</th><th>DB ping</th></tr></thead><tbody>' +
+          h.slice().reverse().map((x) => '<tr><td>' + esc(new Date(x.t).toLocaleString("ar-EG", { dateStyle: "short", timeStyle: "short" })) + '</td><td class="m ' + (x.score >= 80 ? "ok" : x.score >= 55 ? "warn" : "bad") + '">' + x.score + '</td><td class="m">' + ms(x.load) + '</td><td class="m">' + ms(x.api) + '</td><td class="m">' + ms(x.db) + "</td></tr>").join("") + "</tbody></table>" : '<div style="color:var(--muted);font-size:.8rem">لا توجد قياسات محفوظة بعد.</div>';
+      }
+      function saveH(e) {
+        const h = readH();
+        h.push(e);
+        try { localStorage.setItem(HK, JSON.stringify(h.slice(-10))); } catch (_) {}
+      }
+
+      /* ---------- التشغيل ---------- */
+      const setStep = (i, t) => { $("sp-step").textContent = i + "/5 · " + t; $("sp-bar").style.width = (i / 5) * 100 + "%"; };
+      async function run() {
+        if (running) return;
+        running = true;
+        const btn = $("sp-run");
+        btn.disabled = true;
+        $("sp-copy").disabled = true;
+        $("sp-empty").hidden = true;
+        $("sp-prog").hidden = false;
+        const st = $("sp-status");
+        st.className = "hx-live"; st.innerHTML = "<i></i> RUNNING";
+        const c = { probes: [] };
+        try {
+          setStep(1, "الخادم وقاعدة البيانات…");
+          try {
+            let t = performance.now();
+            c.s1 = await sApi("/admin/speed");
+            try { t = performance.now(); c.s2 = await sApi("/admin/speed"); c.rt2 = performance.now() - t; } catch (_) { /* نكتفي بالأولى */ }
+            if (c.s2) c.net = Math.max(0, c.rt2 - c.s2.total_ms);
+          } catch (e) { c.srvErr = e.message; }
+
+          setStep(2, "تحميل الصفحة فعليًا…");
+          const path = $("sp-page").value;
+          c.page = await loadFrame(path);
+
+          setStep(3, "قياس الروابط وواجهات الـ API…");
+          const sbh = { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY };
+          const list = [
+            { label: "الصفحة الرئيسية", url: "/", kind: "page" }, { label: "صفحة المقالات", url: "/articles.html", kind: "page" },
+            { label: "style.css", url: "/style.css", kind: "page" }, { label: "API · الصحة /api/health", url: "/api/health", kind: "api" },
+            { label: "API · تقييمات الطلاب", url: "/api/public/reviews", kind: "api" }, { label: "API · الشهادات", url: "/api/certificates", kind: "api" },
+            { label: "Supabase · بيانات الموقع", url: SUPABASE_URL + "/rest/v1/skills?select=id&limit=1", kind: "supabase", headers: sbh },
+          ];
+          const cu = $("sp-custom").value.trim();
+          if (/^https?:\/\//i.test(cu)) list.push({ label: "رابط إضافي: " + short(cu, 28), url: cu, kind: "custom", noCors: new URL(cu).origin !== location.origin });
+          try { localStorage.setItem("sp_custom", cu); } catch (_) {}
+          for (const p of list) {
+            const times = [];
+            let last2 = null, err = null;
+            for (let i = 0; i < 3; i++) {
+              const r = await fetchTimed(p.url, { headers: p.headers, noCors: p.noCors });
+              if (r.error) { err = r.error; break; }
+              times.push(r.ms); last2 = r;
+            }
+            const o = Object.assign({}, p, { times, error: err && !times.length ? err : null });
+            if (times.length) {
+              o.med = med(times); o.min = Math.min.apply(null, times);
+              o.size = last2.size; o.status = last2.status; o.cdn = last2.cdn; o.enc = last2.enc; o.type = last2.type;
+              o.bad = !last2.ok;
+              o.cold = times.length === 3 && times[0] > 700 && times[0] > 3 * Math.min(times[1], times[2]);
+            }
+            c.probes.push(o);
+          }
+
+          setStep(4, "تحليل كود الصفحة…");
+          try { c.audit = audit(await (await fetch(path, { cache: "no-store" })).text()); } catch (_) { /* تجاهل */ }
+
+          setStep(5, "تحليل النتائج…");
+          const dg = diagnose(c);
+          render(c, dg);
+          last = { c, dg };
+          const apis = c.probes.filter((p) => p.kind === "api" && isNum(p.med));
+          const s2 = c.s2 || c.s1;
+          saveH({ t: Date.now(), score: dg.score, load: c.page && c.page.nv ? c.page.nv.load : null, api: apis.length ? Math.max.apply(null, apis.map((p) => p.med)) : null, db: s2 && s2.mongo && !s2.mongo.error ? med(s2.mongo.ping_ms || []) : null });
+          renderH();
+          $("sp-copy").disabled = false;
+          $("sp-time").textContent = new Date().toLocaleTimeString("en-GB");
+          st.className = "hx-live"; st.innerHTML = "<i></i> DONE";
+          toast("اكتمل القياس · الدرجة " + dg.score + "/100", true);
+        } catch (e) {
+          st.className = "hx-live off"; st.innerHTML = "<i></i> ERROR";
+          toast("تعذر إكمال القياس: " + (e.message || e), false);
+        } finally {
+          $("sp-prog").hidden = true;
+          btn.disabled = false;
+          running = false;
+        }
+      }
+
+      function report() {
+        if (!last) return "";
+        const { c, dg } = last, pg = c.page && !c.page.error ? c.page : null;
+        const L = ["تقرير سرعة الموقع · " + new Date().toLocaleString("ar-EG"), "الدرجة: " + dg.score + "/100"];
+        if (pg) L.push("تحميل الصفحة: " + ms(pg.nv.load) + " | TTFB " + ms(pg.nv.ttfb) + " | FCP " + ms(pg.fcp) + " | LCP " + ms(pg.lcp) + " | CLS " + pg.cls.toFixed(3) + " | الوزن " + kb(pg.tot.bytes) + " | " + pg.tot.count + " طلب");
+        c.probes.forEach((p) => L.push("• " + p.label + ": " + (p.error ? p.error : ms(p.med) + (p.size != null ? " (" + kb(p.size) + ")" : ""))));
+        L.push("", "أسباب البطء:");
+        dg.F.forEach((f) => L.push("[" + { bad: "حرج", warn: "تحذير", info: "ملاحظة", ok: "سليم" }[f.sev] + "] " + f.t + " — " + f.e + (f.f ? " | الحل: " + f.f.replace(/<[^>]+>/g, "") : "")));
+        return L.join("\n");
+      }
+
+      $("sp-run").addEventListener("click", run);
+      $("sp-copy").addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(report()); toast("تم نسخ التقرير", true); } catch (_) { toast("تعذر النسخ", false); }
+      });
+      $("sp-clear").addEventListener("click", () => { try { localStorage.removeItem(HK); } catch (_) {} renderH(); });
+      try { $("sp-custom").value = localStorage.getItem("sp_custom") || ""; } catch (_) {}
+      renderH();
+      // يبقى الاختبار الشامل بعرض أوسع مثل تبويب موقع الحلول
+      document.querySelectorAll(".tab-btn").forEach((b) => b.addEventListener("click", () => {
+        $("admin-main").classList.toggle("sol-wide", b.dataset.tab === "students" || b.dataset.tab === "speed");
+      }));
+    })();
+  </script>
   <script>
       (function () {
         var root = document.documentElement;

@@ -235,6 +235,71 @@ admin.delete("/solutions/access/:id", wrap(async (l, r) => ({ ok: await l.adminA
 admin.get("/solutions/reviews", wrap((l) => l.adminReviews()));
 admin.post("/solutions/reviews", wrap((l, r) => l.adminReviewSave(r.body || {})));
 admin.delete("/solutions/reviews/:id", wrap(async (l, r) => ({ ok: await l.adminReviewDelete(r.params.id) })));
+/* قياس سرعة الخادم وقاعدة البيانات (تبويب "سرعة الموقع" في لوحة المدير) */
+const msSince = (t) => Math.round((Number(process.hrtime.bigint() - t) / 1e6) * 10) / 10;
+async function timed(fn) {
+  const t = process.hrtime.bigint();
+  try { await fn(); return { ms: msSince(t) }; } catch (e) { return { ms: msSince(t), error: String(e && e.message || e).slice(0, 160) }; }
+}
+admin.get("/speed", async (_req, res) => {
+  const t0 = process.hrtime.bigint();
+  const mem = process.memoryUsage();
+  const out = {
+    at: new Date().toISOString(),
+    server: {
+      cold_start: !cached,
+      uptime_s: Math.round(process.uptime()),
+      region: process.env.VERCEL_REGION || null,
+      platform: process.env.VERCEL ? "vercel" : "local",
+      node: process.version,
+      rss_mb: Math.round(mem.rss / 1048576),
+      heap_mb: Math.round(mem.heapUsed / 1048576),
+    },
+    mongo: { db: DB_NAME },
+    supabase: {},
+    collections: [],
+  };
+  // 1) الاتصال بقاعدة البيانات (يظهر هنا زمن فتح الاتصال لو الدالة كانت "نايمة")
+  const conn = await timed(() => getLogic());
+  out.mongo.connect_ms = conn.ms;
+  if (conn.error) {
+    out.mongo.error = explainError(new Error(conn.error));
+  } else {
+    const db = global.__studentsDb;
+    // 2) ping متكرر + قراءة حقيقية من أكبر مجموعتين
+    const pings = [];
+    for (let i = 0; i < 5; i++) pings.push((await timed(() => db.command({ ping: 1 }))).ms);
+    out.mongo.ping_ms = pings;
+    out.mongo.read_students = await timed(() =>
+      db.collection("qureo_students").find({}, { projection: { _id: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(20).toArray());
+    out.mongo.read_messages = await timed(() =>
+      db.collection("qureo_messages").find({}, { projection: { _id: 1, created_at: 1 } }).sort({ created_at: -1 }).limit(20).toArray());
+    out.mongo.count_media = await timed(async () => {
+      out.mongo.media_messages = await db.collection("qureo_messages").countDocuments({ kind: { $in: ["voice", "image"] } });
+    });
+    // 3) حجم المجموعات (الرسائل الصوتية/الصور المخزّنة داخل المستندات تُبطئ القوائم)
+    for (const name of ["qureo_students", "qureo_messages", "qureo_reviews", "qureo_bans", "qureo_convmeta"]) {
+      try {
+        const st = await db.command({ collStats: name });
+        out.collections.push({
+          name, count: st.count || 0, size: st.size || 0, avg: st.avgObjSize || 0,
+          storage: st.storageSize || 0, indexes: st.nindexes || 0, index_size: st.totalIndexSize || 0,
+        });
+      } catch (_) {
+        try { out.collections.push({ name, count: await db.collection(name).estimatedDocumentCount(), size: null }); } catch (_e) { /* تجاهل */ }
+      }
+    }
+  }
+  // 4) زمن الوصول إلى Supabase (تسجيل الدخول + بيانات الموقع الرئيسي)
+  const ctl = new AbortController();
+  const to = setTimeout(() => ctl.abort(), 5000);
+  out.supabase = await timed(() => fetch(SUPABASE_URL + "/auth/v1/health", { headers: { apikey: SUPABASE_ANON_KEY }, signal: ctl.signal }).then((r) => { if (!r.ok) throw new Error("http " + r.status); }));
+  clearTimeout(to);
+  out.total_ms = msSince(t0);
+  res.set("Cache-Control", "no-store");
+  res.json(out);
+});
+
 app.use("/api/admin", admin);
 
 // أي خطأ غير متوقع يرجع JSON واضح بدل صفحة HTML

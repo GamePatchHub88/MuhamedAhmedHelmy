@@ -235,6 +235,12 @@
       .sol-btn:hover { color: var(--fog); border-color: rgba(var(--violet-rgb), .5); }
       .sol-btn.active { color: var(--fog); background: var(--grad-soft); border-color: rgba(var(--violet-rgb), .45); }
       .sol-btn.active i { color: var(--cyan); }
+      .ac-row { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; padding: .7rem .9rem; border: 1px solid var(--line); border-radius: 14px; background: var(--panel2); margin-bottom: .5rem; }
+      .ac-row b { color: var(--fog); }
+      .ac-row small { color: var(--mute, #8b93b7); font-size: .72rem; }
+      .ac-row code { direction: ltr; font-family: "JetBrains Mono", monospace; font-size: .72rem; padding: .15rem .5rem; border-radius: 8px; background: rgba(127,127,127,.15); }
+      .ac-row button { background: none; border: 1px solid var(--line); border-radius: 10px; padding: .3rem .7rem; font-size: .76rem; cursor: pointer; color: var(--fog); }
+      .ac-row button.del { color: #f87171; }
       .mt-card { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 1.2rem 1.4rem; margin-bottom: 1.5rem; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); }
       .mt-card.on { border-color: rgba(248,113,113,.55); background: radial-gradient(80% 120% at 100% 0%, rgba(248,113,113,.14), transparent 70%), var(--panel); }
       .mt-card.off { border-color: rgba(74,222,155,.35); }
@@ -1446,6 +1452,16 @@
                 <button id="mt-prev" class="admin-btn admin-btn-ghost" type="button" style="width:auto"><i class="fas fa-eye"></i> معاينة الصفحة</button>
                 <span id="mt-note" class="text-xs text-muted"></span>
               </div>
+            </div>
+
+            <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
+              <h2 class="text-lg font-bold text-white mb-1">المسموح لهم بالدخول أثناء الإيقاف</h2>
+              <p class="text-xs text-muted mb-5">أنشئ رابطًا خاصًا باسم كل شخص وأرسله له. عند فتحه يدخل الموقع رغم إغلاقه، ويظهر له شريط يخبره أن الموقع مغلق وأنه متاح له وحده. احذف الرابط لإلغاء وصوله فورًا (خلال نحو 15 ثانية).</p>
+              <div class="flex items-center gap-3 mb-5" style="flex-wrap:wrap">
+                <input id="ac-label" type="text" maxlength="40" class="admin-input" placeholder="اسم الشخص، مثال: أحمد" style="flex:1;min-width:160px" />
+                <button id="ac-add" class="admin-btn" type="button" style="width:auto"><i class="fas fa-link"></i> إنشاء رابط وصول</button>
+              </div>
+              <div id="ac-list"><p class="text-xs text-muted">جاري التحميل...</p></div>
             </div>
 
             <div class="bg-panel border border-line rounded-2xl p-7" id="mt-prev-card" hidden>
@@ -3413,6 +3429,50 @@
       $h("mt-msg").addEventListener("input", mtOnInput);
       $h("mt-title").addEventListener("input", mtOnInput);
 
+      /* ---------- روابط الوصول الخاصة ---------- */
+      let acItems = [];
+      function acLink(c) { return SOL_SITE + "/?access=" + c; }
+      function acRender() {
+        const box = $h("ac-list");
+        if (!acItems.length) { box.innerHTML = '<p class="text-xs text-muted">لا يوجد أحد بعد. أضف اسمًا لإنشاء رابطه.</p>'; return; }
+        box.innerHTML = acItems.map((a) =>
+          '<div class="ac-row"><i class="fas fa-user-check" style="color:#4ade9b"></i><b>' + escapeHtml(a.label) + '</b>' +
+          '<small>' + (a.last_used ? "آخر دخول: " + escapeHtml(studentWhen(a.last_used)) : "لم يدخل بعد") + (a.uses ? " · " + a.uses + " مرة" : "") + '</small>' +
+          '<code>' + escapeHtml(a.code) + '</code>' +
+          '<span style="margin-inline-start:auto;display:flex;gap:.4rem"><button type="button" data-ac-copy="' + escapeHtml(a.id) + '"><i class="fas fa-copy"></i> نسخ الرابط</button>' +
+          '<button type="button" class="del" data-ac-del="' + escapeHtml(a.id) + '"><i class="fas fa-trash"></i></button></span></div>'
+        ).join("");
+      }
+      async function loadAccess() {
+        try { acItems = (await sApi("/admin/solutions/access")).items || []; acRender(); }
+        catch (e) { $h("ac-list").innerHTML = '<p class="text-red-400 text-sm">تعذر التحميل: ' + escapeHtml(e.message) + "</p>"; }
+      }
+      $h("ac-add").addEventListener("click", async () => {
+        const inp = $h("ac-label"), label = inp.value.trim();
+        if (label.length < 2) { toast("اكتب اسم الشخص أولًا", false); inp.focus(); return; }
+        try {
+          const r = await sApi("/admin/solutions/access", { method: "POST", body: { label } });
+          if (r.error) throw new Error(r.error);
+          inp.value = "";
+          try { await navigator.clipboard.writeText(acLink(r.code)); toast("تم الإنشاء ونسخ الرابط", true); } catch (_) { toast("تم الإنشاء", true); }
+          loadAccess();
+        } catch (e) { toast("تعذر الإنشاء: " + e.message, false); }
+      });
+      $h("ac-label").addEventListener("keydown", (e) => { if (e.key === "Enter") $h("ac-add").click(); });
+      $h("ac-list").addEventListener("click", async (e) => {
+        const c = e.target.closest("[data-ac-copy]"), d = e.target.closest("[data-ac-del]");
+        if (c) {
+          const a = acItems.find((x) => x.id === c.dataset.acCopy);
+          if (!a) return;
+          try { await navigator.clipboard.writeText(acLink(a.code)); toast("تم نسخ الرابط", true); } catch (_) { prompt("انسخ الرابط:", acLink(a.code)); }
+        } else if (d) {
+          const a = acItems.find((x) => x.id === d.dataset.acDel);
+          if (!a || !confirm("حذف وصول «" + a.label + "»؟ لن يستطيع الدخول بعد الآن.")) return;
+          try { await sApi("/admin/solutions/access/" + encodeURIComponent(a.id), { method: "DELETE" }); toast("تم الحذف", true); loadAccess(); }
+          catch (err) { toast("تعذر الحذف: " + err.message, false); }
+        }
+      });
+
       /* ---------- التنقل بين الأقسام ---------- */
       function solGo(name) {
         document.querySelectorAll(".sol-btn[data-sol]").forEach((x) => x.classList.toggle("active", x.dataset.sol === name));
@@ -3422,7 +3482,7 @@
         else if (name === "reviews") loadSolReviews();
         else if (name === "inbox") { ibLoadConvs(true); if (!studentsCache.length) loadStudents(true); if (ib.sel) ibLoadThread(false); }
         else if (name === "security") loadSecurity();
-        else if (name === "maint") loadMaint(true);
+        else if (name === "maint") { loadMaint(true); loadAccess(); }
       }
       function openSol(name, after) {
         const b = document.querySelector('.tab-btn[data-tab="students"]');

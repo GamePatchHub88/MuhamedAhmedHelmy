@@ -92,10 +92,12 @@ app.get("/api/health", async (_req, res) => {
 const rpc = express.Router();
 rpc.use(limiter);
 // أثناء إيقاف الموقع: ارفض كل طلبات الطلاب فورًا من الكاش (بدون استعلام قاعدة بيانات) لتخفيف الحمل
-async function stopGuard(_req, res, next) {
+async function stopGuard(req, res, next) {
   try {
-    const st = await (await getLogic()).siteStatus();
-    if (st.enabled) return res.status(503).set("Retry-After", "300").json({ maintenance: true });
+    const l = await getLogic();
+    const st = await l.siteStatus();
+    // المسموح لهم برمز وصول صالح يمرّون حتى والموقع متوقف
+    if (st.enabled && !(await l.accessValid(req.headers["x-access-code"]))) return res.status(503).set("Retry-After", "300").json({ maintenance: true });
   } catch (_) { /* لو تعذّر الفحص لا نمنع الموقع */ }
   next();
 }
@@ -121,6 +123,20 @@ app.use("/api/rpc", rpc);
 /* ---------- عام (بدون تسجيل): التقييمات المنشورة لموقع الحلول ---------- */
 const pub = express.Router();
 pub.use(limiter);
+// التحقق من رمز الوصول الخاص (حد 20 محاولة في الدقيقة لكل IP ضد التخمين)
+const accHits = new Map();
+pub.post("/site-access", async (req, res) => {
+  try {
+    const now = Date.now(), h = accHits.get(req.ip);
+    if (!h || now - h.t > 60000) accHits.set(req.ip, { t: now, n: 1 });
+    else if (++h.n > 20) return res.status(429).json({ ok: false });
+    if (accHits.size > 5000) accHits.clear();
+    res.set("Cache-Control", "no-store").json(await (await getLogic()).accessUse((req.body || {}).code));
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ ok: false });
+  }
+});
 // كاش قصير على CDN حتى لا تُحمَّل القاعدة مع كل زائر
 const cacheJson = (fn) => async (req, res) => {
   try {
@@ -209,6 +225,11 @@ admin.post("/solutions/reviews/publish-all", wrap((l) => l.adminReviewsPublishAl
 /* إيقاف الموقع مؤقتًا + الرسالة الثابتة */
 admin.get("/solutions/maintenance", wrap((l) => l.adminSiteStatus()));
 admin.put("/solutions/maintenance", wrap((l, r) => l.adminSiteStatusSave(r.body || {})));
+
+/* روابط الوصول الخاصة لأشخاص معينين أثناء الإيقاف */
+admin.get("/solutions/access", wrap((l) => l.adminAccessList()));
+admin.post("/solutions/access", wrap((l, r) => l.adminAccessCreate(r.body || {})));
+admin.delete("/solutions/access/:id", wrap(async (l, r) => ({ ok: await l.adminAccessDelete(r.params.id) })));
 
 /* أدوات موقع الحلول: التقييمات */
 admin.get("/solutions/reviews", wrap((l) => l.adminReviews()));

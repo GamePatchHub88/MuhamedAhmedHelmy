@@ -149,6 +149,7 @@ function makeLogic({ db, ObjectId }) {
   const bans = db.collection("qureo_bans"); // أجهزة محظورة بالكامل (تظهر لها المحادثة مع الإدارة فقط)
   const convmeta = db.collection("qureo_convmeta"); // تثبيت المحادثات وملاحظات المدير الخاصة
   const settings = db.collection("qureo_settings"); // إعدادات الموقع (وضع الإيقاف المؤقت)
+  const access = db.collection("qureo_access"); // رموز دخول أشخاص معينين أثناء إيقاف الموقع
   // كاش قصير جدًا لقائمة المحادثات (يُبطَل عند أي كتابة) حتى لا يضغط الاستطلاع الدوري على القاعدة
   let convCache = null;
   const bustConv = () => { convCache = null; };
@@ -926,6 +927,7 @@ function makeLogic({ db, ObjectId }) {
     await messages.createIndex({ sender: 1, requires_reply: 1, created_at: -1 });
     await messages.createIndex({ kind: 1 });
     await convmeta.createIndex({ device_id: 1 }, { unique: true });
+    await access.createIndex({ code: 1 }, { unique: true });
   }
 
   /* ---------- إيقاف موقع الحلول مؤقتًا (وضع الصيانة) ---------- */
@@ -968,12 +970,63 @@ function makeLogic({ db, ObjectId }) {
     return siteShape(await settings.findOne({ _id: "maintenance" }));
   }
 
+  /* ---------- روابط الوصول الخاصة (أشخاص معينون يدخلون والموقع متوقف) ---------- */
+  const CODE_RE = /^[A-Za-z0-9]{8,40}$/;
+  const accCache = new Map(); // code -> { v: doc|null, exp }
+  const ACC_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const newCode = () => {
+    const b = require("crypto").randomBytes(14);
+    let out = "";
+    for (let i = 0; i < 14; i++) out += ACC_CHARS[b[i] % ACC_CHARS.length];
+    return out;
+  };
+  async function accessDoc(code) {
+    code = String(code || "").trim();
+    if (!CODE_RE.test(code)) return null;
+    const hit = accCache.get(code);
+    if (hit && hit.exp > Date.now()) return hit.v;
+    const v = await access.findOne({ code });
+    if (accCache.size > 500) accCache.clear();
+    accCache.set(code, { v, exp: Date.now() + 15000 });
+    return v;
+  }
+  async function accessValid(code) { return !!(await accessDoc(code)); }
+  // يُستدعى عند فتح الزائر للموقع برمزه: يسجّل آخر استخدام (بحد أقصى مرة كل 10 دقائق لكل رمز)
+  async function accessUse(code) {
+    const d = await accessDoc(code);
+    if (!d) return { ok: false };
+    if (!d.last_used || Date.now() - new Date(d.last_used).getTime() > 600000) {
+      await access.updateOne({ _id: d._id }, { $set: { last_used: new Date() }, $inc: { uses: 1 } }).catch(() => {});
+    }
+    return { ok: true, label: d.label };
+  }
+  async function adminAccessList() {
+    const rows = await access.find({}).sort({ created_at: -1 }).limit(200).toArray();
+    return { items: rows.map((r) => ({ id: String(r._id), label: r.label, code: r.code, created_at: r.created_at, last_used: r.last_used || null, uses: r.uses || 0 })) };
+  }
+  async function adminAccessCreate(b) {
+    const label = String((b && b.label) || "").replace(/\s+/g, " ").trim().slice(0, 40);
+    if (label.length < 2) return { error: "اكتب اسم الشخص (حرفان على الأقل)" };
+    if ((await access.countDocuments({})) >= 200) return { error: "وصلت للحد الأقصى (200 رابط). احذف القديم أولًا" };
+    const code = newCode();
+    await access.insertOne({ code, label, created_at: new Date(), uses: 0, last_used: null });
+    return { ok: true, code, label };
+  }
+  async function adminAccessDelete(id) {
+    const _id = toId(id);
+    if (!_id) return false;
+    const r = await access.deleteOne({ _id });
+    accCache.clear();
+    return r.deletedCount > 0;
+  }
+
   return {
     check, register, inbox, audio, markRead, send,
     image, adminImage, adminList, adminSetStatus, adminDeleteStudent, adminMessages, adminAudio, adminSend, adminUnlock, adminSetBan, adminClear,
     publicReviews, reviewSubmit, adminReviews, adminReviewSave, adminReviewDelete,
     adminStats, adminBulk, adminBroadcast, adminReviewsPublishAll,
     adminConversations, adminSearchMessages, adminMarkUnread, adminReadAll, adminDeleteMessage, adminConvMeta, adminBans,
+    accessValid, accessUse, adminAccessList, adminAccessCreate, adminAccessDelete,
     siteStatus, publicSiteStatus, adminSiteStatus, adminSiteStatusSave,
     ensureIndexes,
   };

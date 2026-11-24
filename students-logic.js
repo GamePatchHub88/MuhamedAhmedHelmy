@@ -148,6 +148,7 @@ function makeLogic({ db, ObjectId }) {
   const reviews = db.collection("qureo_reviews"); // تقييمات الطلاب
   const bans = db.collection("qureo_bans"); // أجهزة محظورة بالكامل (تظهر لها المحادثة مع الإدارة فقط)
   const convmeta = db.collection("qureo_convmeta"); // تثبيت المحادثات وملاحظات المدير الخاصة
+  const settings = db.collection("qureo_settings"); // إعدادات الموقع (وضع الإيقاف المؤقت)
   // كاش قصير جدًا لقائمة المحادثات (يُبطَل عند أي كتابة) حتى لا يضغط الاستطلاع الدوري على القاعدة
   let convCache = null;
   const bustConv = () => { convCache = null; };
@@ -927,12 +928,53 @@ function makeLogic({ db, ObjectId }) {
     await convmeta.createIndex({ device_id: 1 }, { unique: true });
   }
 
+  /* ---------- إيقاف موقع الحلول مؤقتًا (وضع الصيانة) ---------- */
+  // كاش داخل الذاكرة لمدة 15 ثانية حتى لا يضغط فحص الحالة على القاعدة
+  let siteCache = null;
+  const SITE_TTL = 15000;
+  const siteShape = (d) => ({
+    enabled: !!(d && d.enabled),
+    title: String((d && d.title) || "").slice(0, 80),
+    message: String((d && d.message) || "").slice(0, 1500),
+    updated_at: d && d.updated_at ? new Date(d.updated_at).toISOString() : null,
+  });
+  async function siteStatus() {
+    if (siteCache && siteCache.exp > Date.now()) return siteCache.v;
+    const d = await settings.findOne({ _id: "maintenance" });
+    const v = siteShape(d);
+    siteCache = { v, exp: Date.now() + SITE_TTL };
+    return v;
+  }
+  // للزوار: لا يُرجَع شيء سوى ما يلزم للعرض
+  async function publicSiteStatus() {
+    const v = await siteStatus();
+    return v.enabled ? { enabled: true, title: v.title, message: v.message, updated_at: v.updated_at } : { enabled: false };
+  }
+  async function adminSiteStatus() {
+    const d = await settings.findOne({ _id: "maintenance" });
+    return siteShape(d);
+  }
+  async function adminSiteStatusSave(b) {
+    const title = String((b && b.title) || "").replace(/\s+/g, " ").trim().slice(0, 80);
+    const message = String((b && b.message) || "").replace(/\r\n/g, "\n").trim().slice(0, 1500);
+    const enabled = !!(b && b.enabled);
+    if (enabled && !message) return { error: "اكتب الرسالة التي ستظهر للزوار قبل تفعيل الإيقاف" };
+    await settings.updateOne(
+      { _id: "maintenance" },
+      { $set: { enabled, title, message, updated_at: new Date() } },
+      { upsert: true }
+    );
+    siteCache = null;
+    return siteShape(await settings.findOne({ _id: "maintenance" }));
+  }
+
   return {
     check, register, inbox, audio, markRead, send,
     image, adminImage, adminList, adminSetStatus, adminDeleteStudent, adminMessages, adminAudio, adminSend, adminUnlock, adminSetBan, adminClear,
     publicReviews, reviewSubmit, adminReviews, adminReviewSave, adminReviewDelete,
     adminStats, adminBulk, adminBroadcast, adminReviewsPublishAll,
     adminConversations, adminSearchMessages, adminMarkUnread, adminReadAll, adminDeleteMessage, adminConvMeta, adminBans,
+    siteStatus, publicSiteStatus, adminSiteStatus, adminSiteStatusSave,
     ensureIndexes,
   };
 }

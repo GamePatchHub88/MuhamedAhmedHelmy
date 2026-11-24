@@ -91,6 +91,15 @@ app.get("/api/health", async (_req, res) => {
 /* ---------- للطلاب: نفس أسماء الدوال القديمة وتنسيق الإجابات ---------- */
 const rpc = express.Router();
 rpc.use(limiter);
+// أثناء إيقاف الموقع: ارفض كل طلبات الطلاب فورًا من الكاش (بدون استعلام قاعدة بيانات) لتخفيف الحمل
+async function stopGuard(_req, res, next) {
+  try {
+    const st = await (await getLogic()).siteStatus();
+    if (st.enabled) return res.status(503).set("Retry-After", "300").json({ maintenance: true });
+  } catch (_) { /* لو تعذّر الفحص لا نمنع الموقع */ }
+  next();
+}
+rpc.use(stopGuard);
 const UA = (r) => r.headers["user-agent"] || "";
 // عنوان IP الحقيقي للزائر خلف Vercel (الأولوية لرؤوس المنصة ثم req.ip)
 const IP = (r) => {
@@ -123,7 +132,19 @@ const cacheJson = (fn) => async (req, res) => {
     res.status(500).json({ error: explainError(e) });
   }
 };
-pub.get("/reviews", cacheJson((l) => l.publicReviews()));
+pub.get("/reviews", stopGuard, cacheJson((l) => l.publicReviews()));
+// حالة الموقع (متوقف/يعمل + الرسالة): كاش قصير على CDN لتتحمل ملايين الزيارات دون ضغط على الخادم
+pub.get("/site-status", async (_req, res) => {
+  try {
+    const data = await (await getLogic()).publicSiteStatus();
+    res.set("Cache-Control", "public, s-maxage=20, stale-while-revalidate=60");
+    res.json(data);
+  } catch (e) {
+    console.error(e);
+    // عند الفشل لا نُخبر الزائر بالإيقاف ولا نُخزّن الرد
+    res.set("Cache-Control", "no-store").json({ enabled: false, unknown: true });
+  }
+});
 // صور الطلاب أُزيلت نهائيًا؛ يبقى هذا المسار فارغًا فقط حتى لا يظهر خطأ في نسخة موقع الطلاب القديمة
 pub.get("/photos", (_req, res) => res.set("Cache-Control", "public, s-maxage=300").json({ photos: [] }));
 app.use("/api/public", pub);
@@ -184,6 +205,10 @@ admin.get("/solutions/stats", wrap((l) => l.adminStats()));
 admin.post("/students/bulk", wrap((l, r) => l.adminBulk((r.body || {}).ids, (r.body || {}).action)));
 admin.post("/broadcast", wrap((l, r) => l.adminBroadcast(r.body || {})));
 admin.post("/solutions/reviews/publish-all", wrap((l) => l.adminReviewsPublishAll()));
+
+/* إيقاف الموقع مؤقتًا + الرسالة الثابتة */
+admin.get("/solutions/maintenance", wrap((l) => l.adminSiteStatus()));
+admin.put("/solutions/maintenance", wrap((l, r) => l.adminSiteStatusSave(r.body || {})));
 
 /* أدوات موقع الحلول: التقييمات */
 admin.get("/solutions/reviews", wrap((l) => l.adminReviews()));

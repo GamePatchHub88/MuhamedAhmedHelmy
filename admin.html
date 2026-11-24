@@ -235,6 +235,15 @@
       .sol-btn:hover { color: var(--fog); border-color: rgba(var(--violet-rgb), .5); }
       .sol-btn.active { color: var(--fog); background: var(--grad-soft); border-color: rgba(var(--violet-rgb), .45); }
       .sol-btn.active i { color: var(--cyan); }
+      .mt-card { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 1.2rem 1.4rem; margin-bottom: 1.5rem; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); }
+      .mt-card.on { border-color: rgba(248,113,113,.55); background: radial-gradient(80% 120% at 100% 0%, rgba(248,113,113,.14), transparent 70%), var(--panel); }
+      .mt-card.off { border-color: rgba(74,222,155,.35); }
+      .mt-ic { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-size: 1.2rem; color: #4ade9b; background: rgba(74,222,155,.12); flex: none; }
+      .mt-card.on .mt-ic { color: #f87171; background: rgba(248,113,113,.14); }
+      .mt-st { font-weight: 800; font-size: 1.05rem; color: var(--fog); }
+      .mt-sub { font-size: .78rem; color: var(--mute, #8b93b7); margin-top: .15rem; line-height: 1.7; }
+      .mt-frame { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #0a0f1f; }
+      .mt-frame iframe { display: block; width: 100%; height: 520px; border: 0; }
       .sol-pane { display: none; }
       .sol-pane.active { display: block; animation: tab-in .3s var(--ease); }
       .sol-badge { min-width: 1.35rem; height: 1.35rem; padding: 0 .4rem; border-radius: 99px; background: #f59e0b; color: #1a1200; font-size: .72rem; font-weight: 800; display: inline-grid; place-items: center; }
@@ -1288,6 +1297,7 @@
             <button class="sol-btn" type="button" data-sol="inbox"><i class="fas fa-inbox"></i> الرسائل <span id="sol-unread-badge" class="sol-badge" style="background:#f87171;color:#fff" hidden>0</span></button>
             <button class="sol-btn" type="button" data-sol="students"><i class="fas fa-user-graduate"></i> الطلاب</button>
             <button class="sol-btn" type="button" data-sol="reviews"><i class="fas fa-star"></i> تقييمات الطلاب <span id="sol-pending-badge" class="sol-badge" hidden>0</span></button>
+            <button class="sol-btn" type="button" data-sol="maint" id="sol-maint-btn"><i class="fas fa-power-off"></i> إيقاف الموقع <span id="sol-maint-dot" class="sol-badge" style="background:#f87171;color:#fff" hidden>متوقف</span></button>
             <button class="sol-btn" type="button" data-sol="security"><i class="fas fa-shield-halved"></i> الأمان والحظر <span id="sol-sec-badge" class="sol-badge" hidden>0</span></button>
             <button class="sol-btn" type="button" id="hx-open-pal" title="لوحة الأوامر (Ctrl+K)" style="margin-inline-start:auto"><i class="fas fa-terminal"></i> <span class="mono" style="font-size:.72rem">Ctrl+K</span></button>
           </div>
@@ -1407,6 +1417,42 @@
               <button class="hx-chip" type="button" data-bulk="clear" style="margin-inline-start:auto">إلغاء التحديد</button>
             </div>
           </div>
+          </div>
+
+          <!-- ===== إيقاف الموقع + الرسالة الثابتة ===== -->
+          <div class="sol-pane" id="sol-maint">
+            <div class="mt-card" id="mt-state">
+              <div class="mt-ic" id="mt-ic"><i class="fas fa-power-off"></i></div>
+              <div style="flex:1;min-width:200px">
+                <div class="mt-st" id="mt-st">جاري التحميل...</div>
+                <div class="mt-sub" id="mt-sub">وقت إيقاف الموقع تظهر للزوار رسالتك فقط، ولا يتصل الموقع بالخادم، فيقل الحمل فورًا.</div>
+              </div>
+              <button id="mt-toggle" class="admin-btn" type="button" style="width:auto;white-space:nowrap" disabled><i class="fas fa-power-off"></i> <span id="mt-toggle-l">...</span></button>
+            </div>
+
+            <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
+              <h2 class="text-lg font-bold text-white mb-1">الرسالة التي تظهر للزوار</h2>
+              <p class="text-xs text-muted mb-6">تظهر في صفحة كاملة بتصميم ثابت فوق الموقع. اكتب سبب الإيقاف وموعد العودة إن وُجد. الأسطر الجديدة تُحفظ كما كتبتها.</p>
+              <div class="mb-5">
+                <label class="admin-label">العنوان (اختياري)</label>
+                <input id="mt-title" type="text" maxlength="80" class="admin-input" placeholder="مثال: الموقع في صيانة قصيرة" />
+              </div>
+              <div class="mb-2">
+                <label class="admin-label">نص الرسالة <span id="mt-count" class="text-muted" style="font-weight:400">0 / 1500</span></label>
+                <textarea id="mt-msg" maxlength="1500" class="admin-textarea" style="min-height:150px" placeholder="مثال: نجري تحسينات على الخوادم لتسريع الموقع. سنعود خلال ساعات إن شاء الله، شكرًا لصبركم."></textarea>
+              </div>
+              <div class="flex items-center gap-3 mt-5" style="flex-wrap:wrap">
+                <button id="mt-save" class="admin-btn" type="button" style="width:auto"><i class="fas fa-floppy-disk"></i> حفظ الرسالة</button>
+                <button id="mt-prev" class="admin-btn admin-btn-ghost" type="button" style="width:auto"><i class="fas fa-eye"></i> معاينة الصفحة</button>
+                <span id="mt-note" class="text-xs text-muted"></span>
+              </div>
+            </div>
+
+            <div class="bg-panel border border-line rounded-2xl p-7" id="mt-prev-card" hidden>
+              <h2 class="text-lg font-bold text-white mb-1">معاينة مباشرة</h2>
+              <p class="text-xs text-muted mb-4">هكذا سيراها الزائر. تتحدث أثناء الكتابة، ولا تؤثر على الموقع قبل التفعيل.</p>
+              <div class="mt-frame"><iframe id="mt-frame" title="معاينة صفحة الإيقاف" loading="lazy"></iframe></div>
+            </div>
           </div>
 
           <!-- ===== (2) تقييمات الطلاب ===== -->
@@ -3272,6 +3318,101 @@
         renderSignups();
       });
 
+      /* ---------- إيقاف الموقع + الرسالة الثابتة ---------- */
+      const SOL_SITE = "https://qureoeducationsolve.vercel.app";
+      let mtState = null, mtLoaded = false, mtBusy = false, mtFrameReady = false, mtTimer;
+
+      function mtRender() {
+        const on = !!(mtState && mtState.enabled);
+        const card = $h("mt-state");
+        card.classList.toggle("on", on);
+        card.classList.toggle("off", !on && !!mtState);
+        $h("mt-st").textContent = !mtState ? "جاري التحميل..." : on ? "الموقع متوقف الآن" : "الموقع يعمل بشكل طبيعي";
+        $h("mt-sub").textContent = !mtState ? "" : on
+          ? "الزوار يرون رسالتك فقط ولا يتصل الموقع بالخادم. قد يستغرق ظهور التغيير حتى نحو 20 ثانية."
+          : "فعّل الإيقاف لعرض الرسالة وتقليل الحمل على الخادم فورًا.";
+        const b = $h("mt-toggle");
+        b.disabled = !mtState || mtBusy;
+        b.className = "admin-btn";
+        b.style.width = "auto";
+        b.style.whiteSpace = "nowrap";
+        if (!on) b.style.background = "linear-gradient(135deg,#ef4444,#f97316)";
+        else b.style.background = "";
+        $h("mt-toggle-l").textContent = on ? "إعادة تشغيل الموقع" : "إيقاف الموقع الآن";
+        $h("mt-ic").innerHTML = '<i class="fas ' + (on ? "fa-pause" : "fa-circle-check") + '"></i>';
+        $h("sol-maint-dot").hidden = !on;
+        const ts = mtState && mtState.updated_at;
+        $h("mt-note").textContent = ts ? "آخر تحديث: " + studentWhen(ts) : "";
+      }
+
+      async function loadMaint(force) {
+        if (mtLoaded && !force) return;
+        try {
+          mtState = await sApi("/admin/solutions/maintenance");
+          mtLoaded = true;
+          if (document.activeElement !== $h("mt-title") && document.activeElement !== $h("mt-msg")) {
+            $h("mt-title").value = mtState.title || "";
+            $h("mt-msg").value = mtState.message || "";
+            mtCount();
+          }
+          mtRender();
+        } catch (e) {
+          $h("mt-st").textContent = "تعذر تحميل الحالة";
+          $h("mt-sub").textContent = e.message;
+        }
+      }
+
+      function mtCount() { $h("mt-count").textContent = $h("mt-msg").value.length + " / 1500"; }
+
+      async function mtSave(enabled, textOnly) {
+        const title = $h("mt-title").value.trim();
+        const message = $h("mt-msg").value.trim();
+        if (enabled && !message) { toast("اكتب رسالة الزوار أولًا", false); $h("mt-msg").focus(); return; }
+        mtBusy = true; mtRender();
+        try {
+          const r = await sApi("/admin/solutions/maintenance", { method: "PUT", body: { enabled, title, message } });
+          if (r && r.error) throw new Error(r.error);
+          mtState = r;
+          toast(textOnly ? "تم حفظ الرسالة" : enabled ? "تم إيقاف الموقع وعرض الرسالة للزوار" : "تمت إعادة تشغيل الموقع", true);
+        } catch (e) { toast("تعذر الحفظ: " + e.message, false); }
+        mtBusy = false; mtRender();
+      }
+
+      $h("mt-toggle").addEventListener("click", () => {
+        if (!mtState) return;
+        if (mtState.enabled) {
+          if (!confirm("إعادة تشغيل الموقع للجميع الآن؟")) return;
+          mtSave(false);
+        } else {
+          if (!confirm("إيقاف موقع الحلول وعرض الرسالة لكل الزوار؟")) return;
+          mtSave(true);
+        }
+      });
+      // حفظ النص فقط دون تغيير حالة التشغيل
+      $h("mt-save").addEventListener("click", () => mtSave(!!(mtState && mtState.enabled), true));
+
+      function mtPostPreview() {
+        const f = $h("mt-frame");
+        if (!mtFrameReady || !f.contentWindow) return;
+        f.contentWindow.postMessage({ type: "qs-maint-preview", title: $h("mt-title").value, message: $h("mt-msg").value }, SOL_SITE);
+      }
+      window.addEventListener("message", (e) => {
+        if (e.origin !== SOL_SITE || !e.data || e.data.type !== "qs-maint-ready") return;
+        mtFrameReady = true; mtPostPreview();
+      });
+      $h("mt-prev").addEventListener("click", () => {
+        const card = $h("mt-prev-card"), f = $h("mt-frame");
+        card.hidden = !card.hidden;
+        if (!card.hidden) {
+          if (!f.getAttribute("src")) f.src = SOL_SITE + "/?qs_preview=1";
+          else mtPostPreview();
+          card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      });
+      const mtOnInput = () => { mtCount(); clearTimeout(mtTimer); mtTimer = setTimeout(mtPostPreview, 250); };
+      $h("mt-msg").addEventListener("input", mtOnInput);
+      $h("mt-title").addEventListener("input", mtOnInput);
+
       /* ---------- التنقل بين الأقسام ---------- */
       function solGo(name) {
         document.querySelectorAll(".sol-btn[data-sol]").forEach((x) => x.classList.toggle("active", x.dataset.sol === name));
@@ -3281,6 +3422,7 @@
         else if (name === "reviews") loadSolReviews();
         else if (name === "inbox") { ibLoadConvs(true); if (!studentsCache.length) loadStudents(true); if (ib.sel) ibLoadThread(false); }
         else if (name === "security") loadSecurity();
+        else if (name === "maint") loadMaint(true);
       }
       function openSol(name, after) {
         const b = document.querySelector('.tab-btn[data-tab="students"]');
@@ -3295,6 +3437,7 @@
         b.addEventListener("click", () => {
           $h("admin-main").classList.toggle("sol-wide", b.dataset.tab === "students");
           if (b.dataset.tab === "students" && $h("sol-dash").classList.contains("active") && Date.now() - hxLast > 10000) loadSolDash();
+          if (b.dataset.tab === "students") loadMaint(false); // لإظهار شارة "متوقف" في الشريط
         })
       );
       $h("hx-insights").addEventListener("click", (e) => {
@@ -3362,6 +3505,7 @@
         { k: "awaiting", t: "الرسائل: بانتظار ردّي", i: "fa-reply", run: () => openSol("inbox", () => { ib.filter = "await"; ibRenderList(); }) },
         { k: "newchat", t: "بدء محادثة جديدة", i: "fa-pen-to-square", run: () => openSol("inbox", ncOpen) },
         { k: "readall", t: "تعليم كل الرسائل كمقروءة", i: "fa-check-double", run: () => openSol("inbox", () => $h("ib-readall").click()) },
+        { k: "maint", t: "إيقاف / تشغيل موقع الحلول", i: "fa-power-off", run: () => openSol("maint") },
         { k: "security", t: "الأمان والحظر", i: "fa-shield-halved", run: () => openSol("security") },
         { k: "students", t: "الطلاب", i: "fa-user-graduate", run: () => openSol("students") },
         { k: "unread", t: "الرسائل: غير المقروءة", i: "fa-envelope", run: () => openSol("inbox", () => { ib.filter = "unread"; ibRenderList(); }) },

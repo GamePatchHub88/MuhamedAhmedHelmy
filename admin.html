@@ -1436,6 +1436,15 @@
               <button id="mt-toggle" class="admin-btn" type="button" style="width:auto;white-space:nowrap" disabled><i class="fas fa-power-off"></i> <span id="mt-toggle-l">...</span></button>
             </div>
 
+            <div class="mt-card" id="rc-state">
+              <div class="mt-ic" id="rc-ic"><i class="fas fa-database"></i></div>
+              <div style="flex:1;min-width:200px">
+                <div class="mt-st" id="rc-st">جاري التحميل...</div>
+                <div class="mt-sub" id="rc-sub">عند إيقاف التسجيل يفتح الموقع للجميع دون طلب الاسم، ولا يُكتب أي شيء في قاعدة البيانات (الطلاب والرسائل والتقييمات) فيرتاح المعالج. زر «شاركنا رأيك» يعرض: التقييمات مغلقة الآن لتقليل الاستهلاك.</div>
+              </div>
+              <button id="rc-toggle" class="admin-btn" type="button" style="width:auto;white-space:nowrap" disabled><i class="fas fa-database"></i> <span id="rc-toggle-l">...</span></button>
+            </div>
+
             <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
               <h2 class="text-lg font-bold text-white mb-1">الرسالة التي تظهر للزوار</h2>
               <p class="text-xs text-muted mb-6">تظهر في صفحة كاملة بتصميم ثابت فوق الموقع. اكتب سبب الإيقاف وموعد العودة إن وُجد. الأسطر الجديدة تُحفظ كما كتبتها.</p>
@@ -3378,6 +3387,41 @@
         }
       }
 
+      /* ---------- مفتاح تسجيل بيانات الزوار على القاعدة ---------- */
+      let rcState = null, rcBusy = false;
+      function rcRender() {
+        const off = !!(rcState && !rcState.enabled);
+        const card = $h("rc-state");
+        card.classList.toggle("on", off);
+        card.classList.toggle("off", !off && !!rcState);
+        $h("rc-st").textContent = !rcState ? "جاري التحميل..." : off ? "التسجيل على قاعدة البيانات متوقف" : "التسجيل على قاعدة البيانات يعمل";
+        $h("rc-sub").textContent = !rcState ? "" : off
+          ? (rcState.env_off ? "متوقف من متغير RECORDING=off في Vercel؛ احذفه لإعادة التشغيل من هنا. " : "") + "الموقع مفتوح للزوار بلا بوابة اسم ولا رسائل، والتقييمات مغلقة. قد يستغرق ظهور التغيير حتى دقيقة."
+          : "الطلاب والرسائل والتقييمات تُسجَّل كالمعتاد. أوقفه لإراحة المعالج عند الضغط.";
+        const b = $h("rc-toggle");
+        b.disabled = !rcState || rcBusy || !!(rcState && rcState.env_off);
+        b.style.background = off ? "" : "linear-gradient(135deg,#ef4444,#f97316)";
+        $h("rc-toggle-l").textContent = off ? "إعادة تشغيل التسجيل" : "إيقاف التسجيل";
+        $h("rc-ic").innerHTML = '<i class="fas ' + (off ? "fa-pause" : "fa-database") + '"></i>';
+      }
+      async function loadRec() {
+        try { rcState = await sApi("/admin/solutions/recording"); rcRender(); }
+        catch (e) { $h("rc-st").textContent = "تعذر تحميل حالة التسجيل"; $h("rc-sub").textContent = e.message; }
+      }
+      $h("rc-toggle").addEventListener("click", async () => {
+        if (!rcState) return;
+        const enable = !rcState.enabled;
+        if (!confirm(enable ? "إعادة تشغيل تسجيل البيانات على قاعدة البيانات؟" : "إيقاف تسجيل البيانات؟ سيفتح الموقع بلا بوابة اسم وتُغلق التقييمات والرسائل.")) return;
+        rcBusy = true; rcRender();
+        try {
+          const r = await sApi("/admin/solutions/recording", { method: "PUT", body: { enabled: enable } });
+          if (r && r.error) throw new Error(r.error);
+          rcState = r;
+          toast(enable ? "تمت إعادة تشغيل التسجيل" : "تم إيقاف التسجيل", true);
+        } catch (e) { toast("تعذر الحفظ: " + e.message, false); }
+        rcBusy = false; rcRender();
+      });
+
       function mtCount() { $h("mt-count").textContent = $h("mt-msg").value.length + " / 1500"; }
 
       async function mtSave(enabled, textOnly) {
@@ -3482,7 +3526,7 @@
         else if (name === "reviews") loadSolReviews();
         else if (name === "inbox") { ibLoadConvs(true); if (!studentsCache.length) loadStudents(true); if (ib.sel) ibLoadThread(false); }
         else if (name === "security") loadSecurity();
-        else if (name === "maint") { loadMaint(true); loadAccess(); }
+        else if (name === "maint") { loadMaint(true); loadAccess(); loadRec(); }
       }
       function openSol(name, after) {
         const b = document.querySelector('.tab-btn[data-tab="students"]');

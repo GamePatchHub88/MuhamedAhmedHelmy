@@ -970,6 +970,22 @@ function makeLogic({ db, ObjectId }) {
     return siteShape(await settings.findOne({ _id: "maintenance" }));
   }
 
+  /* ---------- مفتاح تسجيل بيانات الزوار على القاعدة (طلاب/رسائل/تقييمات) ----------
+     الافتراضي: يعمل. عند إيقافه يرفض الخادم كل طلبات التسجيل فورًا من الكاش دون لمس قاعدة الطلاب */
+  let recCache = null;
+  async function recordingState() {
+    if (recCache && recCache.exp > Date.now()) return recCache.v;
+    const d = await settings.findOne({ _id: "recording" });
+    const v = { enabled: !d || d.enabled !== false, updated_at: d && d.updated_at ? new Date(d.updated_at).toISOString() : null };
+    recCache = { v, exp: Date.now() + 15000 };
+    return v;
+  }
+  async function setRecording(enabled) {
+    await settings.updateOne({ _id: "recording" }, { $set: { enabled: !!enabled, updated_at: new Date() } }, { upsert: true });
+    recCache = null;
+    return recordingState();
+  }
+
   /* ---------- روابط الوصول الخاصة (أشخاص معينون يدخلون والموقع متوقف) ---------- */
   const CODE_RE = /^[A-Za-z0-9]{8,40}$/;
   const accCache = new Map(); // code -> { v: doc|null, exp }
@@ -1027,7 +1043,7 @@ function makeLogic({ db, ObjectId }) {
     adminStats, adminBulk, adminBroadcast, adminReviewsPublishAll,
     adminConversations, adminSearchMessages, adminMarkUnread, adminReadAll, adminDeleteMessage, adminConvMeta, adminBans,
     accessValid, accessUse, adminAccessList, adminAccessCreate, adminAccessDelete,
-    siteStatus, publicSiteStatus, adminSiteStatus, adminSiteStatusSave,
+    siteStatus, publicSiteStatus, adminSiteStatus, adminSiteStatusSave, recordingState, setRecording,
     ensureIndexes,
   };
 }

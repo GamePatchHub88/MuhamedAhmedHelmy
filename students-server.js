@@ -13,6 +13,8 @@ const SUPABASE_ANON_KEY =
   process.env.SUPABASE_ANON_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnY2ZhanJ3Zm11bndvcW1uZXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzNDg3ODQsImV4cCI6MjA5ODkyNDc4NH0.sR7YNvM3YKGQkavCN617r9B30oEwf06dCuuRz83ojlE";
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
+// إيقاف التسجيل من متغيرات Vercel دون أي اتصال بالقاعدة: RECORDING=off (احذفه أو اجعله on لإعادة التشغيل)
+const ENV_OFF = /^(off|0|false)$/i.test(String(process.env.RECORDING || "").trim());
 const ALLOWED = (process.env.ALLOWED_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
 
 // اتصال واحد يُعاد استخدامه (مهم على Vercel)
@@ -102,6 +104,15 @@ async function stopGuard(req, res, next) {
   next();
 }
 rpc.use(stopGuard);
+// تسجيل البيانات متوقف (من لوحة الإدارة): لا كتابة ولا قراءة في قاعدة الطلاب/الرسائل/التقييمات
+async function recGuard(_req, res, next) {
+  try {
+    if (ENV_OFF) return res.json({ status: "paused" });
+    if (!(await (await getLogic()).recordingState()).enabled) return res.json({ status: "paused" });
+  } catch (_) { /* لو تعذّر الفحص لا نمنع الموقع */ }
+  next();
+}
+rpc.use(recGuard);
 const UA = (r) => r.headers["user-agent"] || "";
 // عنوان IP الحقيقي للزائر خلف Vercel (الأولوية لرؤوس المنصة ثم req.ip)
 const IP = (r) => {
@@ -149,6 +160,16 @@ const cacheJson = (fn) => async (req, res) => {
   }
 };
 pub.get("/reviews", stopGuard, cacheJson((l) => l.publicReviews()));
+// حالة التسجيل (كاش CDN 30 ثانية): enabled=false تعني أن الموقع لا يسجّل شيئًا على القاعدة
+pub.get("/recording", async (_req, res) => {
+  try {
+    const enabled = ENV_OFF ? false : (await (await getLogic()).recordingState()).enabled;
+    res.set("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120").json({ enabled });
+  } catch (e) {
+    console.error(e);
+    res.set("Cache-Control", "no-store").json({ enabled: true });
+  }
+});
 // حالة الموقع (متوقف/يعمل + الرسالة): كاش قصير على CDN لتتحمل ملايين الزيارات دون ضغط على الخادم
 pub.get("/site-status", async (_req, res) => {
   try {
@@ -223,6 +244,8 @@ admin.post("/broadcast", wrap((l, r) => l.adminBroadcast(r.body || {})));
 admin.post("/solutions/reviews/publish-all", wrap((l) => l.adminReviewsPublishAll()));
 
 /* إيقاف الموقع مؤقتًا + الرسالة الثابتة */
+admin.get("/solutions/recording", wrap(async (l) => ({ ...(await l.recordingState()), enabled: ENV_OFF ? false : (await l.recordingState()).enabled, env_off: ENV_OFF })));
+admin.put("/solutions/recording", wrap(async (l, r) => ({ ...(await l.setRecording(!!(r.body || {}).enabled)), env_off: ENV_OFF })));
 admin.get("/solutions/maintenance", wrap((l) => l.adminSiteStatus()));
 admin.put("/solutions/maintenance", wrap((l, r) => l.adminSiteStatusSave(r.body || {})));
 

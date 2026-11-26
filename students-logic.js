@@ -150,6 +150,7 @@ function makeLogic({ db, ObjectId }) {
   const convmeta = db.collection("qureo_convmeta"); // تثبيت المحادثات وملاحظات المدير الخاصة
   const settings = db.collection("qureo_settings"); // إعدادات الموقع (وضع الإيقاف المؤقت)
   const access = db.collection("qureo_access"); // رموز دخول أشخاص معينين أثناء إيقاف الموقع
+  const partners = db.collection("qureo_partners"); // شركاء الموقع (شعار + اسم + رابط)
   // كاش قصير جدًا لقائمة المحادثات (يُبطَل عند أي كتابة) حتى لا يضغط الاستطلاع الدوري على القاعدة
   let convCache = null;
   const bustConv = () => { convCache = null; };
@@ -928,6 +929,7 @@ function makeLogic({ db, ObjectId }) {
     await messages.createIndex({ kind: 1 });
     await convmeta.createIndex({ device_id: 1 }, { unique: true });
     await access.createIndex({ code: 1 }, { unique: true });
+    await partners.createIndex({ active: 1, order: 1, created_at: 1 });
   }
 
   /* ---------- إيقاف موقع الحلول مؤقتًا (وضع الصيانة) ---------- */
@@ -1036,6 +1038,132 @@ function makeLogic({ db, ObjectId }) {
     return r.deletedCount > 0;
   }
 
+  /* =========================================================
+     الشركاء (تعاونات) + شريط الإعلان
+     - الشعار يُحفظ كصورة base64 (png/jpeg/webp/svg ≤ 300KB) أو كرابط خارجي
+     - placement: both | top | footer — أين يظهر الشريك في موقع الحلول
+     - الزوار يحصلون على كل شيء في طلب واحد مخزَّن على CDN: publicExtras
+  ========================================================= */
+  const LOGO_MAX = 300 * 1024;
+  const LOGO_RE = /^data:(image\/(?:png|jpeg|webp|svg\+xml));base64,([A-Za-z0-9+/=]+)$/;
+  const urlOk = (u) => /^https?:\/\/[^\s<>"']{3,500}$/i.test(u || "");
+  const partnerOut = (r, full) => {
+    const o = {
+      id: String(r._id), name: r.name, url: r.url || "", tagline: r.tagline || "",
+      logo_url: r.logo_url || "", has_logo: !!r.logo, placement: r.placement || "both",
+      order: r.order || 0, active: r.active !== false, clicks: r.clicks || 0,
+      v: r.updated_at ? new Date(r.updated_at).getTime() : 0, created_at: r.created_at,
+    };
+    return full ? o : { id: o.id, name: o.name, url: o.url, tagline: o.tagline, logo_url: o.logo_url, has_logo: o.has_logo, placement: o.placement, v: o.v };
+  };
+  const annShape = (d) => ({
+    enabled: !!(d && d.enabled),
+    text: String((d && d.text) || "").slice(0, 220),
+    link: (d && d.link) || "",
+    link_label: String((d && d.link_label) || "").slice(0, 30),
+    tone: ["info", "success", "warn", "promo"].includes(d && d.tone) ? d.tone : "info",
+    dismissible: !d || d.dismissible !== false,
+    rev: d && d.rev ? Number(d.rev) : 0,
+    updated_at: d && d.updated_at ? new Date(d.updated_at).toISOString() : null,
+  });
+  let extrasCache = null;
+  async function publicExtras() {
+    if (extrasCache && extrasCache.exp > Date.now()) return extrasCache.v;
+    const [rows, ad] = await Promise.all([
+      partners.find({ active: { $ne: false } }, { projection: { logo: 0 } }).sort({ order: 1, created_at: 1 }).limit(60).toArray(),
+      settings.findOne({ _id: "announcement" }),
+    ]);
+    const a = annShape(ad);
+    const v = {
+      partners: rows.map((r) => partnerOut(r, false)),
+      announcement: a.enabled && a.text ? { text: a.text, link: a.link, link_label: a.link_label, tone: a.tone, dismissible: a.dismissible, rev: a.rev } : null,
+    };
+    extrasCache = { v, exp: Date.now() + 20000 };
+    return v;
+  }
+  async function partnerLogo(id) {
+    const _id = toId(id);
+    if (!_id) return null;
+    const r = await partners.findOne({ _id }, { projection: { logo: 1 } });
+    const m = r && r.logo && LOGO_RE.exec(r.logo);
+    return m ? { mime: m[1], buf: Buffer.from(m[2], "base64") } : null;
+  }
+  async function partnerClick(id) {
+    const _id = toId(id);
+    if (!_id) return false;
+    await partners.updateOne({ _id }, { $inc: { clicks: 1 } }).catch(() => {});
+    return true;
+  }
+  async function adminPartners() {
+    const rows = await partners.find({}, { projection: { logo: 0 } }).sort({ order: 1, created_at: 1 }).limit(200).toArray();
+    return { partners: rows.map((r) => partnerOut(r, true)) };
+  }
+  // إنشاء (بدون id) أو تعديل (مع id). logo: dataURL جديد، أو "" لحذف الشعار، أو undefined للإبقاء عليه
+  async function adminPartnerSave(b) {
+    b = b || {};
+    const name = clip(b.name, 50), tagline = clip(b.tagline, 90);
+    if (name.length < 2) return { status: "invalid", error: "اكتب اسم الشريك (حرفان على الأقل)" };
+    const url = String(b.url || "").trim();
+    if (url && !urlOk(url)) return { status: "invalid", error: "رابط الموقع يجب أن يبدأ بـ https://" };
+    const logo_url = String(b.logo_url || "").trim();
+    if (logo_url && !urlOk(logo_url)) return { status: "invalid", error: "رابط الشعار يجب أن يبدأ بـ https://" };
+    const placement = ["both", "top", "footer"].includes(b.placement) ? b.placement : "both";
+    const order = Math.max(-9999, Math.min(9999, Math.round(Number(b.order) || 0)));
+    const active = b.active !== false;
+    const set = { name, url, tagline, logo_url, placement, order, active, updated_at: new Date() };
+    if (typeof b.logo === "string") {
+      if (b.logo === "") set.logo = null;
+      else {
+        const m = LOGO_RE.exec(b.logo);
+        if (!m) return { status: "invalid", error: "صيغة الشعار غير مدعومة (PNG أو JPG أو WebP أو SVG)" };
+        if (Buffer.byteLength(m[2], "base64") > LOGO_MAX) return { status: "invalid", error: "حجم الشعار أكبر من 300KB" };
+        set.logo = b.logo;
+      }
+    }
+    extrasCache = null;
+    if (b.id) {
+      const _id = toId(b.id);
+      if (!_id) return { status: "invalid" };
+      const res = await partners.updateOne({ _id }, { $set: set });
+      return { status: res.matchedCount ? "ok" : "not_found" };
+    }
+    if ((await partners.countDocuments({})) >= 60) return { status: "invalid", error: "وصلت للحد الأقصى (60 شريكًا)" };
+    await partners.insertOne({ ...set, logo: set.logo || null, clicks: 0, created_at: new Date() });
+    return { status: "ok" };
+  }
+  async function adminPartnerDelete(id) {
+    const _id = toId(id);
+    if (!_id) return false;
+    extrasCache = null;
+    return (await partners.deleteOne({ _id })).deletedCount > 0;
+  }
+  async function adminPartnersReorder(ids) {
+    const list = (Array.isArray(ids) ? ids : []).slice(0, 200).map(toId).filter(Boolean);
+    if (!list.length) return { status: "invalid" };
+    await partners.bulkWrite(list.map((_id, i) => ({ updateOne: { filter: { _id }, update: { $set: { order: i + 1 } } } })));
+    extrasCache = null;
+    return { status: "ok" };
+  }
+  async function adminAnnouncement() {
+    return annShape(await settings.findOne({ _id: "announcement" }));
+  }
+  async function adminAnnouncementSave(b) {
+    b = b || {};
+    const text = clip(b.text, 220);
+    const enabled = !!b.enabled;
+    if (enabled && text.length < 3) return { error: "اكتب نص الإعلان قبل تفعيله" };
+    const link = String(b.link || "").trim();
+    if (link && !urlOk(link)) return { error: "رابط الإعلان يجب أن يبدأ بـ https://" };
+    const tone = ["info", "success", "warn", "promo"].includes(b.tone) ? b.tone : "info";
+    await settings.updateOne(
+      { _id: "announcement" },
+      { $set: { enabled, text, link, link_label: clip(b.link_label, 30), tone, dismissible: b.dismissible !== false, updated_at: new Date() }, $inc: { rev: 1 } },
+      { upsert: true }
+    );
+    extrasCache = null;
+    return annShape(await settings.findOne({ _id: "announcement" }));
+  }
+
   return {
     check, register, inbox, audio, markRead, send,
     image, adminImage, adminList, adminSetStatus, adminDeleteStudent, adminMessages, adminAudio, adminSend, adminUnlock, adminSetBan, adminClear,
@@ -1044,6 +1172,7 @@ function makeLogic({ db, ObjectId }) {
     adminConversations, adminSearchMessages, adminMarkUnread, adminReadAll, adminDeleteMessage, adminConvMeta, adminBans,
     accessValid, accessUse, adminAccessList, adminAccessCreate, adminAccessDelete,
     siteStatus, publicSiteStatus, adminSiteStatus, adminSiteStatusSave, recordingState, setRecording,
+    publicExtras, partnerLogo, partnerClick, adminPartners, adminPartnerSave, adminPartnerDelete, adminPartnersReorder, adminAnnouncement, adminAnnouncementSave,
     ensureIndexes,
   };
 }

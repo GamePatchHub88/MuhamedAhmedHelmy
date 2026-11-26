@@ -170,6 +170,31 @@ pub.get("/recording", async (_req, res) => {
     res.set("Cache-Control", "no-store").json({ enabled: true });
   }
 });
+// الشركاء + شريط الإعلان في طلب واحد (كاش CDN)
+pub.get("/extras", stopGuard, cacheJson((l) => l.publicExtras()));
+// شعار شريك (صورة مخزّنة في القاعدة؛ يُخزَّن طويلًا لأن الرابط يحمل ?v= يتغير عند التعديل)
+pub.get("/partner-logo/:id", async (req, res) => {
+  try {
+    const r = await (await getLogic()).partnerLogo(req.params.id);
+    if (!r) return res.status(404).end();
+    res.set({
+      "Content-Type": r.mime,
+      "Cache-Control": "public, max-age=86400, s-maxage=2592000, immutable",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+      "Cross-Origin-Resource-Policy": "cross-origin",
+    });
+    res.end(r.buf);
+  } catch (e) {
+    console.error(e);
+    res.status(500).end();
+  }
+});
+// عدّاد نقرات الشريك (sendBeacon)
+pub.post("/partner-click/:id", async (req, res) => {
+  try { await (await getLogic()).partnerClick(req.params.id); } catch (_) { /* تجاهل */ }
+  res.status(204).end();
+});
 // حالة الموقع (متوقف/يعمل + الرسالة): كاش قصير على CDN لتتحمل ملايين الزيارات دون ضغط على الخادم
 pub.get("/site-status", async (_req, res) => {
   try {
@@ -258,6 +283,13 @@ admin.delete("/solutions/access/:id", wrap(async (l, r) => ({ ok: await l.adminA
 admin.get("/solutions/reviews", wrap((l) => l.adminReviews()));
 admin.post("/solutions/reviews", wrap((l, r) => l.adminReviewSave(r.body || {})));
 admin.delete("/solutions/reviews/:id", wrap(async (l, r) => ({ ok: await l.adminReviewDelete(r.params.id) })));
+/* الشركاء (التعاونات) + شريط الإعلان */
+admin.get("/solutions/partners", wrap((l) => l.adminPartners()));
+admin.post("/solutions/partners", wrap((l, r) => l.adminPartnerSave(r.body || {})));
+admin.put("/solutions/partners-order", wrap((l, r) => l.adminPartnersReorder((r.body || {}).ids)));
+admin.delete("/solutions/partners/:id", wrap(async (l, r) => ({ ok: await l.adminPartnerDelete(r.params.id) })));
+admin.get("/solutions/announcement", wrap((l) => l.adminAnnouncement()));
+admin.put("/solutions/announcement", wrap((l, r) => l.adminAnnouncementSave(r.body || {})));
 /* قياس سرعة الخادم وقاعدة البيانات (تبويب "سرعة الموقع" في لوحة المدير) */
 const msSince = (t) => Math.round((Number(process.hrtime.bigint() - t) / 1e6) * 10) / 10;
 async function timed(fn) {

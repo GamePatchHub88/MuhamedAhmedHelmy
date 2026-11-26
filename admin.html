@@ -260,6 +260,42 @@
       .rv-text { font-size: .8rem; color: var(--muted); line-height: 1.8; margin-top: .25rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
       .sol-icon-btn { background: none; border: none; cursor: pointer; font-size: .95rem; padding: .25rem; }
 
+      /* ---------- تحسينات شكل لوحة موقع الحلول ---------- */
+      .sol-nav { position: sticky; top: 64px; z-index: 20; padding: .5rem; margin-inline: -.5rem; border-radius: 20px; background: rgba(var(--panel-rgb), .78); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--line); box-shadow: 0 14px 30px -24px rgba(0,0,0,.8); }
+      .sol-btn { border-color: transparent; border-radius: 12px; }
+      .sol-btn:hover { background: rgba(var(--violet-rgb), .1); }
+      .sol-btn.active { box-shadow: 0 10px 22px -14px rgba(var(--violet-rgb), .95); }
+      .sol-pane .bg-panel { transition: border-color .25s, box-shadow .25s; }
+      .sol-pane .bg-panel:hover { border-color: rgba(var(--violet-rgb), .35); box-shadow: 0 18px 40px -30px rgba(var(--violet-rgb), .9); }
+      .hx-row { transition: border-color .2s, transform .2s, background .2s; }
+      .hx-row:hover { border-color: rgba(var(--cyan-rgb), .4); transform: translateY(-1px); }
+      .stat-chip { border-radius: 14px; }
+      @media (max-width: 640px) { .sol-nav { top: 56px; } }
+
+      /* ---------- الشركاء والإعلان ---------- */
+      .pt-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+      @media (max-width: 640px) { .pt-grid2 { grid-template-columns: 1fr; } }
+      .pt-pv { display: flex; flex-wrap: wrap; gap: 1rem; align-items: stretch; margin-top: 1.1rem; padding: 1rem; border-radius: 16px; border: 1px dashed var(--line); background: #0a1020; }
+      .pt-pv small { display: block; width: 100%; color: #8fa0c8; font-size: .7rem; margin-bottom: -.4rem; }
+      .pt-pv-tile { display: inline-flex; align-items: center; gap: .55rem; height: 40px; padding: 0 .9rem 0 .75rem; border-radius: 12px; background: #fff; color: #0f1a33; font-weight: 800; font-size: .8rem; white-space: nowrap; }
+      .pt-pv-tile img { height: 24px; max-width: 92px; object-fit: contain; }
+      .pt-pv-card { display: flex; flex-direction: column; align-items: center; gap: .5rem; width: 150px; padding: .7rem; border-radius: 16px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: #e9efff; text-align: center; font-weight: 800; font-size: .8rem; }
+      .pt-pv-card .lg { display: grid; place-items: center; width: 100%; height: 56px; border-radius: 12px; background: #fff; }
+      .pt-pv-card .lg img { max-width: 90%; max-height: 38px; object-fit: contain; }
+      .pt-pv-card em { font-style: normal; color: #9ba9d0; font-weight: 500; font-size: .7rem; }
+      .pt-ini { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg,#b8f23d,#2dd4bf); color: #0b1400; font-weight: 900; font-size: .8rem; }
+      .pt-thumb { flex: none; display: grid; place-items: center; width: 64px; height: 44px; border-radius: 10px; background: #fff; overflow: hidden; }
+      .pt-thumb img { max-width: 88%; max-height: 32px; object-fit: contain; }
+      .pt-badge { font-size: .66rem; font-weight: 800; padding: .1rem .5rem; border-radius: 99px; background: rgba(var(--cyan-rgb), .14); color: var(--cyan); white-space: nowrap; }
+      .pt-badge.off { background: rgba(248,113,113,.16); color: #f87171; }
+      .pt-logo-row { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+      .pt-ann-pv { margin: 1.1rem 0 1.3rem; border-radius: 14px; overflow: hidden; }
+      .pt-ann-pv .a { display: flex; align-items: center; justify-content: center; gap: .6rem; flex-wrap: wrap; padding: .6rem 1rem; font-size: .82rem; font-weight: 700; color: #e9efff; background: linear-gradient(90deg,#10182d,#1a2a55,#10182d); text-align: center; }
+      .pt-ann-pv .a.success { background: linear-gradient(90deg,#0c3a2a,#11503a,#0c3a2a); }
+      .pt-ann-pv .a.warn { background: linear-gradient(90deg,#fbbf24,#fcd34d,#fbbf24); color: #3a2600; }
+      .pt-ann-pv .a.promo { background: linear-gradient(90deg,#b8f23d,#2dd4bf); color: #0b1400; }
+      .pt-ann-pv .a u { text-decoration: none; padding: .05rem .6rem; border-radius: 99px; background: rgba(255,255,255,.18); font-size: .74rem; }
+
       /* ---------- Ribbon badge + edit mode ---------- */
       .swatches { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
       .swatch {
@@ -1303,6 +1339,7 @@
             <button class="sol-btn" type="button" data-sol="inbox"><i class="fas fa-inbox"></i> الرسائل <span id="sol-unread-badge" class="sol-badge" style="background:#f87171;color:#fff" hidden>0</span></button>
             <button class="sol-btn" type="button" data-sol="students"><i class="fas fa-user-graduate"></i> الطلاب</button>
             <button class="sol-btn" type="button" data-sol="reviews"><i class="fas fa-star"></i> تقييمات الطلاب <span id="sol-pending-badge" class="sol-badge" hidden>0</span></button>
+            <button class="sol-btn" type="button" data-sol="partners"><i class="fas fa-handshake"></i> الشركاء والإعلان</button>
             <button class="sol-btn" type="button" data-sol="maint" id="sol-maint-btn"><i class="fas fa-power-off"></i> إيقاف الموقع <span id="sol-maint-dot" class="sol-badge" style="background:#f87171;color:#fff" hidden>متوقف</span></button>
             <button class="sol-btn" type="button" data-sol="security"><i class="fas fa-shield-halved"></i> الأمان والحظر <span id="sol-sec-badge" class="sol-badge" hidden>0</span></button>
             <button class="sol-btn" type="button" id="hx-open-pal" title="لوحة الأوامر (Ctrl+K)" style="margin-inline-start:auto"><i class="fas fa-terminal"></i> <span class="mono" style="font-size:.72rem">Ctrl+K</span></button>
@@ -1536,6 +1573,120 @@
               <div id="srv-list"></div>
             </div>
           </div>
+          <!-- ===== (2.5) الشركاء + شريط الإعلان ===== -->
+          <div class="sol-pane" id="sol-partners">
+            <div class="flex items-center gap-3 mb-8" style="flex-wrap: wrap">
+              <span class="stat-chip">الشركاء: <b id="pt-count">0</b></span>
+              <span class="stat-chip">ظاهر في الموقع: <b id="pt-active" style="color:#4ade9b">0</b></span>
+              <span class="stat-chip">إجمالي النقرات: <b id="pt-clicks" style="color:var(--cyan)">0</b></span>
+              <button id="pt-refresh" class="admin-btn" type="button" style="width:auto;padding:.55rem 1rem;margin-inline-start:auto"><i class="fas fa-rotate"></i> تحديث</button>
+            </div>
+
+            <div class="bg-panel border border-line rounded-2xl p-7 mb-8" id="pt-form-card">
+              <h2 class="text-lg font-bold text-white mb-1" id="pt-form-title">إضافة شريك جديد</h2>
+              <p class="text-xs text-muted mb-6">يظهر الشريك في شريط متحرك أعلى موقع الحلول وفي بطاقات داخل الفوتر، حسب اختيارك. الشعار اختياري: بدونه يظهر أول حرف من الاسم.</p>
+              <div class="pt-grid2 mb-5">
+                <div>
+                  <label class="admin-label">اسم الشريك</label>
+                  <input id="pt-name" type="text" maxlength="50" class="admin-input" placeholder="مثال: أكاديمية النور" />
+                </div>
+                <div>
+                  <label class="admin-label">رابط موقع الشريك (اختياري)</label>
+                  <input id="pt-url" type="url" dir="ltr" class="admin-input" placeholder="https://example.com" />
+                </div>
+              </div>
+              <div class="mb-5">
+                <label class="admin-label">وصف قصير (يظهر في الفوتر)</label>
+                <input id="pt-tagline" type="text" maxlength="90" class="admin-input" placeholder="مثال: شريك تعليمي" />
+              </div>
+              <div class="mb-5">
+                <label class="admin-label">شعار الشريك (PNG / JPG / WebP / SVG)</label>
+                <div class="pt-logo-row">
+                  <div class="pt-thumb" id="pt-thumb"><span class="pt-ini">؟</span></div>
+                  <button id="pt-pick" class="admin-btn admin-btn-ghost" type="button" style="width:auto"><i class="fas fa-upload"></i> رفع شعار</button>
+                  <button id="pt-rmlogo" class="admin-btn admin-btn-ghost" type="button" style="width:auto;color:#f87171" hidden><i class="fas fa-trash"></i> إزالة الشعار</button>
+                  <input id="pt-file" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden />
+                </div>
+                <p class="text-xs text-muted" style="margin-top:.5rem">تُصغَّر الصور الكبيرة تلقائيًا. أو الصق رابط شعار مباشر بدلًا من الرفع:</p>
+                <input id="pt-logourl" type="url" dir="ltr" class="admin-input" placeholder="https://.../logo.png" style="margin-top:.4rem" />
+              </div>
+              <div class="pt-grid2 mb-2">
+                <div>
+                  <label class="admin-label">مكان الظهور</label>
+                  <select id="pt-place" class="admin-select">
+                    <option value="both" selected>أعلى الصفحة + الفوتر</option>
+                    <option value="top">أعلى الصفحة فقط</option>
+                    <option value="footer">الفوتر فقط</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="admin-label">الحالة</label>
+                  <select id="pt-act" class="admin-select">
+                    <option value="1" selected>ظاهر</option>
+                    <option value="0">مخفي مؤقتًا</option>
+                  </select>
+                </div>
+              </div>
+              <div class="pt-pv" aria-label="معاينة">
+                <small>معاينة مباشرة</small>
+                <span class="pt-pv-tile" id="pt-pv-tile"></span>
+                <span class="pt-pv-card" id="pt-pv-card"></span>
+              </div>
+              <div class="flex items-center gap-3 mt-5" style="flex-wrap:wrap">
+                <button id="pt-save" class="admin-btn" type="button" style="width:auto"><i class="fas fa-plus"></i> <span id="pt-save-label">إضافة الشريك</span></button>
+                <button id="pt-cancel" class="admin-btn admin-btn-ghost" type="button" style="width:auto" hidden>إلغاء التعديل</button>
+              </div>
+            </div>
+
+            <div class="bg-panel border border-line rounded-2xl p-7 mb-8">
+              <h2 class="text-lg font-bold text-white mb-1">كل الشركاء</h2>
+              <p class="text-xs text-muted mb-5">الترتيب هنا هو ترتيب الظهور في الموقع. استخدم <i class="fas fa-arrow-up"></i> <i class="fas fa-arrow-down"></i> للتحريك، والعين للإظهار/الإخفاء.</p>
+              <div id="pt-list"></div>
+            </div>
+
+            <div class="bg-panel border border-line rounded-2xl p-7" id="ann-card">
+              <h2 class="text-lg font-bold text-white mb-1"><i class="fas fa-bullhorn" style="color:var(--cyan)"></i> شريط الإعلان العلوي</h2>
+              <p class="text-xs text-muted mb-6">رسالة قصيرة تظهر في أعلى موقع الحلول لكل الزوار (مثل: إضافة حلول جديدة). يستطيع الزائر إغلاقها، وتعود للظهور إذا حفظت إعلانًا جديدًا.</p>
+              <div class="mb-5">
+                <label class="admin-label">نص الإعلان</label>
+                <input id="ann-text" type="text" maxlength="220" class="admin-input" placeholder="مثال: تمت إضافة حلول جديدة للصف الثاني الثانوي" />
+              </div>
+              <div class="pt-grid2 mb-5">
+                <div>
+                  <label class="admin-label">نص الزر (اختياري)</label>
+                  <input id="ann-label" type="text" maxlength="30" class="admin-input" placeholder="اعرف المزيد" />
+                </div>
+                <div>
+                  <label class="admin-label">رابط الزر (اختياري)</label>
+                  <input id="ann-link" type="url" dir="ltr" class="admin-input" placeholder="https://..." />
+                </div>
+              </div>
+              <div class="pt-grid2 mb-2">
+                <div>
+                  <label class="admin-label">اللون</label>
+                  <select id="ann-tone" class="admin-select">
+                    <option value="info">أزرق داكن (معلومة)</option>
+                    <option value="promo">أخضر مضيء (ترويج)</option>
+                    <option value="success">أخضر هادئ (خبر سار)</option>
+                    <option value="warn">أصفر (تنبيه)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="admin-label">الحالة</label>
+                  <select id="ann-on" class="admin-select">
+                    <option value="0">مخفي</option>
+                    <option value="1">ظاهر للزوار</option>
+                  </select>
+                </div>
+              </div>
+              <label class="text-xs text-muted" style="display:flex;align-items:center;gap:.5rem;margin-top:.9rem"><input id="ann-dis" type="checkbox" checked style="accent-color:var(--cyan)" /> يسمح للزائر بإغلاق الإعلان</label>
+              <div class="pt-ann-pv"><div class="a info" id="ann-pv"></div></div>
+              <div class="flex items-center gap-3 mt-5" style="flex-wrap:wrap">
+                <button id="ann-save" class="admin-btn" type="button" style="width:auto"><i class="fas fa-floppy-disk"></i> حفظ الإعلان</button>
+              </div>
+            </div>
+          </div>
+
           <!-- ===== (3) صندوق الرسائل ===== -->
           <div class="sol-pane" id="sol-inbox">
             <div class="ib-top">
@@ -3517,6 +3668,215 @@
         }
       });
 
+      /* ---------- الشركاء (التعاونات) + شريط الإعلان ---------- */
+      let ptCache = [], ptEditId = null, ptLogo, ptLogoPreview = "";
+      const ptLogoSrc = (p) => (p.has_logo ? "/api/public/partner-logo/" + encodeURIComponent(p.id) + "?v=" + (p.v || 0) : /^https?:\/\//i.test(p.logo_url || "") ? p.logo_url : "");
+      const ptImgOrIni = (src, name) => src ? '<img src="' + escapeHtml(src) + '" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'pt-ini\',textContent:\'؟\'}))">' : '<span class="pt-ini">' + escapeHtml((name || "؟").trim().charAt(0) || "؟") + "</span>";
+
+      // ptLogo: undefined = إبقاء الحالي، "" = حذف، "data:..." = جديد
+      function ptCurrentSrc() {
+        if (ptLogo) return ptLogo;
+        if (ptLogo === "") return $h("pt-logourl").value.trim();
+        const p = ptCache.find((x) => x.id === ptEditId);
+        return $h("pt-logourl").value.trim() || (p ? ptLogoSrc(p) : "");
+      }
+      function ptPreview() {
+        const name = $h("pt-name").value.trim() || "اسم الشريك", tag = $h("pt-tagline").value.trim(), src = ptCurrentSrc();
+        $h("pt-pv-tile").innerHTML = ptImgOrIni(src, name) + "<span>" + escapeHtml(name) + "</span>";
+        $h("pt-pv-card").innerHTML = '<span class="lg">' + ptImgOrIni(src, name) + "</span><b>" + escapeHtml(name) + "</b>" + (tag ? "<em>" + escapeHtml(tag) + "</em>" : "");
+        $h("pt-thumb").innerHTML = ptImgOrIni(src, name);
+        $h("pt-rmlogo").hidden = !(src);
+      }
+      ["pt-name", "pt-tagline", "pt-logourl"].forEach((id) => $h(id).addEventListener("input", ptPreview));
+
+      function ptReset() {
+        ptEditId = null; ptLogo = undefined;
+        ["pt-name", "pt-url", "pt-tagline", "pt-logourl"].forEach((id) => ($h(id).value = ""));
+        $h("pt-place").value = "both"; $h("pt-act").value = "1"; $h("pt-file").value = "";
+        $h("pt-form-title").textContent = "إضافة شريك جديد";
+        $h("pt-save-label").textContent = "إضافة الشريك";
+        $h("pt-cancel").hidden = true;
+        $h("pt-form-card").classList.remove("edit-mode-card");
+        ptPreview();
+      }
+      function ptStartEdit(id) {
+        const p = ptCache.find((x) => x.id === id);
+        if (!p) return;
+        ptEditId = id; ptLogo = undefined;
+        $h("pt-name").value = p.name; $h("pt-url").value = p.url; $h("pt-tagline").value = p.tagline;
+        $h("pt-logourl").value = p.logo_url || ""; $h("pt-place").value = p.placement; $h("pt-act").value = p.active ? "1" : "0";
+        $h("pt-form-title").textContent = "تعديل الشريك: " + p.name;
+        $h("pt-save-label").textContent = "حفظ التعديلات";
+        $h("pt-cancel").hidden = false;
+        $h("pt-form-card").classList.add("edit-mode-card");
+        ptPreview();
+        $h("pt-form-card").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      // رفع الشعار: SVG كما هو، والصور تُصغَّر (حد 400px) وتُحفظ PNG أو WebP لتبقى أقل من 300KB
+      function ptReadFile(file) {
+        return new Promise((resolve, reject) => {
+          const fr = new FileReader();
+          fr.onload = () => resolve(fr.result);
+          fr.onerror = () => reject(new Error("تعذر قراءة الملف"));
+          fr.readAsDataURL(file);
+        });
+      }
+      async function ptProcessLogo(file) {
+        if (!/^image\/(png|jpeg|webp|svg\+xml)$/.test(file.type)) throw new Error("الصيغة غير مدعومة");
+        const url = await ptReadFile(file);
+        if (file.type === "image/svg+xml") {
+          if (file.size > 300 * 1024) throw new Error("ملف SVG أكبر من 300KB");
+          return url;
+        }
+        const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("صورة غير صالحة")); i.src = url; });
+        const k = Math.min(1, 400 / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        let out = c.toDataURL("image/png");
+        if (out.length * 0.75 > 280 * 1024) out = c.toDataURL("image/webp", 0.88);
+        if (out.length * 0.75 > 290 * 1024) throw new Error("الصورة معقّدة جدًا، جرّب صورة أبسط");
+        return out;
+      }
+      $h("pt-pick").addEventListener("click", () => $h("pt-file").click());
+      $h("pt-file").addEventListener("change", async (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        try { ptLogo = await ptProcessLogo(f); $h("pt-logourl").value = ""; ptPreview(); }
+        catch (err) { toast(err.message, false); }
+        e.target.value = "";
+      });
+      $h("pt-rmlogo").addEventListener("click", () => { ptLogo = ""; $h("pt-logourl").value = ""; ptPreview(); });
+
+      function ptRender() {
+        const list = $h("pt-list"), act = ptCache.filter((p) => p.active);
+        $h("pt-count").textContent = ptCache.length;
+        $h("pt-active").textContent = act.length;
+        $h("pt-clicks").textContent = ptCache.reduce((n, p) => n + (p.clicks || 0), 0);
+        if (!ptCache.length) { list.innerHTML = '<p class="text-muted text-sm">لا يوجد شركاء بعد. أضف أول شريك من النموذج أعلاه.</p>'; return; }
+        const place = { both: "أعلى + فوتر", top: "أعلى فقط", footer: "فوتر فقط" };
+        list.innerHTML = ptCache.map((p, i) => `
+          <div class="hx-row" style="${p.active ? "" : "opacity:.6"}">
+            <div class="flex items-center gap-3" style="min-width:0;flex:1">
+              <div class="pt-thumb">${ptImgOrIni(ptLogoSrc(p), p.name)}</div>
+              <div style="min-width:0">
+                <div class="flex items-center gap-3" style="flex-wrap:wrap">
+                  <span class="text-sm font-bold text-white">${escapeHtml(p.name)}</span>
+                  <span class="pt-badge">${place[p.placement] || ""}</span>
+                  ${p.active ? "" : '<span class="pt-badge off">مخفي</span>'}
+                </div>
+                <div class="mono text-xs text-muted" style="overflow-wrap:anywhere">${escapeHtml(p.tagline || "—")} · <i class="fas fa-arrow-pointer"></i> ${p.clicks || 0} نقرة</div>
+                ${p.url ? `<div class="mono text-xs text-muted" dir="ltr" style="text-align:right;overflow-wrap:anywhere">${escapeHtml(p.url)}</div>` : ""}
+              </div>
+            </div>
+            <div class="flex items-center gap-3" style="flex:none">
+              <button class="sol-icon-btn" data-pt="up" data-id="${p.id}" title="تقديم" ${i === 0 ? "disabled style='opacity:.3'" : ""}><i class="fas fa-arrow-up"></i></button>
+              <button class="sol-icon-btn" data-pt="down" data-id="${p.id}" title="تأخير" ${i === ptCache.length - 1 ? "disabled style='opacity:.3'" : ""}><i class="fas fa-arrow-down"></i></button>
+              <button class="sol-icon-btn" data-pt="tog" data-id="${p.id}" title="${p.active ? "إخفاء" : "إظهار"}" style="color:${p.active ? "#f59e0b" : "#4ade9b"}"><i class="fas ${p.active ? "fa-eye-slash" : "fa-eye"}"></i></button>
+              <button class="sol-icon-btn" data-pt="edit" data-id="${p.id}" title="تعديل" style="color:var(--cyan)"><i class="fas fa-pen"></i></button>
+              <button class="sol-icon-btn" data-pt="del" data-id="${p.id}" title="حذف" style="color:#f87171"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>`).join("");
+      }
+
+      async function loadPartners(silent) {
+        const list = $h("pt-list");
+        if (silent !== true) list.innerHTML = '<p class="text-muted text-sm">جاري التحميل...</p>';
+        try { ptCache = (await sApi("/admin/solutions/partners")).partners || []; }
+        catch (e) { if (silent !== true) list.innerHTML = '<p class="text-red-400 text-sm">تعذر تحميل الشركاء: ' + escapeHtml(e.message) + "</p>"; return; }
+        ptRender();
+        ptPreview();
+      }
+      async function ptSaveOrder() {
+        try { await sApi("/admin/solutions/partners-order", { method: "PUT", body: { ids: ptCache.map((p) => p.id) } }); }
+        catch (e) { toast("تعذر حفظ الترتيب: " + e.message, false); loadPartners(true); }
+      }
+      $h("pt-list").addEventListener("click", async (e) => {
+        const b = e.target.closest("button[data-pt]");
+        if (!b || b.disabled) return;
+        const id = b.dataset.id, i = ptCache.findIndex((x) => x.id === id), p = ptCache[i], a = b.dataset.pt;
+        if (!p) return;
+        if (a === "edit") return ptStartEdit(id);
+        if (a === "up" || a === "down") {
+          const j = a === "up" ? i - 1 : i + 1;
+          if (j < 0 || j >= ptCache.length) return;
+          [ptCache[i], ptCache[j]] = [ptCache[j], ptCache[i]];
+          ptRender();
+          return ptSaveOrder();
+        }
+        if (a === "tog") {
+          try {
+            const r = await sApi("/admin/solutions/partners", { method: "POST", body: { ...p, active: !p.active } });
+            if (r.status !== "ok") throw new Error(r.error || "بيانات غير صالحة");
+            toast(p.active ? "أُخفي الشريك" : "أصبح الشريك ظاهرًا", true);
+            loadPartners(true);
+          } catch (err) { toast("تعذر التحديث: " + err.message, false); }
+          return;
+        }
+        if (a === "del") {
+          if (!confirm("حذف الشريك «" + p.name + "» نهائيًا؟")) return;
+          try {
+            await sApi("/admin/solutions/partners/" + encodeURIComponent(id), { method: "DELETE" });
+            if (ptEditId === id) ptReset();
+            toast("تم الحذف", true);
+            loadPartners(true);
+          } catch (err) { toast("تعذر الحذف: " + err.message, false); }
+        }
+      });
+      $h("pt-save").addEventListener("click", async () => {
+        const name = $h("pt-name").value.trim();
+        if (name.length < 2) return toast("اكتب اسم الشريك", false);
+        const cur = ptCache.find((x) => x.id === ptEditId);
+        const body = {
+          id: ptEditId || undefined, name, url: $h("pt-url").value.trim(), tagline: $h("pt-tagline").value.trim(),
+          logo_url: $h("pt-logourl").value.trim(), placement: $h("pt-place").value, active: $h("pt-act").value === "1",
+          order: cur ? cur.order : ptCache.length ? Math.max(...ptCache.map((x) => x.order || 0)) + 1 : 1,
+        };
+        if (ptLogo !== undefined) body.logo = ptLogo; // وإلا يبقى الشعار المحفوظ كما هو
+        const btn = $h("pt-save");
+        btn.disabled = true;
+        try {
+          const r = await sApi("/admin/solutions/partners", { method: "POST", body });
+          if (r.status !== "ok") throw new Error(r.error || (r.status === "not_found" ? "الشريك لم يعد موجودًا" : "بيانات غير صالحة"));
+          toast(ptEditId ? "تم حفظ التعديلات" : "تمت إضافة الشريك", true);
+          ptReset();
+          loadPartners(true);
+        } catch (err) { toast("تعذر الحفظ: " + err.message, false); }
+        btn.disabled = false;
+      });
+      $h("pt-cancel").addEventListener("click", ptReset);
+      $h("pt-refresh").addEventListener("click", () => { loadPartners(); loadAnn(); });
+
+      /* شريط الإعلان */
+      function annPreview() {
+        const pv = $h("ann-pv"), t = $h("ann-text").value.trim(), l = $h("ann-label").value.trim() || "اعرف المزيد";
+        pv.className = "a " + $h("ann-tone").value;
+        pv.innerHTML = "<span>" + escapeHtml(t || "هنا يظهر نص الإعلان") + "</span>" + ($h("ann-link").value.trim() ? "<u>" + escapeHtml(l) + " ‹</u>" : "");
+      }
+      ["ann-text", "ann-label", "ann-link", "ann-tone"].forEach((id) => { $h(id).addEventListener("input", annPreview); $h(id).addEventListener("change", annPreview); });
+      async function loadAnn() {
+        try {
+          const a = await sApi("/admin/solutions/announcement");
+          $h("ann-text").value = a.text || ""; $h("ann-label").value = a.link_label || ""; $h("ann-link").value = a.link || "";
+          $h("ann-tone").value = a.tone || "info"; $h("ann-on").value = a.enabled ? "1" : "0"; $h("ann-dis").checked = a.dismissible !== false;
+          annPreview();
+        } catch (_) { /* يبقى النموذج فارغًا */ }
+      }
+      $h("ann-save").addEventListener("click", async () => {
+        const btn = $h("ann-save");
+        btn.disabled = true;
+        try {
+          const r = await sApi("/admin/solutions/announcement", {
+            method: "PUT",
+            body: { text: $h("ann-text").value, link: $h("ann-link").value, link_label: $h("ann-label").value, tone: $h("ann-tone").value, enabled: $h("ann-on").value === "1", dismissible: $h("ann-dis").checked },
+          });
+          if (r.error) throw new Error(r.error);
+          toast($h("ann-on").value === "1" ? "تم حفظ الإعلان وهو ظاهر الآن (قد يتأخر حتى دقيقة)" : "تم حفظ الإعلان (مخفي)", true);
+        } catch (err) { toast("تعذر الحفظ: " + err.message, false); }
+        btn.disabled = false;
+      });
+
       /* ---------- التنقل بين الأقسام ---------- */
       function solGo(name) {
         document.querySelectorAll(".sol-btn[data-sol]").forEach((x) => x.classList.toggle("active", x.dataset.sol === name));
@@ -3526,6 +3886,7 @@
         else if (name === "reviews") loadSolReviews();
         else if (name === "inbox") { ibLoadConvs(true); if (!studentsCache.length) loadStudents(true); if (ib.sel) ibLoadThread(false); }
         else if (name === "security") loadSecurity();
+        else if (name === "partners") { loadPartners(); loadAnn(); }
         else if (name === "maint") { loadMaint(true); loadAccess(); loadRec(); }
       }
       function openSol(name, after) {
@@ -3616,6 +3977,7 @@
         { k: "online", t: "الطلاب: المتصلون الآن", i: "fa-circle", run: () => openStudentsFilter("online") },
         { k: "locked", t: "الطلاب: المحجوبون", i: "fa-lock", run: () => openStudentsFilter("locked") },
         { k: "reviews", t: "تقييمات الطلاب", i: "fa-star", run: () => openSol("reviews") },
+        { k: "partners", t: "الشركاء والإعلان", i: "fa-handshake", run: () => openSol("partners") },
         { k: "pending", t: "التقييمات قيد المراجعة", i: "fa-hourglass-half", run: () => openSol("reviews", () => { srvFilter = "pending"; renderSolReviews(); }) },
         { k: "broadcast", t: "إرسال إعلان للجميع", i: "fa-bullhorn", run: () => openSol("students", () => bcOpen()) },
         { k: "export", t: "تصدير الطلاب CSV", i: "fa-file-csv", run: () => openSol("students", stExport) },
